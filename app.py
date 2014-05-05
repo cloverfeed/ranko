@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, redirect, url_for
+from flask import Flask, render_template, flash, redirect, url_for, send_from_directory
 from flask.ext.wtf import Form
 from flask_wtf.file import FileField
 import os
@@ -58,6 +58,12 @@ def upload():
 def view_doc(id):
     doc = Document.get_by_id(id)
     return render_template('view.html', doc=doc)
+
+@app.route('/raw/<id>')
+def rawdoc(id):
+    doc = Document.get_by_id(id)
+    docdir = os.path.join(app.instance_path, 'uploads')
+    return send_from_directory(docdir, doc.filename)
 
 def main():
     pass
