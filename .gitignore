@@ -1,2 +1,4 @@
 *.pyc
 instance/secret.key
+instance/*.db
+instance/uploads
