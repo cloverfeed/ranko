@@ -1,10 +1,10 @@
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask('Review')
 
 @app.route('/')
 def home():
-    return 'hello'
+    return render_template('home.html')
 
 def main():
     pass
