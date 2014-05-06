@@ -1,7 +1,27 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div id="pdfview"></div>
+
+<div id="pdfview" class="col-md-9"></div>
+
+<div class="col-md-3">
+<div id="subnav" data-spy="affix">
+    <h3>Comments</h3>
+    <form method="POST" action="{{ url_for('post_comment') }}">
+        {{form.hidden_tag()}}
+        <p>{{form.comment()}}</p>
+        {{form.docid()}}
+        <p><input type="submit" value="Upload"></p>
+    </form>
+    <ul>
+        {% for comment in comments %}
+            <li>
+            {{comment.text}}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+</div>
 
 <script src="{{url_for('static', filename='vendor/pdfjs-1.0.21-dist/build/pdf.js')}}"></script>
 <script src="{{url_for('static', filename='js/view.js')}}"></script>
