@@ -14,17 +14,8 @@
         - uwsgi
         - uwsgi-plugin-python
 
-    - name: remove default nginx site
-      action: file path=/etc/nginx/sites-enabled/default state=absent
-
-    - name: write nginx.conf
-      action: template src=templates/nginx.conf dest=/etc/nginx/nginx.conf
-
     - name: create supervisord config folder
       action: file dest=/etc/supervisor state=directory owner=root
-
-    - name: create supervisord config
-      action: template src=templates/supervisord.conf dest=/etc/supervisord.conf
 
     - name: start supervisord service and have it run during system startup
       action: service name=supervisord state=started enabled=yes
