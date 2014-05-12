@@ -35,3 +35,7 @@
 
     - name: create webapps directory
       action: file dest=/srv/webapps state=directory
+
+  handlers:
+    - name: restart app
+      action: supervisorctl name={{app_name}} state=restarted
