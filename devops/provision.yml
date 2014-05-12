@@ -14,11 +14,8 @@
         - uwsgi
         - uwsgi-plugin-python
 
-    - name: create supervisord config folder
-      action: file dest=/etc/supervisor state=directory owner=root
-
     - name: start supervisord service and have it run during system startup
-      action: service name=supervisord state=started enabled=yes
+      action: service name=supervisor state=started enabled=yes
 
     - name: start nginx service and have it run during system startup
       action: service name=nginx state=started enabled=yes
