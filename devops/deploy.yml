@@ -11,6 +11,7 @@
     webapps_dir: /srv/webapps
     wsgi_callable: app
     wsgi_file: app.py
+    server_name: ranko.emillon.org
 
   tasks:
     - name: ensure log directory
