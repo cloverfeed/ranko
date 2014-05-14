@@ -7,13 +7,13 @@
 <div class="col-md-3">
 <div id="subnav" data-spy="affix">
     <h3>Comments</h3>
-    <form method="POST" action="{{ url_for('post_comment') }}">
+    <form method="POST" action="{{ url_for('post_comment') }}" id="post_comment_form">
         {{form.hidden_tag()}}
         <p>{{form.comment()}}</p>
         {{form.docid()}}
         <p><input type="submit" value="Upload"></p>
     </form>
-    <ul>
+    <ul id="comments">
         {% for comment in comments %}
             <li>
             {{comment.text}}
@@ -30,6 +30,20 @@ var src = "{{url_for('rawdoc', id=doc.id)}}";
 var pv = document.getElementById("pdfview");
 PDFJS.workerSrc = "{{url_for('static', filename='vendor/pdfjs-1.0.21-dist/build/pdf.worker.js')}}";
 PDFJS.getDocument(src).then(function(pdf) { view_pdf(pv, pdf); });
+$('#post_comment_form').submit(function(e){
+  e.preventDefault();
+  $.ajax({
+    type: 'POST',
+    url: "{{ url_for('post_comment') }}",
+    data: $(this).serialize(),
+    success: function(data)
+    {
+        var comm = $('#comment').val();
+        var li = $('<li>').text(comm);
+        $('#comments').append(li);
+    }
+  });
+});
 </script>
 
 {% endblock %}
