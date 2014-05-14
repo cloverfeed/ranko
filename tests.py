@@ -2,6 +2,7 @@ from app import app, db
 from key import get_secret_key
 import unittest
 import os
+from flask.ext.uploads import TestingFileStorage
 
 
 class TestCase(unittest.TestCase):
@@ -22,3 +23,11 @@ class TestCase(unittest.TestCase):
     def test_home(self):
         r = self.app.get('/')
         self.assertIn('Upload and review', r.data)
+
+    def test_upload(self):
+        storage = TestingFileStorage(filename='toto.pdf')
+        r = self.app.post('/upload', data={
+                'file': storage
+            })
+        self.assertEqual(r.status_code, 302)
+        self.assertIn('/view/', r.location)
