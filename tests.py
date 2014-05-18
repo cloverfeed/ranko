@@ -3,6 +3,7 @@ from key import get_secret_key
 import unittest
 import os
 from flask.ext.uploads import TestingFileStorage
+import re
 
 
 class TestCase(unittest.TestCase):
@@ -24,10 +25,26 @@ class TestCase(unittest.TestCase):
         r = self.app.get('/')
         self.assertIn('Upload and review', r.data)
 
-    def test_upload(self):
-        storage = TestingFileStorage(filename='toto.pdf')
+    # FIXME If called > 1, it yields a "file closed" error
+    def _upload(self, filename):
+        storage = TestingFileStorage(filename=filename)
         r = self.app.post('/upload', data={
                 'file': storage
             })
+        return r
+
+    def test_upload(self):
+        r = self._upload('toto.pdf')
         self.assertEqual(r.status_code, 302)
-        self.assertIn('/view/', r.location)
+        m = re.search('/view/(\d+)', r.location)
+        self.assertIsNotNone(m)
+        docid = m.group(1)
+        comm = 'bla bla bla'
+        r = self.app.post('/comment/new', data={
+                'docid': docid,
+                'comment': comm
+            })
+        self.assertEqual(r.status_code, 302)
+        r = self.app.get(r.location)
+        self.assertEqual(r.status_code, 200)
+        self.assertIn(comm, r.data)
