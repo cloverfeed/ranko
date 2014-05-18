@@ -1,4 +1,5 @@
 *.pyc
-instance/secret.key
+instance/*.key
 instance/*.db
 instance/uploads
+.coverage

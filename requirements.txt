@@ -1,4 +1,6 @@
+coverage
 flask
 flask-sqlalchemy
 flask-uploads
 flask-wtf
+nose
