@@ -1,5 +1,5 @@
 from app import app, db
-from key import get_secret_key
+from .key import get_secret_key
 import unittest
 import os
 from flask.ext.uploads import TestingFileStorage
@@ -28,9 +28,7 @@ class TestCase(unittest.TestCase):
     # FIXME If called > 1, it yields a "file closed" error
     def _upload(self, filename):
         storage = TestingFileStorage(filename=filename)
-        r = self.app.post('/upload', data={
-                'file': storage
-            })
+        r = self.app.post('/upload', data={'file': storage})
         return r
 
     def test_upload(self):
@@ -40,10 +38,10 @@ class TestCase(unittest.TestCase):
         self.assertIsNotNone(m)
         docid = m.group(1)
         comm = 'bla bla bla'
-        r = self.app.post('/comment/new', data={
-                'docid': docid,
-                'comment': comm
-            })
+        r = self.app.post('/comment/new',
+                          data={'docid': docid,
+                                'comment': comm
+                                })
         self.assertEqual(r.status_code, 302)
         r = self.app.get(r.location)
         self.assertEqual(r.status_code, 200)

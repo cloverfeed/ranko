@@ -1,8 +1,9 @@
-from app import db
+from app import app
 
 
 def main():
-    db.create_all()
+    pass
+    app.run(debug=True)
 
 if __name__ == '__main__':
     main()
