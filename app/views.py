@@ -37,9 +37,9 @@ class CommentForm(Form):
 
 @app.route('/view/<id>')
 def view_doc(id):
-    doc = Document.get_by_id(id)
+    doc = Document.query.get_or_404(id)
     form = CommentForm(docid=id)
-    comments = Comment.all_for_doc(id)
+    comments = Comment.query.filter_by(doc=id)
     return render_template('view.html', doc=doc, form=form, comments=comments)
 
 
@@ -57,6 +57,6 @@ def post_comment():
 
 @app.route('/raw/<id>')
 def rawdoc(id):
-    doc = Document.get_by_id(id)
+    doc = Document.query.get_or_404(id)
     docdir = os.path.join(app.instance_path, 'uploads')
     return send_from_directory(docdir, doc.filename)
