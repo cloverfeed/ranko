@@ -7,6 +7,8 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 app = Flask('Review')
 
+app.config['pdfjs_version'] = '1.0.473'
+
 # CSRF & WTForms
 key_file = os.path.join(app.instance_path, 'secret.key')
 app.config['SECRET_KEY'] = get_secret_key(key_file)

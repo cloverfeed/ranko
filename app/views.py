@@ -5,6 +5,7 @@ from flask.ext.wtf import Form
 from flask_wtf.file import FileField
 from wtforms import TextAreaField, HiddenField
 from .models import Comment, Document
+import os.path
 
 
 @app.route('/')
