@@ -7,7 +7,7 @@ function view_pdf(pv, pdf) {
 function render_page(pv, pdf, i, page) {
     var canvas = document.createElement('canvas');
     var context = canvas.getContext('2d');
-    var scale = 1.2;
+    var scale = 1.5;
     var viewport = page.getViewport(scale);
     canvas.width = viewport.width;
     canvas.height = viewport.height;
