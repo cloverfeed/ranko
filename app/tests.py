@@ -46,3 +46,7 @@ class TestCase(unittest.TestCase):
         r = self.app.get(r.location)
         self.assertEqual(r.status_code, 200)
         self.assertIn(comm, r.data)
+
+    def test_no_doc(self):
+        r = self.app.get('/view/0')
+        self.assertEqual(r.status_code, 404)

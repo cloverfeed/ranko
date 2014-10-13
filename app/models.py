@@ -10,7 +10,7 @@ class Document(db.Model):
 
     @staticmethod
     def get_by_id(id):
-        return db.session.query(Document).get(id)
+        return Document.query.get_or_404(id)
 
 
 class Comment(db.Model):
