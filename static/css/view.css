@@ -50,3 +50,7 @@
 .textLayer .highlight.selected {
     background-color: rgba(0, 100, 0, 0.2);
 }
+
+#exitfullscreen {
+    display: none;
+}

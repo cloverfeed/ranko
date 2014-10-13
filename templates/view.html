@@ -5,13 +5,29 @@
 <div id="pdfview" class="col-md-9"></div>
 
 <div class="col-md-3">
+<div id="exitfullscreen">
+    <div class="list-group">
+        <a id="fullscreen_button_exit" href="#" class="list-group-item">
+            <span class="glyphicon glyphicon-resize-small"></span>
+            Exit fullscreen
+        </a>
+    </div>
+</div>
 <div id="subnav" data-spy="affix">
-    <h3>Comments</h3>
+
+    <div class="list-group">
+        <a id="fullscreen_button" href="#" class="list-group-item">
+            <span class="glyphicon glyphicon-fullscreen"></span>
+            Full screen
+        </a>
+    </div>
+
+    <h3><span class="glyphicon glyphicon-comment"></span> Comments</h3>
     <form method="POST" action="{{ url_for('post_comment') }}" id="post_comment_form">
         {{form.hidden_tag()}}
         <p>{{form.comment()}}</p>
         {{form.docid()}}
-        <p><input type="submit" value="Upload"></p>
+        <p><input type="submit" value="Comment"></p>
     </form>
     <ul id="comments">
         {% for comment in comments %}
@@ -47,6 +63,14 @@ $('#post_comment_form').submit(function(e){
         $('#comments').append(li);
     }
   });
+});
+$('#fullscreen_button').click(function(e){
+    e.preventDefault();
+    view_fullscreen_enter();
+});
+$('#fullscreen_button_exit').click(function(e){
+    e.preventDefault();
+    view_fullscreen_exit();
 });
 </script>
 

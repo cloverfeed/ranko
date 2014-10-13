@@ -47,3 +47,13 @@ function render_page(pv, pdf, i, page) {
         });
     }
 }
+
+function view_fullscreen_enter() {
+    $('#subnav').hide();
+    $('#exitfullscreen').show();
+}
+
+function view_fullscreen_exit() {
+    $('#subnav').show();
+    $('#exitfullscreen').hide();
+}
