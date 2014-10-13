@@ -35,7 +35,7 @@ class TestCase(unittest.TestCase):
     def test_upload(self):
         r = self._upload('toto.pdf')
         self.assertEqual(r.status_code, 302)
-        m = re.search('/view/(\d+)', r.location)
+        m = re.search('/view/(\w+)', r.location)
         self.assertIsNotNone(m)
         docid = m.group(1)
         comm = 'bla bla bla'
@@ -49,8 +49,8 @@ class TestCase(unittest.TestCase):
         self.assertIn(comm, r.data)
         r = self.app.get('/view/' + docid)
         self.assertEqual(r.status_code, 200)
-        kore_docid = koremutake.encode(int(docid))
-        r = self.app.get('/view/' + kore_docid)
+        unkore_docid = str(koremutake.decode(docid))
+        r = self.app.get('/view/' + unkore_docid)
         self.assertEqual(r.status_code, 200)
 
     def test_no_doc(self):

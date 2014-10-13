@@ -9,6 +9,18 @@ import os.path
 import koremutake
 
 
+def kore_id(s):
+    """
+    Decode the string into an integer.
+    It can be a koremutake or a decimal number.
+    """
+    try:
+        r = koremutake.decode(s)
+    except ValueError:
+        r = int(s)
+    return r
+
+
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -27,7 +39,7 @@ def upload():
         db.session.add(doc)
         db.session.commit()
         flash('Uploaded')
-        return redirect(url_for('view_doc', id=doc.id))
+        return redirect(url_for('view_doc', id=koremutake.encode(doc.id)))
     return render_template('upload.html', form=form)
 
 
@@ -38,10 +50,7 @@ class CommentForm(Form):
 
 @app.route('/view/<id>')
 def view_doc(id):
-    try:
-        id = koremutake.decode(id)
-    except ValueError:
-        pass
+    id = kore_id(id)
     doc = Document.query.get_or_404(id)
     form = CommentForm(docid=id)
     comments = Comment.query.filter_by(doc=id)
@@ -52,7 +61,7 @@ def view_doc(id):
 def post_comment():
     form = CommentForm()
     assert(form.validate_on_submit())
-    docid = form.docid.data
+    docid = kore_id(form.docid.data)
     comm = Comment(docid, form.comment.data)
     db.session.add(comm)
     db.session.commit()
