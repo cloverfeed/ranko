@@ -24,6 +24,8 @@
 </div>
 
 <script src="{{url_for('static', filename='vendor/pdfjs-' + config.pdfjs_version + '-dist/build/pdf.js')}}"></script>
+<script src="{{url_for('static', filename='js/text_layer_builder.js')}}"></script>
+<script src="{{url_for('static', filename='js/ui_utils.js')}}"></script>
 <script src="{{url_for('static', filename='js/view.js')}}"></script>
 <script type="text/javascript">
 var src = "{{url_for('rawdoc', id=doc.id)}}";
