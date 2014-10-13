@@ -29,7 +29,9 @@
 var src = "{{url_for('rawdoc', id=doc.id)}}";
 var pv = document.getElementById("pdfview");
 PDFJS.workerSrc = "{{url_for('static', filename='vendor/pdfjs-1.0.21-dist/build/pdf.worker.js')}}";
-PDFJS.getDocument(src).then(function(pdf) { view_pdf(pv, pdf); });
+PDFJS.getDocument(src).then(function(pdf) { view_pdf(pv, pdf); }).then(null, function() {
+    pv.innerHTML = "Error loading the document.";
+});
 $('#post_comment_form').submit(function(e){
   e.preventDefault();
   $.ajax({
