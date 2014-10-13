@@ -11,7 +11,12 @@ function render_page(pv, pdf, i, page) {
     var viewport = page.getViewport(scale);
     canvas.width = viewport.width;
     canvas.height = viewport.height;
-    pv.appendChild(canvas);
+    var pdfPage = document.createElement('div');
+    pdfPage.className = 'pdfPage';
+    pdfPage.appendChild(canvas);
+    pdfPage.style.width = viewport.width + "px";
+    pdfPage.style.height = viewport.height + "px";
+    pv.appendChild(pdfPage);
     var renderContext = {
         canvasContext: context,
         viewport: viewport,
@@ -20,12 +25,8 @@ function render_page(pv, pdf, i, page) {
     var $textLayerDiv = jQuery("<div />")
         .addClass("textLayer")
         .css("height", viewport.height + "px")
-        .css("width", viewport.width + "px")
-        .offset({
-            top: canvas.offsetTop,
-            left: canvas.offsetLeft
-        });
-    pv.appendChild($textLayerDiv.get(0));
+        .css("width", viewport.width + "px");
+    pdfPage.appendChild($textLayerDiv.get(0));
     page.getTextContent().then(function(textContent) {
         var pageNumber = 1;
         var pageIndex = pageNumber - 1;
