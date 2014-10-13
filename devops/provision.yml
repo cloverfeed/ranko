@@ -1,11 +1,11 @@
 ---
 
-- hosts: webservers
+- hosts: all
   sudo: True
 
   tasks:
     - name: install common packages needed for python application development
-      action: apt pkg={{item}} state=installed
+      action: apt pkg={{item}} state=installed update_cache=yes
       with_items:
         - git-core
         - nginx
