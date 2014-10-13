@@ -4,6 +4,7 @@ import unittest
 import os
 from flask.ext.uploads import TestingFileStorage
 import re
+import koremutake
 
 
 class TestCase(unittest.TestCase):
@@ -46,6 +47,11 @@ class TestCase(unittest.TestCase):
         r = self.app.get(r.location)
         self.assertEqual(r.status_code, 200)
         self.assertIn(comm, r.data)
+        r = self.app.get('/view/' + docid)
+        self.assertEqual(r.status_code, 200)
+        kore_docid = koremutake.encode(int(docid))
+        r = self.app.get('/view/' + kore_docid)
+        self.assertEqual(r.status_code, 200)
 
     def test_no_doc(self):
         r = self.app.get('/view/0')

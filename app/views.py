@@ -6,6 +6,7 @@ from flask_wtf.file import FileField
 from wtforms import TextAreaField, HiddenField
 from .models import Comment, Document
 import os.path
+import koremutake
 
 
 @app.route('/')
@@ -37,6 +38,10 @@ class CommentForm(Form):
 
 @app.route('/view/<id>')
 def view_doc(id):
+    try:
+        id = koremutake.decode(id)
+    except ValueError:
+        pass
     doc = Document.query.get_or_404(id)
     form = CommentForm(docid=id)
     comments = Comment.query.filter_by(doc=id)

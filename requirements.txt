@@ -3,4 +3,5 @@ flask
 flask-sqlalchemy
 flask-uploads
 flask-wtf
+koremutake
 nose
