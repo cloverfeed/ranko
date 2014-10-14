@@ -18,26 +18,48 @@
       action: file dest={{webapps_dir}}/{{app_name}}/log state=directory
 
     - name: deploy code from repository
-      action: git repo={{repo_url}} dest={{webapps_dir}}/{{app_name}}/src remote={{repo_remote}} version={{repo_version}}
+      action: git
+      args:
+          repo: "{{repo_url}}"
+          dest: "{{webapps_dir}}/{{app_name}}/src"
+          remote: "{{repo_remote}}"
+          version: "{{repo_version}}"
 
     - name: install dependencies into virtualenv
-      action: pip requirements={{webapps_dir}}/{{app_name}}/src/requirements.txt virtualenv={{webapps_dir}}/{{app_name}}/venv state=present
+      action: pip
+      args:
+          requirements: "{{webapps_dir}}/{{app_name}}/src/requirements.txt"
+          virtualenv: "{{webapps_dir}}/{{app_name}}/venv"
+          state: present
 
     - name: create supervisor program config
-      action: template src=templates/supervisor.ini dest=/etc/supervisor/conf.d/{{app_name}}.conf
+      action: template
+      args:
+          src: templates/supervisor.ini
+          dest: /etc/supervisor/conf.d/{{app_name}}.conf
       notify:
         - restart app
 
     - name: create nginx site config
-      action: template src=templates/nginx_site.conf dest=/etc/nginx/sites-available/{{app_name}}.conf
+      action: template
+      args:
+          src: templates/nginx_site.conf
+          dest: /etc/nginx/sites-available/{{app_name}}.conf
       notify:
         - restart nginx
 
     - name: link nginx config
-      action: file src=/etc/nginx/sites-available/{{app_name}}.conf dest=/etc/nginx/sites-enabled/{{app_name}}.conf state=link
+      action: file
+      args:
+          src: /etc/nginx/sites-available/{{app_name}}.conf
+          dest: /etc/nginx/sites-enabled/{{app_name}}.conf
+          state: link
 
     - name: create DB
-      action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/makedb.py chdir={{webapps_dir}}/{{app_name}}/src creates={{webapps_dir}}/{{app_name}}/src/instance/app.db
+      action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/makedb.py
+      args:
+          chdir: "{{webapps_dir}}/{{app_name}}/src"
+          creates: "{{webapps_dir}}/{{app_name}}/src/instance/app.db"
 
     - name: start app
       action: supervisorctl name={{app_name}} state=started
