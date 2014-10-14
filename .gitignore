@@ -3,3 +3,5 @@ instance/*.key
 instance/*.db
 instance/uploads
 .coverage
+static/gen
+static/.webassets-cache

@@ -1,5 +1,6 @@
 coverage
 flask
+flask-assets
 flask-sqlalchemy
 flask-uploads
 flask-wtf

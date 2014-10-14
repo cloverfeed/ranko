@@ -43,6 +43,9 @@
 <script src="{{url_for('static', filename='js/text_layer_builder.js')}}"></script>
 <script src="{{url_for('static', filename='js/ui_utils.js')}}"></script>
 <script src="{{url_for('static', filename='js/view.js')}}"></script>
+{% assets "coffee_app" %}
+<script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
 <script type="text/javascript">
 var src = "{{url_for('rawdoc', id=doc.id)}}";
 var pv = document.getElementById("pdfview");

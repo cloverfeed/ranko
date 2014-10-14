@@ -4,6 +4,7 @@ from .key import get_secret_key
 from flask.ext.uploads import UploadSet
 from flask.ext.uploads import configure_uploads
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.assets import Environment, Bundle
 
 app = Flask('Review')
 
@@ -24,5 +25,14 @@ configure_uploads(app, [documents])
 uri = 'sqlite:///' + os.path.join(app.instance_path, 'app.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
 db = SQLAlchemy(app)
+
+# flask-assets
+assets = Environment(app)
+coffee = Bundle(
+    'coffee/view.coffee',
+    filters='coffeescript',
+    output='gen/app.js'
+    )
+assets.register('coffee_app', coffee)
 
 import views
