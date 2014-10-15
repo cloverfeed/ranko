@@ -1,6 +1,6 @@
 ---
 
-- hosts: webservers
+- hosts: all
   sudo: True
 
   vars:
