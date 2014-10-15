@@ -15,11 +15,9 @@ render_page = (pv, pdf, i, page) ->
     pdfPage.style.width = viewport.width + "px"
     pdfPage.style.height = viewport.height + "px"
     pv.appendChild pdfPage
-    renderContext = {
-        canvasContext: context,
-        viewport: viewport,
-    }
-    page.render renderContext
+    page.render
+        canvasContext: context
+        viewport: viewport
     $textLayerDiv = jQuery("<div />")
         .addClass("textLayer")
         .css("height", viewport.height + "px")
@@ -28,12 +26,10 @@ render_page = (pv, pdf, i, page) ->
     page.getTextContent().then (textContent) ->
         pageNumber = 1
         pageIndex = pageNumber - 1
-        tlbOptions = {
-            textLayerDiv: $textLayerDiv.get(0),
-            pageIndex: pageIndex,
-            viewport: viewport,
-        }
-        textLayer = new TextLayerBuilder tlbOptions
+        textLayer = new TextLayerBuilder
+            textLayerDiv: $textLayerDiv.get(0)
+            pageIndex: pageIndex
+            viewport: viewport
         textLayer.setTextContent textContent
     .then null, (error) ->
         pv.innerHTML = "Error while rendering PDF."
