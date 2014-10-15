@@ -1,6 +1,8 @@
 language: python
 python:
     - "2.7"
+before_install:
+    - npm install coffee-script
 script: nosetests --with-coverage --cover-package=app
 notifications:
-      slack: cloverfeed:Zd60W6QoaC1pGFP85rOvNJa1
+    slack: cloverfeed:Zd60W6QoaC1pGFP85rOvNJa1
