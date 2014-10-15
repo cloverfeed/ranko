@@ -2,3 +2,5 @@ language: python
 python:
     - "2.7"
 script: nosetests --with-coverage --cover-package=app
+notifications:
+      slack: cloverfeed:Zd60W6QoaC1pGFP85rOvNJa1
