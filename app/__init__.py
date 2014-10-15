@@ -8,6 +8,8 @@ from flask.ext.assets import Environment, Bundle
 
 app = Flask('Review')
 
+app.config['PROPAGATE_EXCEPTIONS'] = True
+
 app.config['pdfjs_version'] = '1.0.473'
 
 # CSRF & WTForms
