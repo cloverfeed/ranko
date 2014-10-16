@@ -48,33 +48,9 @@
 {% endassets %}
 <script type="text/javascript">
 var src = "{{url_for('rawdoc', id=doc.id)}}";
-var pv = document.getElementById("pdfview");
+var url_post_comment = "{{ url_for('post_comment') }}";
 PDFJS.workerSrc = "{{url_for('static', filename='vendor/pdfjs-' + config.pdfjs_version + '-dist/build/pdf.worker.js')}}";
-PDFJS.getDocument(src).then(function(pdf) { view_pdf({{doc.id}}, pv, pdf); }).then(null, function() {
-    pv.innerHTML = "Error loading the document.";
-});
-$('#post_comment_form').submit(function(e){
-  e.preventDefault();
-  $.ajax({
-    type: 'POST',
-    url: "{{ url_for('post_comment') }}",
-    data: $(this).serialize(),
-    success: function(data)
-    {
-        var comm = $('#comment').val();
-        var li = $('<li>').text(comm);
-        $('#comments').append(li);
-    }
-  });
-});
-$('#fullscreen_button').click(function(e){
-    e.preventDefault();
-    view_fullscreen_enter();
-});
-$('#fullscreen_button_exit').click(function(e){
-    e.preventDefault();
-    view_fullscreen_exit();
-});
+view_init(src, {{doc.id}}, url_post_comment);
 </script>
 
 {% endblock %}

@@ -144,3 +144,27 @@ view_fullscreen_enter = () ->
 view_fullscreen_exit = () ->
     $('#subnav').show()
     $('#exitfullscreen').hide()
+
+view_init = (src, docid, url_post_comment) ->
+    pv = document.getElementById "pdfview"
+    PDFJS.getDocument(src).then (pdf) ->
+        view_pdf(docid, pv, pdf)
+    .then null, ->
+        pv.innerHTML = "Error loading the document."
+    $('#post_comment_form').submit (e) ->
+      e.preventDefault()
+      $.ajax
+        type: 'POST'
+        url: url_post_comment
+        data: $(this).serialize()
+        success: (data) ->
+            comm = $('#comment').val()
+            $li = $('<li>').text(comm)
+            $('#comments').append $li
+
+    $('#fullscreen_button').click (e) ->
+        e.preventDefault()
+        view_fullscreen_enter()
+    $('#fullscreen_button_exit').click (e) ->
+        e.preventDefault()
+        view_fullscreen_exit()
