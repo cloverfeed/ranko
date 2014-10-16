@@ -9,7 +9,7 @@ setCoords = ($div, coords) ->
         width: coords.x2 - coords.x1 + "px"
         height: coords.y2 - coords.y1 + "px"
 
-makeSelectionDiv = ($tld) ->
+makeSelectionDiv = ($pdfp, $tld) ->
     sdCoords =
         x1: 0
         y1: 0
@@ -40,7 +40,7 @@ makeSelectionDiv = ($tld) ->
         $sd.hide()
         if bigEnough()
             $ann = makeAnnotation sdCoords
-            $tld.append $ann
+            $pdfp.append $ann
 
     $tld.mousemove (e) ->
         ec = eventCoords e
@@ -59,6 +59,12 @@ makeAnnotation = (coords) ->
 
     $closeBtn.click ->
         $ad.remove()
+
+    $annText = jQuery('<div>')
+    $ad.append $annText
+
+    console.log "makeann"
+    $annText.editable (value, settings) -> return value
 
     return $ad
 
@@ -85,7 +91,7 @@ render_page = (pv, pdf, i, page) ->
         .css
             height: viewport.height + "px"
             width: viewport.width + "px"
-    $selectionDiv = makeSelectionDiv $textLayerDiv
+    $selectionDiv = makeSelectionDiv $pdfPage, $textLayerDiv
     $pdfPage.append($selectionDiv)
     pdfPage.appendChild($textLayerDiv.get 0)
     page.getTextContent().then (textContent) ->
