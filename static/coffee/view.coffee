@@ -31,10 +31,16 @@ makeSelectionDiv = ($tld) ->
         sdCoords.y1 = ec.y
         $sd.show()
 
+    bigEnough = ->
+        width = sdCoords.x2 - sdCoords.x1
+        height = sdCoords.y2 - sdCoords.y1
+        width > 30 && height > 30
+
     $tld.mouseup ->
         $sd.hide()
-        $ann = makeAnnotation sdCoords
-        $tld.append $ann
+        if bigEnough()
+            $ann = makeAnnotation sdCoords
+            $tld.append $ann
 
     $tld.mousemove (e) ->
         ec = eventCoords e
