@@ -1,10 +1,10 @@
 from app import app, db, documents
-from flask import flash, redirect, url_for, render_template
+from flask import flash, redirect, url_for, render_template, request
 from flask import send_from_directory
 from flask.ext.wtf import Form
 from flask_wtf.file import FileField
 from wtforms import TextAreaField, HiddenField
-from .models import Comment, Document
+from .models import Comment, Document, Annotation
 import os.path
 import koremutake
 
@@ -74,3 +74,18 @@ def rawdoc(id):
     doc = Document.query.get_or_404(id)
     docdir = os.path.join(app.instance_path, 'uploads')
     return send_from_directory(docdir, doc.filename)
+
+
+@app.route('/annotation/new', methods=['POST'])
+def annotation_new():
+    doc = request.form['doc']
+    page = request.form['page']
+    posx = request.form['posx']
+    posy = request.form['posy']
+    width = request.form['width']
+    height = request.form['height']
+    text = request.form['value']
+    ann = Annotation(doc, page, posx, posy, width, height, text)
+    db.session.add(ann)
+    db.session.commit()
+    return text

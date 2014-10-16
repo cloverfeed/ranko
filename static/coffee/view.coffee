@@ -1,6 +1,6 @@
-view_pdf = (pv, pdf) ->
+view_pdf = (docid, pv, pdf) ->
     pdf.getPage(1).then (page) ->
-        render_page pv, pdf, 1, page
+        render_page docid, pv, pdf, 1, page
 
 setCoords = ($div, coords) ->
     $div.css
@@ -9,7 +9,7 @@ setCoords = ($div, coords) ->
         width: coords.x2 - coords.x1 + "px"
         height: coords.y2 - coords.y1 + "px"
 
-makeSelectionDiv = ($pdfp, $tld) ->
+makeSelectionDiv = (docid, page, $pdfp, $tld) ->
     sdCoords =
         x1: 0
         y1: 0
@@ -39,7 +39,7 @@ makeSelectionDiv = ($pdfp, $tld) ->
     $tld.mouseup ->
         $sd.hide()
         if bigEnough()
-            $ann = makeAnnotation sdCoords
+            $ann = makeAnnotation docid, page, sdCoords
             $pdfp.append $ann
 
     $tld.mousemove (e) ->
@@ -50,7 +50,7 @@ makeSelectionDiv = ($pdfp, $tld) ->
 
     return $sd
 
-makeAnnotation = (coords) ->
+makeAnnotation = (docid, page, coords) ->
     $ad = jQuery('<div>').addClass 'annotation'
     setCoords $ad, coords
 
@@ -63,12 +63,19 @@ makeAnnotation = (coords) ->
     $annText = jQuery('<div>')
     $ad.append $annText
 
-    console.log "makeann"
-    $annText.editable (value, settings) -> return value
+    POST_URL = '/annotation/new'
+    $annText.editable POST_URL,
+        submitdata:
+            posx: coords.x1
+            posy: coords.y1
+            width: coords.x2 - coords.x1
+            height: coords.y2 - coords.y1
+            doc: docid
+            page: page
 
     return $ad
 
-render_page = (pv, pdf, i, page) ->
+render_page = (docid, pv, pdf, i, page) ->
     canvas = document.createElement 'canvas'
     context = canvas.getContext '2d'
     scale = 1.5
@@ -91,11 +98,11 @@ render_page = (pv, pdf, i, page) ->
         .css
             height: viewport.height + "px"
             width: viewport.width + "px"
-    $selectionDiv = makeSelectionDiv $pdfPage, $textLayerDiv
+    $selectionDiv = makeSelectionDiv docid, i, $pdfPage, $textLayerDiv
     $pdfPage.append($selectionDiv)
     pdfPage.appendChild($textLayerDiv.get 0)
     page.getTextContent().then (textContent) ->
-        pageNumber = 1
+        pageNumber = i
         pageIndex = pageNumber - 1
         textLayer = new TextLayerBuilder
             textLayerDiv: $textLayerDiv.get(0)
@@ -108,7 +115,7 @@ render_page = (pv, pdf, i, page) ->
 
     if (i+1 <= pdf.numPages)
         pdf.getPage(i+1).then (page) ->
-            render_page pv, pdf, i+1, page
+            render_page docid, pv, pdf, i+1, page
 
 view_fullscreen_enter = () ->
     $('#subnav').hide()

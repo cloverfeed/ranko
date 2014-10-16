@@ -50,7 +50,7 @@
 var src = "{{url_for('rawdoc', id=doc.id)}}";
 var pv = document.getElementById("pdfview");
 PDFJS.workerSrc = "{{url_for('static', filename='vendor/pdfjs-' + config.pdfjs_version + '-dist/build/pdf.worker.js')}}";
-PDFJS.getDocument(src).then(function(pdf) { view_pdf(pv, pdf); }).then(null, function() {
+PDFJS.getDocument(src).then(function(pdf) { view_pdf({{doc.id}}, pv, pdf); }).then(null, function() {
     pv.innerHTML = "Error loading the document.";
 });
 $('#post_comment_form').submit(function(e){
