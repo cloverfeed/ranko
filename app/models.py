@@ -41,7 +41,8 @@ class Annotation(db.Model):
         self.text = text
 
     def to_json(self):
-        return {'posx': self.posx,
+        return {'id': self.id,
+                'posx': self.posx,
                 'posy': self.posy,
                 'width': self.width,
                 'height': self.height,

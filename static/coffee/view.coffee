@@ -41,7 +41,7 @@ makeSelectionDiv = (docid, page, $pdfp, $tld) ->
     $tld.mouseup ->
         $sd.hide()
         if bigEnough()
-            $ann = makeAnnotation docid, page, "", sdCoords
+            $ann = makeAnnotation docid, page, "", null, sdCoords
             $pdfp.append $ann
 
     $tld.mousemove (e) ->
@@ -52,7 +52,7 @@ makeSelectionDiv = (docid, page, $pdfp, $tld) ->
 
     return $sd
 
-makeAnnotation = (docid, page, text, coords) ->
+makeAnnotation = (docid, page, text, annid, coords) ->
     $ad = jQuery('<div>').addClass 'annotation'
     setCoords $ad, coords
 
@@ -60,7 +60,16 @@ makeAnnotation = (docid, page, text, coords) ->
     $ad.append $closeBtn
 
     $closeBtn.click ->
-        $ad.remove()
+        delDone = ->
+            $ad.remove()
+        if annid
+            ANN_URL = '/annotation/' + annid
+            $.ajax
+                url: ANN_URL
+                type: 'DELETE'
+                success: -> delDone()
+        else
+            delDone()
 
     $annText = jQuery('<div>').text(text)
     $ad.append $annText
@@ -117,7 +126,7 @@ render_page = (docid, pv, pdf, i, page, annotations) ->
     anns = annotations[i]
     if anns
         for ann in anns
-            $annDiv = makeAnnotation docid, i, ann.text,
+            $annDiv = makeAnnotation docid, i, ann.text, ann.id,
                 x1: ann.posx
                 y1: ann.posy
                 x2: ann.posx + ann.width

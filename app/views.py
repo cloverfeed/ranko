@@ -102,3 +102,11 @@ def annotations_for_doc(id):
             data[page] = []
         data[page].append(ann.to_json())
     return jsonify(data=data)
+
+
+@app.route('/annotation/<id>', methods=['DELETE'])
+def annotation_delete(id):
+    ann = Annotation.query.get(id)
+    db.session.delete(ann)
+    db.session.commit()
+    return jsonify(status='ok')
