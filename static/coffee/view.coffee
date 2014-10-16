@@ -47,6 +47,13 @@ makeSelectionDiv = ($tld) ->
 makeAnnotation = (coords) ->
     $ad = jQuery('<div>').addClass 'annotation'
     setCoords $ad, coords
+
+    $closeBtn = jQuery('<a>').text '[X]'
+    $ad.append $closeBtn
+
+    $closeBtn.click ->
+        $ad.remove()
+
     return $ad
 
 render_page = (pv, pdf, i, page) ->
