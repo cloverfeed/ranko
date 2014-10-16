@@ -1,6 +1,8 @@
 coverage
 flask
 flask-assets
+flask-migrate
+flask-script
 flask-sqlalchemy
 flask-uploads
 flask-wtf

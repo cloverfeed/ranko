@@ -34,6 +34,11 @@
           virtualenv: "{{webapps_dir}}/{{app_name}}/venv"
           state: present
 
+    - name: run DB migrations
+      action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py db upgrade
+      args:
+          chdir: "{{webapps_dir}}/{{app_name}}/src"
+
     - name: create supervisor program config
       action: template
       args:

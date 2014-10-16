@@ -19,3 +19,32 @@ class Comment(db.Model):
     def __init__(self, doc, text):
         self.doc = doc
         self.text = text
+
+
+class Annotation(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    doc = db.Column(db.Integer, db.ForeignKey('document.id'), nullable=False)
+    page = db.Column(db.Integer, nullable=False)
+    posx = db.Column(db.Integer, nullable=False)
+    posy = db.Column(db.Integer, nullable=False)
+    width = db.Column(db.Integer, nullable=False)
+    height = db.Column(db.Integer, nullable=False)
+    text = db.Column(db.String, nullable=False)
+
+    def __init__(self, doc, page, posx, posy, width, height, text):
+        self.doc = doc
+        self.page = page
+        self.posx = posx
+        self.posy = posy
+        self.width = width
+        self.height = height
+        self.text = text
+
+    def to_json(self):
+        return {'id': self.id,
+                'posx': self.posx,
+                'posy': self.posy,
+                'width': self.width,
+                'height': self.height,
+                'text': self.text,
+                }
