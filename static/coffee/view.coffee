@@ -1,6 +1,8 @@
 view_pdf = (docid, pv, pdf) ->
-    pdf.getPage(1).then (page) ->
-        render_page docid, pv, pdf, 1, page
+    GET_ANN_URL = '/view/' + docid + '/annotations'
+    $.getJSON GET_ANN_URL, (annotations) ->
+        pdf.getPage(1).then (page) ->
+            render_page docid, pv, pdf, 1, page, annotations.data
 
 setCoords = ($div, coords) ->
     $div.css
@@ -39,7 +41,7 @@ makeSelectionDiv = (docid, page, $pdfp, $tld) ->
     $tld.mouseup ->
         $sd.hide()
         if bigEnough()
-            $ann = makeAnnotation docid, page, sdCoords
+            $ann = makeAnnotation docid, page, "", sdCoords
             $pdfp.append $ann
 
     $tld.mousemove (e) ->
@@ -50,7 +52,7 @@ makeSelectionDiv = (docid, page, $pdfp, $tld) ->
 
     return $sd
 
-makeAnnotation = (docid, page, coords) ->
+makeAnnotation = (docid, page, text, coords) ->
     $ad = jQuery('<div>').addClass 'annotation'
     setCoords $ad, coords
 
@@ -60,7 +62,7 @@ makeAnnotation = (docid, page, coords) ->
     $closeBtn.click ->
         $ad.remove()
 
-    $annText = jQuery('<div>')
+    $annText = jQuery('<div>').text(text)
     $ad.append $annText
 
     POST_URL = '/annotation/new'
@@ -75,7 +77,7 @@ makeAnnotation = (docid, page, coords) ->
 
     return $ad
 
-render_page = (docid, pv, pdf, i, page) ->
+render_page = (docid, pv, pdf, i, page, annotations) ->
     canvas = document.createElement 'canvas'
     context = canvas.getContext '2d'
     scale = 1.5
@@ -112,10 +114,19 @@ render_page = (docid, pv, pdf, i, page) ->
     .then null, (error) ->
         pv.innerHTML = "Error while rendering PDF."
         console.log ("Error while rendering PDF: " + error)
+    anns = annotations[i]
+    if anns
+        for ann in anns
+            $annDiv = makeAnnotation docid, i, ann.text,
+                x1: ann.posx
+                y1: ann.posy
+                x2: ann.posx + ann.width
+                y2: ann.posy + ann.height
+            $pdfPage.append $annDiv
 
     if (i+1 <= pdf.numPages)
         pdf.getPage(i+1).then (page) ->
-            render_page docid, pv, pdf, i+1, page
+            render_page docid, pv, pdf, i+1, page, annotations
 
 view_fullscreen_enter = () ->
     $('#subnav').hide()

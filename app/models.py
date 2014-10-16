@@ -39,3 +39,11 @@ class Annotation(db.Model):
         self.width = width
         self.height = height
         self.text = text
+
+    def to_json(self):
+        return {'posx': self.posx,
+                'posy': self.posy,
+                'width': self.width,
+                'height': self.height,
+                'text': self.text,
+                }

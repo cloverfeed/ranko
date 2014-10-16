@@ -1,6 +1,6 @@
 from app import app, db, documents
 from flask import flash, redirect, url_for, render_template, request
-from flask import send_from_directory
+from flask import send_from_directory, jsonify
 from flask.ext.wtf import Form
 from flask_wtf.file import FileField
 from wtforms import TextAreaField, HiddenField
@@ -54,7 +54,9 @@ def view_doc(id):
     doc = Document.query.get_or_404(id)
     form = CommentForm(docid=id)
     comments = Comment.query.filter_by(doc=id)
-    return render_template('view.html', doc=doc, form=form, comments=comments)
+    annotations = Annotation.query.filter_by(doc=id)
+    return render_template('view.html', doc=doc, form=form,
+                           comments=comments, annotations=annotations)
 
 
 @app.route('/comment/new', methods=['POST'])
@@ -89,3 +91,14 @@ def annotation_new():
     db.session.add(ann)
     db.session.commit()
     return text
+
+
+@app.route('/view/<id>/annotations')
+def annotations_for_doc(id):
+    data = {}
+    for ann in Annotation.query.filter_by(doc=id):
+        page = ann.page
+        if page not in data:
+            data[page] = []
+        data[page].append(ann.to_json())
+    return jsonify(data=data)
