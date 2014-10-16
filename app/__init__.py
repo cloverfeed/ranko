@@ -5,6 +5,8 @@ from flask.ext.uploads import UploadSet
 from flask.ext.uploads import configure_uploads
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.assets import Environment, Bundle
+from flask.ext.script import Manager
+from flask.ext.migrate import Migrate, MigrateCommand
 
 app = Flask('Review')
 
@@ -36,5 +38,12 @@ coffee = Bundle(
     output='gen/app.js'
     )
 assets.register('coffee_app', coffee)
+
+# flask-migrate
+migrate = Migrate(app, db)
+
+# flask-script
+manager = Manager(app)
+manager.add_command('db', MigrateCommand)
 
 import views
