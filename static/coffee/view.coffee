@@ -2,6 +2,13 @@ view_pdf = (pv, pdf) ->
     pdf.getPage(1).then (page) ->
         render_page pv, pdf, 1, page
 
+setCoords = ($div, coords) ->
+    $div.css
+        left: coords.x1 + "px"
+        top: coords.y1 + "px"
+        width: coords.x2 - coords.x1 + "px"
+        height: coords.y2 - coords.y1 + "px"
+
 makeSelectionDiv = ($tld) ->
     sdCoords =
         x1: 0
@@ -18,13 +25,6 @@ makeSelectionDiv = ($tld) ->
             y: e.pageY - tldOffset.top
         )
 
-    updateDiv = ->
-        $sd.css
-            left: sdCoords.x1 + "px"
-            top: sdCoords.y1 + "px"
-            width: sdCoords.x2 - sdCoords.x1 + "px"
-            height: sdCoords.y2 - sdCoords.y1 + "px"
-
     $tld.mousedown (e) ->
         ec = eventCoords e
         sdCoords.x1 = ec.x
@@ -33,14 +33,21 @@ makeSelectionDiv = ($tld) ->
 
     $tld.mouseup ->
         $sd.hide()
+        $ann = makeAnnotation sdCoords
+        $tld.append $ann
 
     $tld.mousemove (e) ->
         ec = eventCoords e
         sdCoords.x2 = ec.x
         sdCoords.y2 = ec.y
-        updateDiv()
+        setCoords $sd, sdCoords
 
     return $sd
+
+makeAnnotation = (coords) ->
+    $ad = jQuery('<div>').addClass 'annotation'
+    setCoords $ad, coords
+    return $ad
 
 render_page = (pv, pdf, i, page) ->
     canvas = document.createElement 'canvas'
