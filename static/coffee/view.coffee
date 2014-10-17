@@ -11,10 +11,6 @@ setGeom = ($div, geom) ->
     width: geom.width + "px"
     height: geom.height + "px"
 
-
-
-
-
 render_page = (docid, pv, pdf, i, page, annotations) ->
   canvas = document.createElement 'canvas'
   context = canvas.getContext '2d'
