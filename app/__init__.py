@@ -34,6 +34,8 @@ db = SQLAlchemy(app)
 assets = Environment(app)
 coffee = Bundle(
     'coffee/view.coffee',
+    'coffee/selection.coffee',
+    'coffee/annotation.coffee',
     filters='coffeescript',
     output='gen/app.js'
     )
