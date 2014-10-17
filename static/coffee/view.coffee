@@ -53,39 +53,37 @@ class Selection
         setCoords @$div, @coords
 
 
-makeAnnotation = (docid, page, text, annid, coords) ->
-    $ad = jQuery('<div>').addClass 'annotation'
-    setCoords $ad, coords
+class Annotation
+    constructor: (docid, page, text, @annid, coords) ->
+        @$div = jQuery('<div>').addClass 'annotation'
+        setCoords @$div, coords
+        $closeBtn = jQuery('<a>').text '[X]'
+        @$div.append $closeBtn
 
-    $closeBtn = jQuery('<a>').text '[X]'
-    $ad.append $closeBtn
+        $closeBtn.click =>
+            delDone = =>
+                @$div.remove()
+            if @annid
+                ANN_URL = '/annotation/' + @annid
+                $.ajax
+                    url: ANN_URL
+                    type: 'DELETE'
+                    success: -> delDone()
+            else
+                delDone()
 
-    $closeBtn.click ->
-        delDone = ->
-            $ad.remove()
-        if annid
-            ANN_URL = '/annotation/' + annid
-            $.ajax
-                url: ANN_URL
-                type: 'DELETE'
-                success: -> delDone()
-        else
-            delDone()
+        $annText = jQuery('<div>').text(text)
+        @$div.append $annText
 
-    $annText = jQuery('<div>').text(text)
-    $ad.append $annText
-
-    POST_URL = '/annotation/new'
-    $annText.editable POST_URL,
-        submitdata:
-            posx: coords.x1
-            posy: coords.y1
-            width: coords.x2 - coords.x1
-            height: coords.y2 - coords.y1
-            doc: docid
-            page: page
-
-    return $ad
+        POST_URL = '/annotation/new'
+        $annText.editable POST_URL,
+            submitdata:
+                posx: coords.x1
+                posy: coords.y1
+                width: coords.x2 - coords.x1
+                height: coords.y2 - coords.y1
+                doc: docid
+                page: page
 
 render_page = (docid, pv, pdf, i, page, annotations) ->
     canvas = document.createElement 'canvas'
@@ -111,8 +109,8 @@ render_page = (docid, pv, pdf, i, page, annotations) ->
             height: viewport.height + "px"
             width: viewport.width + "px"
     selection = new Selection $textLayerDiv, (coords) ->
-        $ann = makeAnnotation docid, i, "", null, coords
-        $pdfPage.append $ann
+        ann = new Annotation docid, i, "", null, coords
+        $pdfPage.append ann.$div
     $selectionDiv = selection.$div
     $pdfPage.append($selectionDiv)
     pdfPage.appendChild($textLayerDiv.get 0)
@@ -130,12 +128,12 @@ render_page = (docid, pv, pdf, i, page, annotations) ->
     anns = annotations[i]
     if anns
         for ann in anns
-            $annDiv = makeAnnotation docid, i, ann.text, ann.id,
+            annotation = new Annotation docid, i, ann.text, ann.id,
                 x1: ann.posx
                 y1: ann.posy
                 x2: ann.posx + ann.width
                 y2: ann.posy + ann.height
-            $pdfPage.append $annDiv
+            $pdfPage.append annotation.$div
 
     if (i+1 <= pdf.numPages)
         pdf.getPage(i+1).then (page) ->
