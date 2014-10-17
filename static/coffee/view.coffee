@@ -11,26 +11,22 @@ setGeom = ($div, geom) ->
         width: geom.width + "px"
         height: geom.height + "px"
 
-coordsToGeom = (coords) ->
-    posx: coords.x1
-    posy: coords.y1
-    width: coords.x2 - coords.x1
-    height: coords.y2 - coords.y1
-
-setCoords = ($div, coords) ->
-    setGeom $div, (coordsToGeom coords)
-
 class Selection
     constructor: (@$tld, @create) ->
-        @coords =
-            x1: 0
-            y1: 0
-            x2: 0
-            y2: 0
+        @x1 = 0
+        @y1 = 0
+        @x2 = 0
+        @y2 = 0
         @$div = jQuery('<div>').addClass 'selectionDiv'
         @$tld.mousedown (e) => @mousedown e
         @$tld.mousemove (e) => @mousemove e
         @$tld.mouseup (e) => @mouseup e
+
+    computeGeom: ->
+        posx: Math.min @x1, @x2
+        posy: Math.min @y1, @y2
+        width: Math.abs(@x2 - @x1)
+        height: Math.abs(@y2 - @y1)
 
     eventCoords: (e) ->
         tldOffset = @$tld.offset()
@@ -41,25 +37,26 @@ class Selection
 
     mousedown: (e) ->
         ec = @eventCoords e
-        @coords.x1 = ec.x
-        @coords.y1 = ec.y
+        @x1 = ec.x
+        @y1 = ec.y
         @$div.show()
 
     bigEnough: ->
-        width = @coords.x2 - @coords.x1
-        height = @coords.y2 - @coords.y1
-        width > 30 && height > 30
+        geom = @computeGeom()
+        geom.width > 30 && geom.height > 30
 
     mouseup: ->
         @$div.hide()
         if @bigEnough()
-            @create(@coords)
+            geom = @computeGeom()
+            @create geom
 
     mousemove: (e) ->
         ec = @eventCoords e
-        @coords.x2 = ec.x
-        @coords.y2 = ec.y
-        setCoords @$div, @coords
+        @x2 = ec.x
+        @y2 = ec.y
+        geom = @computeGeom()
+        setGeom @$div, geom
 
 
 class Annotation
@@ -152,8 +149,8 @@ render_page = (docid, pv, pdf, i, page, annotations) ->
         .css
             height: viewport.height + "px"
             width: viewport.width + "px"
-    selection = new Selection $textLayerDiv, (coords) ->
-        ann = new Annotation $textLayerDiv, docid, i, "", null, (coordsToGeom coords)
+    selection = new Selection $textLayerDiv, (geom) ->
+        ann = new Annotation $textLayerDiv, docid, i, "", null, geom
         $pdfPage.append ann.$div
     $selectionDiv = selection.$div
     $pdfPage.append($selectionDiv)
