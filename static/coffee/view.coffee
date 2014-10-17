@@ -172,15 +172,15 @@ render_page = (docid, pv, pdf, i, page, annotations) ->
       annotation = new Annotation $textLayerDiv, docid, i, ann.text, ann.id, ann
       $pdfPage.append annotation.$div
 
-  if (i+1 <= pdf.numPages)
-    pdf.getPage(i+1).then (page) ->
-      render_page docid, pv, pdf, i+1, page, annotations
+  if (i + 1 <= pdf.numPages)
+    pdf.getPage(i + 1).then (page) ->
+      render_page docid, pv, pdf, i + 1, page, annotations
 
-view_fullscreen_enter = () ->
+view_fullscreen_enter = ->
   $('#subnav').hide()
   $('#exitfullscreen').show()
 
-view_fullscreen_exit = () ->
+view_fullscreen_exit = ->
   $('#subnav').show()
   $('#exitfullscreen').hide()
 
