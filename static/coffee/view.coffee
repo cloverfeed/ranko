@@ -54,7 +54,7 @@ class Selection
 
 
 class Annotation
-    constructor: (@docid, @page, text, @annid, @coords) ->
+    constructor: (@$tld, @docid, @page, @text, @annid, @coords) ->
         @$div = jQuery('<div>').addClass 'annotation'
         setCoords @$div, @coords
         $closeBtn = jQuery('<a>').text '[X]'
@@ -72,12 +72,28 @@ class Annotation
             else
                 delDone()
 
-        $annText = jQuery('<div>').text(text)
+        $annText = jQuery('<div>').text(@text)
         @$div.append $annText
 
-        $annText.editable (value, settings) => @submitChanges value, settings
+        $annText.editable (value, settings) =>
+            @text = value
+            @submitChanges()
+            return value
+        @$div.draggable
+            stop: (ev, ui) =>
+                @updateCoords(ev, ui)
+                @submitChanges()
 
-    submitChanges: (value, settings) ->
+    updateCoords: (e, ui) ->
+        tldOffset = @$tld.offset()
+        width = @coords.x2 - @coords.x1
+        height = @coords.y2 - @coords.y1
+        @coords.x1 = ui.offset.left - tldOffset.left
+        @coords.y1 = ui.offset.top - tldOffset.top
+        @coords.x2 = @coords.x1 + width
+        @coords.y2 = @coords.y1 + height
+
+    submitChanges: ->
         if @annid
             type = 'PUT'
             url = '/annotation/' + @annid
@@ -94,8 +110,7 @@ class Annotation
                 height: @coords.y2 - @coords.y1
                 doc: @docid
                 page: @page
-                value: value
-        return value
+                value: @text
 
 
 render_page = (docid, pv, pdf, i, page, annotations) ->
@@ -122,7 +137,7 @@ render_page = (docid, pv, pdf, i, page, annotations) ->
             height: viewport.height + "px"
             width: viewport.width + "px"
     selection = new Selection $textLayerDiv, (coords) ->
-        ann = new Annotation docid, i, "", null, coords
+        ann = new Annotation $textLayerDiv, docid, i, "", null, coords
         $pdfPage.append ann.$div
     $selectionDiv = selection.$div
     $pdfPage.append($selectionDiv)
@@ -141,7 +156,7 @@ render_page = (docid, pv, pdf, i, page, annotations) ->
     anns = annotations[i]
     if anns
         for ann in anns
-            annotation = new Annotation docid, i, ann.text, ann.id,
+            annotation = new Annotation $textLayerDiv, docid, i, ann.text, ann.id,
                 x1: ann.posx
                 y1: ann.posy
                 x2: ann.posx + ann.width
