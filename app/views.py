@@ -90,7 +90,7 @@ def annotation_new():
     ann = Annotation(doc, page, posx, posy, width, height, text)
     db.session.add(ann)
     db.session.commit()
-    return text
+    return jsonify(id=ann.id)
 
 
 @app.route('/view/<id>/annotations')

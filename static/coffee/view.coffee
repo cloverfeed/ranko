@@ -124,6 +124,9 @@ class Annotation
                 doc: @docid
                 page: @page
                 value: @text
+            success: (d) =>
+                if type == 'POST'
+                    @annid = d.id
 
 
 render_page = (docid, pv, pdf, i, page, annotations) ->
