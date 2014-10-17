@@ -11,46 +11,47 @@ setCoords = ($div, coords) ->
         width: coords.x2 - coords.x1 + "px"
         height: coords.y2 - coords.y1 + "px"
 
-makeSelectionDiv = (docid, page, $pdfp, $tld) ->
-    sdCoords =
-        x1: 0
-        y1: 0
-        x2: 0
-        y2: 0
+class Selection
+    constructor: (@$tld, @create) ->
+        @coords =
+            x1: 0
+            y1: 0
+            x2: 0
+            y2: 0
+        @$div = jQuery('<div>').addClass 'selectionDiv'
+        @$tld.mousedown (e) => @mousedown e
+        @$tld.mousemove (e) => @mousemove e
+        @$tld.mouseup (e) => @mouseup e
 
-    $sd = jQuery('<div>').addClass 'selectionDiv'
-
-    eventCoords = (e) ->
-        tldOffset = $tld.offset()
+    eventCoords: (e) ->
+        tldOffset = @$tld.offset()
         return (
             x: e.pageX - tldOffset.left
             y: e.pageY - tldOffset.top
         )
 
-    $tld.mousedown (e) ->
-        ec = eventCoords e
-        sdCoords.x1 = ec.x
-        sdCoords.y1 = ec.y
-        $sd.show()
+    mousedown: (e) ->
+        ec = @eventCoords e
+        @coords.x1 = ec.x
+        @coords.y1 = ec.y
+        @$div.show()
 
-    bigEnough = ->
-        width = sdCoords.x2 - sdCoords.x1
-        height = sdCoords.y2 - sdCoords.y1
+    bigEnough: ->
+        width = @coords.x2 - @coords.x1
+        height = @coords.y2 - @coords.y1
         width > 30 && height > 30
 
-    $tld.mouseup ->
-        $sd.hide()
-        if bigEnough()
-            $ann = makeAnnotation docid, page, "", null, sdCoords
-            $pdfp.append $ann
+    mouseup: ->
+        @$div.hide()
+        if @bigEnough()
+            @create(@coords)
 
-    $tld.mousemove (e) ->
-        ec = eventCoords e
-        sdCoords.x2 = ec.x
-        sdCoords.y2 = ec.y
-        setCoords $sd, sdCoords
+    mousemove: (e) ->
+        ec = @eventCoords e
+        @coords.x2 = ec.x
+        @coords.y2 = ec.y
+        setCoords @$div, @coords
 
-    return $sd
 
 makeAnnotation = (docid, page, text, annid, coords) ->
     $ad = jQuery('<div>').addClass 'annotation'
@@ -109,7 +110,10 @@ render_page = (docid, pv, pdf, i, page, annotations) ->
         .css
             height: viewport.height + "px"
             width: viewport.width + "px"
-    $selectionDiv = makeSelectionDiv docid, i, $pdfPage, $textLayerDiv
+    selection = new Selection $textLayerDiv, (coords) ->
+        $ann = makeAnnotation docid, i, "", null, coords
+        $pdfPage.append $ann
+    $selectionDiv = selection.$div
     $pdfPage.append($selectionDiv)
     pdfPage.appendChild($textLayerDiv.get 0)
     page.getTextContent().then (textContent) ->
