@@ -210,3 +210,5 @@ view_init = (src, docid, url_post_comment) ->
     $('#fullscreen_button_exit').click (e) ->
         e.preventDefault()
         view_fullscreen_exit()
+    $('#toggle_annotations_button').click (e) ->
+        $('.annotation').toggle()
