@@ -83,15 +83,23 @@ class Annotation
             stop: (ev, ui) =>
                 @updateCoords(ev, ui)
                 @submitChanges()
+        @$div.resizable
+            stop: (ev, ui) =>
+                @updateCoords(ev, ui)
+                @submitChanges()
 
     updateCoords: (e, ui) ->
         tldOffset = @$tld.offset()
-        width = @coords.x2 - @coords.x1
-        height = @coords.y2 - @coords.y1
-        @coords.x1 = ui.offset.left - tldOffset.left
-        @coords.y1 = ui.offset.top - tldOffset.top
-        @coords.x2 = @coords.x1 + width
-        @coords.y2 = @coords.y1 + height
+        if e.type == 'dragstop'
+            width = @coords.x2 - @coords.x1
+            height = @coords.y2 - @coords.y1
+            @coords.x1 = ui.offset.left - tldOffset.left
+            @coords.y1 = ui.offset.top - tldOffset.top
+            @coords.x2 = @coords.x1 + width
+            @coords.y2 = @coords.y1 + height
+        else if e.type == 'resizestop'
+            @coords.x2 = @coords.x1 + ui.size.width
+            @coords.y2 = @coords.y1 + ui.size.height
 
     submitChanges: ->
         if @annid
