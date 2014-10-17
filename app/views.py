@@ -110,3 +110,11 @@ def annotation_delete(id):
     db.session.delete(ann)
     db.session.commit()
     return jsonify(status='ok')
+
+
+@app.route('/annotation/<id>', methods=['PUT'])
+def annotation_edit(id):
+    ann = Annotation.query.get(id)
+    ann.load_json(request.form)
+    db.session.commit()
+    return jsonify(status='ok')

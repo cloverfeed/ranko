@@ -78,10 +78,15 @@ class Annotation
         $annText.editable (value, settings) => @submitChanges value, settings
 
     submitChanges: (value, settings) ->
-        POST_URL = '/annotation/new'
+        if @annid
+            type = 'PUT'
+            url = '/annotation/' + @annid
+        else
+            type = 'POST'
+            url = '/annotation/new'
         $.ajax
-            type: 'POST'
-            url: POST_URL
+            type: type
+            url: url
             data:
                 posx: @coords.x1
                 posy: @coords.y1
