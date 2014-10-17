@@ -4,12 +4,21 @@ view_pdf = (docid, pv, pdf) ->
         pdf.getPage(1).then (page) ->
             render_page docid, pv, pdf, 1, page, annotations.data
 
-setCoords = ($div, coords) ->
+setGeom = ($div, geom) ->
     $div.css
-        left: coords.x1 + "px"
-        top: coords.y1 + "px"
-        width: coords.x2 - coords.x1 + "px"
-        height: coords.y2 - coords.y1 + "px"
+        left: geom.posx + "px"
+        top: geom.posy + "px"
+        width: geom.width + "px"
+        height: geom.height + "px"
+
+coordsToGeom = (coords) ->
+    posx: coords.x1
+    posy: coords.y1
+    width: coords.x2 - coords.x1
+    height: coords.y2 - coords.y1
+
+setCoords = ($div, coords) ->
+    setGeom $div, (coordsToGeom coords)
 
 class Selection
     constructor: (@$tld, @create) ->
@@ -54,9 +63,9 @@ class Selection
 
 
 class Annotation
-    constructor: (@$tld, @docid, @page, @text, @annid, @coords) ->
+    constructor: (@$tld, @docid, @page, @text, @annid, @geom) ->
         @$div = jQuery('<div>').addClass 'annotation'
-        setCoords @$div, @coords
+        setGeom @$div, @geom
         $closeBtn = jQuery('<a>').text '[X]'
         @$div.append $closeBtn
 
@@ -81,25 +90,21 @@ class Annotation
             return value
         @$div.draggable
             stop: (ev, ui) =>
-                @updateCoords(ev, ui)
+                @updateGeom(ev, ui)
                 @submitChanges()
         @$div.resizable
             stop: (ev, ui) =>
-                @updateCoords(ev, ui)
+                @updateGeom(ev, ui)
                 @submitChanges()
 
-    updateCoords: (e, ui) ->
+    updateGeom: (e, ui) ->
         tldOffset = @$tld.offset()
         if e.type == 'dragstop'
-            width = @coords.x2 - @coords.x1
-            height = @coords.y2 - @coords.y1
-            @coords.x1 = ui.offset.left - tldOffset.left
-            @coords.y1 = ui.offset.top - tldOffset.top
-            @coords.x2 = @coords.x1 + width
-            @coords.y2 = @coords.y1 + height
+            @geom.posx = ui.offset.left - tldOffset.left
+            @geom.posy = ui.offset.top - tldOffset.top
         else if e.type == 'resizestop'
-            @coords.x2 = @coords.x1 + ui.size.width
-            @coords.y2 = @coords.y1 + ui.size.height
+            @geom.width = ui.size.width
+            @geom.height = ui.size.height
 
     submitChanges: ->
         if @annid
@@ -112,10 +117,10 @@ class Annotation
             type: type
             url: url
             data:
-                posx: @coords.x1
-                posy: @coords.y1
-                width: @coords.x2 - @coords.x1
-                height: @coords.y2 - @coords.y1
+                posx: @geom.posx
+                posy: @geom.posy
+                width: @geom.width
+                height: @geom.height
                 doc: @docid
                 page: @page
                 value: @text
@@ -145,7 +150,7 @@ render_page = (docid, pv, pdf, i, page, annotations) ->
             height: viewport.height + "px"
             width: viewport.width + "px"
     selection = new Selection $textLayerDiv, (coords) ->
-        ann = new Annotation $textLayerDiv, docid, i, "", null, coords
+        ann = new Annotation $textLayerDiv, docid, i, "", null, (coordsToGeom coords)
         $pdfPage.append ann.$div
     $selectionDiv = selection.$div
     $pdfPage.append($selectionDiv)
@@ -164,11 +169,7 @@ render_page = (docid, pv, pdf, i, page, annotations) ->
     anns = annotations[i]
     if anns
         for ann in anns
-            annotation = new Annotation $textLayerDiv, docid, i, ann.text, ann.id,
-                x1: ann.posx
-                y1: ann.posy
-                x2: ann.posx + ann.width
-                y2: ann.posy + ann.height
+            annotation = new Annotation $textLayerDiv, docid, i, ann.text, ann.id, ann
             $pdfPage.append annotation.$div
 
     if (i+1 <= pdf.numPages)
