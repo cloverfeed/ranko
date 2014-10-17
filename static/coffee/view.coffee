@@ -4,87 +4,127 @@ view_pdf = (docid, pv, pdf) ->
         pdf.getPage(1).then (page) ->
             render_page docid, pv, pdf, 1, page, annotations.data
 
-setCoords = ($div, coords) ->
+setGeom = ($div, geom) ->
     $div.css
-        left: coords.x1 + "px"
-        top: coords.y1 + "px"
-        width: coords.x2 - coords.x1 + "px"
-        height: coords.y2 - coords.y1 + "px"
+        left: geom.posx + "px"
+        top: geom.posy + "px"
+        width: geom.width + "px"
+        height: geom.height + "px"
 
-makeSelectionDiv = (docid, page, $pdfp, $tld) ->
-    sdCoords =
-        x1: 0
-        y1: 0
-        x2: 0
-        y2: 0
+class Selection
+    constructor: (@$tld, @create) ->
+        @x1 = 0
+        @y1 = 0
+        @x2 = 0
+        @y2 = 0
+        @$div = jQuery('<div>').addClass 'selectionDiv'
+        @$tld.mousedown (e) => @mousedown e
+        @$tld.mousemove (e) => @mousemove e
+        @$tld.mouseup (e) => @mouseup e
 
-    $sd = jQuery('<div>').addClass 'selectionDiv'
+    computeGeom: ->
+        posx: Math.min @x1, @x2
+        posy: Math.min @y1, @y2
+        width: Math.abs(@x2 - @x1)
+        height: Math.abs(@y2 - @y1)
 
-    eventCoords = (e) ->
-        tldOffset = $tld.offset()
+    eventCoords: (e) ->
+        tldOffset = @$tld.offset()
         return (
             x: e.pageX - tldOffset.left
             y: e.pageY - tldOffset.top
         )
 
-    $tld.mousedown (e) ->
-        ec = eventCoords e
-        sdCoords.x1 = ec.x
-        sdCoords.y1 = ec.y
-        $sd.show()
+    mousedown: (e) ->
+        ec = @eventCoords e
+        @x1 = ec.x
+        @y1 = ec.y
+        @$div.show()
 
-    bigEnough = ->
-        width = sdCoords.x2 - sdCoords.x1
-        height = sdCoords.y2 - sdCoords.y1
-        width > 30 && height > 30
+    bigEnough: ->
+        geom = @computeGeom()
+        geom.width > 30 && geom.height > 30
 
-    $tld.mouseup ->
-        $sd.hide()
-        if bigEnough()
-            $ann = makeAnnotation docid, page, "", null, sdCoords
-            $pdfp.append $ann
+    mouseup: ->
+        @$div.hide()
+        if @bigEnough()
+            geom = @computeGeom()
+            @create geom
 
-    $tld.mousemove (e) ->
-        ec = eventCoords e
-        sdCoords.x2 = ec.x
-        sdCoords.y2 = ec.y
-        setCoords $sd, sdCoords
+    mousemove: (e) ->
+        ec = @eventCoords e
+        @x2 = ec.x
+        @y2 = ec.y
+        geom = @computeGeom()
+        setGeom @$div, geom
 
-    return $sd
 
-makeAnnotation = (docid, page, text, annid, coords) ->
-    $ad = jQuery('<div>').addClass 'annotation'
-    setCoords $ad, coords
+class Annotation
+    constructor: (@$tld, @docid, @page, @text, @annid, @geom) ->
+        @$div = jQuery('<div>').addClass 'annotation'
+        setGeom @$div, @geom
+        $closeBtn = jQuery('<a>').text '[X]'
+        @$div.append $closeBtn
 
-    $closeBtn = jQuery('<a>').text '[X]'
-    $ad.append $closeBtn
+        $closeBtn.click =>
+            delDone = =>
+                @$div.remove()
+            if @annid
+                ANN_URL = '/annotation/' + @annid
+                $.ajax
+                    url: ANN_URL
+                    type: 'DELETE'
+                    success: -> delDone()
+            else
+                delDone()
 
-    $closeBtn.click ->
-        delDone = ->
-            $ad.remove()
-        if annid
-            ANN_URL = '/annotation/' + annid
-            $.ajax
-                url: ANN_URL
-                type: 'DELETE'
-                success: -> delDone()
+        $annText = jQuery('<div>').text(@text)
+        @$div.append $annText
+
+        $annText.editable (value, settings) =>
+            @text = value
+            @submitChanges()
+            return value
+        @$div.draggable
+            stop: (ev, ui) =>
+                @updateGeom(ev, ui)
+                @submitChanges()
+        @$div.resizable
+            stop: (ev, ui) =>
+                @updateGeom(ev, ui)
+                @submitChanges()
+
+    updateGeom: (e, ui) ->
+        tldOffset = @$tld.offset()
+        if e.type == 'dragstop'
+            @geom.posx = ui.offset.left - tldOffset.left
+            @geom.posy = ui.offset.top - tldOffset.top
+        else if e.type == 'resizestop'
+            @geom.width = ui.size.width
+            @geom.height = ui.size.height
+
+    submitChanges: ->
+        if @annid
+            type = 'PUT'
+            url = '/annotation/' + @annid
         else
-            delDone()
+            type = 'POST'
+            url = '/annotation/new'
+        $.ajax
+            type: type
+            url: url
+            data:
+                posx: @geom.posx
+                posy: @geom.posy
+                width: @geom.width
+                height: @geom.height
+                doc: @docid
+                page: @page
+                value: @text
+            success: (d) =>
+                if type == 'POST'
+                    @annid = d.id
 
-    $annText = jQuery('<div>').text(text)
-    $ad.append $annText
-
-    POST_URL = '/annotation/new'
-    $annText.editable POST_URL,
-        submitdata:
-            posx: coords.x1
-            posy: coords.y1
-            width: coords.x2 - coords.x1
-            height: coords.y2 - coords.y1
-            doc: docid
-            page: page
-
-    return $ad
 
 render_page = (docid, pv, pdf, i, page, annotations) ->
     canvas = document.createElement 'canvas'
@@ -109,7 +149,10 @@ render_page = (docid, pv, pdf, i, page, annotations) ->
         .css
             height: viewport.height + "px"
             width: viewport.width + "px"
-    $selectionDiv = makeSelectionDiv docid, i, $pdfPage, $textLayerDiv
+    selection = new Selection $textLayerDiv, (geom) ->
+        ann = new Annotation $textLayerDiv, docid, i, "", null, geom
+        $pdfPage.append ann.$div
+    $selectionDiv = selection.$div
     $pdfPage.append($selectionDiv)
     pdfPage.appendChild($textLayerDiv.get 0)
     page.getTextContent().then (textContent) ->
@@ -126,12 +169,8 @@ render_page = (docid, pv, pdf, i, page, annotations) ->
     anns = annotations[i]
     if anns
         for ann in anns
-            $annDiv = makeAnnotation docid, i, ann.text, ann.id,
-                x1: ann.posx
-                y1: ann.posy
-                x2: ann.posx + ann.width
-                y2: ann.posy + ann.height
-            $pdfPage.append $annDiv
+            annotation = new Annotation $textLayerDiv, docid, i, ann.text, ann.id, ann
+            $pdfPage.append annotation.$div
 
     if (i+1 <= pdf.numPages)
         pdf.getPage(i+1).then (page) ->
@@ -168,3 +207,5 @@ view_init = (src, docid, url_post_comment) ->
     $('#fullscreen_button_exit').click (e) ->
         e.preventDefault()
         view_fullscreen_exit()
+    $('#toggle_annotations_button').click (e) ->
+        $('.annotation').toggle()

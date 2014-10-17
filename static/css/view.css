@@ -51,5 +51,5 @@
 
 .annotation {
     background-color: orange;
-    position: absolute;
+    position: absolute !important; /* important is needed for http://bugs.jqueryui.com/ticket/6939 */
 }

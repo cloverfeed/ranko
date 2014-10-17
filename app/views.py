@@ -90,7 +90,7 @@ def annotation_new():
     ann = Annotation(doc, page, posx, posy, width, height, text)
     db.session.add(ann)
     db.session.commit()
-    return text
+    return jsonify(id=ann.id)
 
 
 @app.route('/view/<id>/annotations')
@@ -108,5 +108,13 @@ def annotations_for_doc(id):
 def annotation_delete(id):
     ann = Annotation.query.get(id)
     db.session.delete(ann)
+    db.session.commit()
+    return jsonify(status='ok')
+
+
+@app.route('/annotation/<id>', methods=['PUT'])
+def annotation_edit(id):
+    ann = Annotation.query.get(id)
+    ann.load_json(request.form)
     db.session.commit()
     return jsonify(status='ok')

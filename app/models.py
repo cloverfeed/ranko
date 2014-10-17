@@ -48,3 +48,10 @@ class Annotation(db.Model):
                 'height': self.height,
                 'text': self.text,
                 }
+
+    def load_json(self, data):
+        self.posx = data['posx']
+        self.posy = data['posy']
+        self.width = data['width']
+        self.height = data['height']
+        self.text = data['value']
