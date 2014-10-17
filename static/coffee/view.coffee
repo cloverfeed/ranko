@@ -54,9 +54,9 @@ class Selection
 
 
 class Annotation
-    constructor: (docid, page, text, @annid, coords) ->
+    constructor: (@docid, @page, text, @annid, @coords) ->
         @$div = jQuery('<div>').addClass 'annotation'
-        setCoords @$div, coords
+        setCoords @$div, @coords
         $closeBtn = jQuery('<a>').text '[X]'
         @$div.append $closeBtn
 
@@ -75,15 +75,23 @@ class Annotation
         $annText = jQuery('<div>').text(text)
         @$div.append $annText
 
+        $annText.editable (value, settings) => @submitChanges value, settings
+
+    submitChanges: (value, settings) ->
         POST_URL = '/annotation/new'
-        $annText.editable POST_URL,
-            submitdata:
-                posx: coords.x1
-                posy: coords.y1
-                width: coords.x2 - coords.x1
-                height: coords.y2 - coords.y1
-                doc: docid
-                page: page
+        $.ajax
+            type: 'POST'
+            url: POST_URL
+            data:
+                posx: @coords.x1
+                posy: @coords.y1
+                width: @coords.x2 - @coords.x1
+                height: @coords.y2 - @coords.y1
+                doc: @docid
+                page: @page
+                value: value
+        return value
+
 
 render_page = (docid, pv, pdf, i, page, annotations) ->
     canvas = document.createElement 'canvas'
