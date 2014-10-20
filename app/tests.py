@@ -14,7 +14,7 @@ class TestCase(unittest.TestCase):
         app.config['CSRF_ENABLED'] = False
         app.config['WTF_CSRF_ENABLED'] = False
 
-        uri = 'sqlite:///' + os.path.join(app.instance_path, 'test.db')
+        uri = 'sqlite://'  # In-memory DB
         app.config['SQLALCHEMY_DATABASE_URI'] = uri
 
         self.key_file = os.path.join(app.instance_path, 'secret-test.key')
