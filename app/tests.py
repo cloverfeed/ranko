@@ -5,6 +5,7 @@ import os
 from flask.ext.uploads import TestingFileStorage
 import re
 import koremutake
+import json
 
 
 class TestCase(unittest.TestCase):
@@ -13,7 +14,7 @@ class TestCase(unittest.TestCase):
         app.config['CSRF_ENABLED'] = False
         app.config['WTF_CSRF_ENABLED'] = False
 
-        uri = 'sqlite:///' + os.path.join(app.instance_path, 'test.db')
+        uri = 'sqlite://'  # In-memory DB
         app.config['SQLALCHEMY_DATABASE_URI'] = uri
 
         self.key_file = os.path.join(app.instance_path, 'secret-test.key')
@@ -38,6 +39,9 @@ class TestCase(unittest.TestCase):
         m = re.search('/view/(\w+)', r.location)
         self.assertIsNotNone(m)
         docid = m.group(1)
+        r = self.app.get('/raw/' + docid)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.content_type, 'application/pdf')
         comm = 'bla bla bla'
         r = self.app.post('/comment/new',
                           data={'docid': docid,
@@ -56,3 +60,51 @@ class TestCase(unittest.TestCase):
     def test_no_doc(self):
         r = self.app.get('/view/0')
         self.assertEqual(r.status_code, 404)
+        r = self.app.get('/raw/0')
+        self.assertEqual(r.status_code, 404)
+
+    def test_annotation(self):
+        data = { 'doc': 1
+               , 'page': 2
+               , 'posx': 3
+               , 'posy': 4
+               , 'width': 5
+               , 'height': 6
+               , 'value': 'Oh oh'
+               }
+        r = self.app.post('/annotation/new', data=data)
+        self.assertEqual(r.status_code, 200)
+        d = json.loads(r.data)
+        self.assertIn('id', d)
+        id_resp = d['id']
+
+        r = self.app.get('/view/1/annotations')
+        d = json.loads(r.data)
+        anns = d['data']['2']
+        self.assertEqual(len(anns), 1)
+        ann = anns[0]
+        id_retr = ann['id']
+        self.assertEqual(ann['height'], 6)
+        self.assertEqual(id_retr, id_resp)
+
+        data = { 'doc': 1
+               , 'page': 2
+               , 'posx': 3
+               , 'posy': 4
+               , 'width': 5
+               , 'height': 60
+               , 'value': 'Oh oh'
+               }
+        r = self.app.put('/annotation/{}'.format(id_retr), data=data)
+        r = self.app.get('/view/1/annotations')
+        d = json.loads(r.data)
+        anns = d['data']['2']
+        self.assertEqual(len(anns), 1)
+        ann = anns[0]
+        self.assertEqual(ann['height'], 60)
+
+        r = self.app.delete('/annotation/{}'.format(id_retr))
+        self.assertEqual(r.status_code, 200)
+        r = self.app.get('/view/1/annotations')
+        d = json.loads(r.data)
+        self.assertNotIn('2', d['data'])
