@@ -13,9 +13,9 @@ render_page = (docid, $pv, pdf, i, page, annotations) ->
     pdf.getPage(i + 1).then (page) ->
       render_page docid, $pv, pdf, i + 1, page, annotations
 
-view_init = (src, docid, url_post_comment) ->
+view_init = (docid) ->
   $pv = $('#pdfview')
-  PDFJS.getDocument(src).then (pdf) ->
+  PDFJS.getDocument('/raw/' + docid).then (pdf) ->
     GET_ANN_URL = '/view/' + docid + '/annotations'
     $.getJSON GET_ANN_URL, (annotations) ->
       pdf.getPage(1).then (page) ->
@@ -26,7 +26,7 @@ view_init = (src, docid, url_post_comment) ->
     e.preventDefault()
     $.ajax
       type: 'POST'
-      url: url_post_comment
+      url: '/comment/new'
       data: $(this).serialize()
       success: (data) ->
         comm = $('#comment').val()
