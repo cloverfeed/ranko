@@ -36,6 +36,7 @@ coffee = Bundle(
     'coffee/view.coffee',
     'coffee/selection.coffee',
     'coffee/annotation.coffee',
+    'coffee/pdfpage.coffee',
     filters='coffeescript',
     output='gen/app.js'
     )

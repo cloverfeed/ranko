@@ -52,10 +52,8 @@
 <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets %}
 <script type="text/javascript">
-var src = "{{url_for('rawdoc', id=doc.id)}}";
-var url_post_comment = "{{ url_for('post_comment') }}";
 PDFJS.workerSrc = "{{url_for('static', filename='vendor/pdfjs-' + config.pdfjs_version + '-dist/build/pdf.worker.js')}}";
-view_init(src, {{doc.id}}, url_post_comment);
+view_init({{doc.id}});
 </script>
 
 {% endblock %}
