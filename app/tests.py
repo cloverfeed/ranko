@@ -76,3 +76,7 @@ class TestCase(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         d = json.loads(r.data)
         self.assertIn('id', d)
+        r = self.app.get('/view/1/annotations')
+        d = json.loads(r.data)
+        anns = d['data']['2']
+        self.assertEqual(len(anns), 1)
