@@ -5,6 +5,7 @@ import os
 from flask.ext.uploads import TestingFileStorage
 import re
 import koremutake
+import json
 
 
 class TestCase(unittest.TestCase):
@@ -61,3 +62,17 @@ class TestCase(unittest.TestCase):
         self.assertEqual(r.status_code, 404)
         r = self.app.get('/raw/0')
         self.assertEqual(r.status_code, 404)
+
+    def test_annotation(self):
+        data = { 'doc': 1
+               , 'page': 2
+               , 'posx': 3
+               , 'posy': 4
+               , 'width': 5
+               , 'height': 6
+               , 'value': 'Oh oh'
+               }
+        r = self.app.post('/annotation/new', data=data)
+        self.assertEqual(r.status_code, 200)
+        d = json.loads(r.data)
+        self.assertIn('id', d)
