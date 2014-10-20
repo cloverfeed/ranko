@@ -73,6 +73,7 @@ def post_comment():
 
 @app.route('/raw/<id>')
 def rawdoc(id):
+    id = kore_id(id)
     doc = Document.query.get_or_404(id)
     docdir = os.path.join(app.instance_path, 'uploads')
     return send_from_directory(docdir, doc.filename)

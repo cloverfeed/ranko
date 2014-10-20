@@ -38,6 +38,9 @@ class TestCase(unittest.TestCase):
         m = re.search('/view/(\w+)', r.location)
         self.assertIsNotNone(m)
         docid = m.group(1)
+        r = self.app.get('/raw/' + docid)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.content_type, 'application/pdf')
         comm = 'bla bla bla'
         r = self.app.post('/comment/new',
                           data={'docid': docid,
@@ -55,4 +58,6 @@ class TestCase(unittest.TestCase):
 
     def test_no_doc(self):
         r = self.app.get('/view/0')
+        self.assertEqual(r.status_code, 404)
+        r = self.app.get('/raw/0')
         self.assertEqual(r.status_code, 404)
