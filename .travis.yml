@@ -8,8 +8,13 @@ install:
     - "pip install sphinxcontrib-httpdomain --use-mirrors"
 before_install:
     - npm install coffee-script
+before_script:
+    - npm install casperjs
+    - export PATH=node_modules/phantomjs/bin:node_modules/casperjs/bin:$PATH
+    - python run.py &
 script:
     - nosetests --with-coverage --cover-package=app
+    - casperjs test tests.coffee
     - make -C docs html
 notifications:
     slack: cloverfeed:Zd60W6QoaC1pGFP85rOvNJa1
