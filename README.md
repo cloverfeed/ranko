@@ -13,7 +13,7 @@ Make a branch! Don't directly commit to master.
 
 Unit tests:
 
-   nosetests --with-coverage --cover-package=app
+    nosetests --with-coverage --cover-package=app
 
 Coverage is nice but not absolute. A metric that becomes an objective is not a
 metric anymore.
@@ -28,10 +28,8 @@ Linters are available but not enforced: pep8, coffeelint.
   - deploy master to a vagrant VM (`vagrant up` + `scripts/deploy --to=test` should do this).
   - test upgrade using `scripts/deploy --to=test --branch=YOURBRANCH`.
   - If everything is fine, merge the branch (no FF):
-
-    git checkout master
-    git merge --no-ff YOURBRANCH
-    git push origin master :YOURBRANCH
-    git branch -d YOURBRANCH
-
+    - `git checkout master`
+    - `git merge --no-ff YOURBRANCH`
+    - `git push origin master :YOURBRANCH`
+    - `git branch -d YOURBRANCH`
   - Deploy master to prod: `scripts/deploy`.
