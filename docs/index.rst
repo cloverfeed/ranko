@@ -11,6 +11,7 @@ Contents:
 .. toctree::
 
     app
+    http
 
 Indices and tables
 ==================
