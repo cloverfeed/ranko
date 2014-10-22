@@ -6,7 +6,9 @@ install:
     - "pip install coveralls --use-mirrors"
 before_install:
     - npm install coffee-script
-script: nosetests --with-coverage --cover-package=app
+script:
+    - nosetests --with-coverage --cover-package=app
+    - make -C docs html
 notifications:
     slack: cloverfeed:Zd60W6QoaC1pGFP85rOvNJa1
 after_success:
