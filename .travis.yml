@@ -4,6 +4,7 @@ python:
 install:
     - "pip install -r requirements.txt --use-mirrors"
     - "pip install coveralls --use-mirrors"
+    - "pip install sphinx --use-mirrors"
 before_install:
     - npm install coffee-script
 script:
