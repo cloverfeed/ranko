@@ -47,6 +47,15 @@
       notify:
         - restart app
 
+    - name: delete nginx default site
+      when: delete_default_site is defined
+      action: file
+      args:
+          name: /etc/nginx/sites-enabled/default
+          state: absent
+      notify:
+        - restart nginx
+
     - name: create nginx site config
       action: template
       args:
