@@ -5,3 +5,4 @@ instance/uploads
 .coverage
 static/gen
 static/.webassets-cache
+docs/_build

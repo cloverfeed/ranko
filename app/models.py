@@ -1,7 +1,12 @@
+"""
+SQLAlchemy models
+"""
 from app import db
 import random
 
-
+"""
+A document. The actual file is stored in the application's instance path.
+"""
 class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     filename = db.Column(db.String, nullable=False)

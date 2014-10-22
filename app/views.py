@@ -23,6 +23,9 @@ def kore_id(s):
 
 @app.route('/')
 def home():
+    """
+    Home page.
+    """
     return render_template('home.html')
 
 
@@ -32,6 +35,9 @@ class UploadForm(Form):
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
+    """
+    Form to upload a document.
+    """
     form = UploadForm()
     if form.validate_on_submit():
         filename = documents.save(form.file.data)
@@ -50,6 +56,11 @@ class CommentForm(Form):
 
 @app.route('/view/<id>')
 def view_doc(id):
+    """
+    View a Document.
+
+    :param id: A numeric (or koremutake) id.
+    """
     id = kore_id(id)
     doc = Document.query.get_or_404(id)
     form = CommentForm(docid=id)
@@ -61,6 +72,11 @@ def view_doc(id):
 
 @app.route('/comment/new', methods=['POST'])
 def post_comment():
+    """
+    Create a new comment.
+
+    :status 302: Redirects to the "view document" page.
+    """
     form = CommentForm()
     assert(form.validate_on_submit())
     docid = kore_id(form.docid.data)
@@ -73,6 +89,11 @@ def post_comment():
 
 @app.route('/raw/<id>')
 def rawdoc(id):
+    """
+    Get the file associated to a Document.
+
+    :param id: A numeric (or koremutake) id.
+    """
     id = kore_id(id)
     doc = Document.query.get_or_404(id)
     docdir = os.path.join(app.instance_path, 'uploads')
@@ -81,6 +102,11 @@ def rawdoc(id):
 
 @app.route('/annotation/new', methods=['POST'])
 def annotation_new():
+    """
+    Create a new annotation.
+
+    :>json int id: The new ID.
+    """
     doc = request.form['doc']
     page = request.form['page']
     posx = request.form['posx']
@@ -96,6 +122,12 @@ def annotation_new():
 
 @app.route('/view/<id>/annotations')
 def annotations_for_doc(id):
+    """
+    Get the annotations associated to a Document.
+
+    :param id: Integer ID
+    :>json array data: Results
+    """
     data = {}
     for ann in Annotation.query.filter_by(doc=id):
         page = ann.page
@@ -107,6 +139,12 @@ def annotations_for_doc(id):
 
 @app.route('/annotation/<id>', methods=['DELETE'])
 def annotation_delete(id):
+    """
+    Delete an annotation.
+
+    :param id: Integer ID
+    :>json string status: The string 'ok'
+    """
     ann = Annotation.query.get(id)
     db.session.delete(ann)
     db.session.commit()
@@ -115,6 +153,9 @@ def annotation_delete(id):
 
 @app.route('/annotation/<id>', methods=['PUT'])
 def annotation_edit(id):
+    """
+    Edit an Annotation.
+    """
     ann = Annotation.query.get(id)
     ann.load_json(request.form)
     db.session.commit()
