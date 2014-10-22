@@ -34,6 +34,12 @@
           virtualenv: "{{webapps_dir}}/{{app_name}}/venv"
           state: present
 
+    - name: create DB
+      action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/makedb.py
+      args:
+          chdir: "{{webapps_dir}}/{{app_name}}/src"
+          creates: "{{webapps_dir}}/{{app_name}}/src/instance/app.db"
+
     - name: run DB migrations
       action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py db upgrade
       args:
@@ -46,6 +52,15 @@
           dest: /etc/supervisor/conf.d/{{app_name}}.conf
       notify:
         - restart app
+
+    - name: delete nginx default site
+      when: delete_default_site is defined
+      action: file
+      args:
+          name: /etc/nginx/sites-enabled/default
+          state: absent
+      notify:
+        - restart nginx
 
     - name: create nginx site config
       action: template
@@ -61,12 +76,6 @@
           src: /etc/nginx/sites-available/{{app_name}}.conf
           dest: /etc/nginx/sites-enabled/{{app_name}}.conf
           state: link
-
-    - name: create DB
-      action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/makedb.py
-      args:
-          chdir: "{{webapps_dir}}/{{app_name}}/src"
-          creates: "{{webapps_dir}}/{{app_name}}/src/instance/app.db"
 
     - name: start app
       action: supervisorctl name={{app_name}} state=started
