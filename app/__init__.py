@@ -1,3 +1,7 @@
+"""
+This application and DB object.
+"""
+
 from flask import Flask
 import os
 from .key import get_secret_key
@@ -8,7 +12,10 @@ from flask.ext.assets import Environment, Bundle
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 
-app = Flask('Review')
+this_dir = os.path.dirname(os.path.abspath(__file__))
+instance_path = os.path.join(this_dir, '..', 'instance')
+
+app = Flask('Review', instance_path=instance_path)
 
 app.config['PROPAGATE_EXCEPTIONS'] = True
 
