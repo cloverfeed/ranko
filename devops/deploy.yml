@@ -12,6 +12,8 @@
     wsgi_callable: app
     wsgi_file: run.py
     server_name: ranko.emillon.org
+    dbname: ranko
+    dbuser: ranko
 
   tasks:
     - name: ensure log directory
@@ -39,6 +41,26 @@
       args:
           chdir: "{{webapps_dir}}/{{app_name}}/src"
           creates: "{{webapps_dir}}/{{app_name}}/src/instance/app.db"
+
+    - name: give vagrant user access to postgres
+      action: lineinfile
+      args:
+          dest: /etc/sudoers
+          regexp: "^%vagrant"
+          line: "%vagrant ALL = (postgres) NOPASSWD: ALL"
+          state: present
+
+    - name: create Postgresql DB
+      sudo_user: postgres
+      postgresql_db: name={{dbname}}
+
+    - name: ensure user has access to database
+      sudo_user: postgres
+      postgresql_user: db={{dbname}} name={{dbuser}} priv=ALL
+
+    - name: ensure user does not have unnecessary privilege
+      sudo_user: postgres
+      postgresql_user: name={{dbuser}} role_attr_flags=NOSUPERUSER,NOCREATEDB
 
     - name: run DB migrations
       action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py db upgrade
