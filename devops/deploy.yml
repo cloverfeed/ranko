@@ -10,7 +10,7 @@
     repo_version: master
     webapps_dir: /srv/webapps
     wsgi_callable: app
-    wsgi_file: run.py
+    wsgi_file: wsgi.py
     server_name: ranko.emillon.org
     dbname: ranko
     dbuser: ranko
