@@ -16,6 +16,7 @@
         - coffeescript
         - postgresql-9.4
         - python-psycopg2
+        - libpq-dev
 
     - name: start supervisord service and have it run during system startup
       action: service name=supervisor state=started enabled=yes
