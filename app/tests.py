@@ -10,9 +10,7 @@ import json
 
 class TestCase(TestCase):
     def create_app(self):
-        return create_app(db_backend='sql_memory',
-                          testing=True,
-                          )
+        return create_app(config_file='conf/testing.py')
 
     def setUp(self):
         db.create_all()

@@ -7,40 +7,29 @@ from flask.ext.uploads import configure_uploads
 from flask.ext.assets import Environment, Bundle
 from flask.ext.migrate import Migrate, MigrateCommand
 
-def create_app(db_backend=None, testing=False):
+def create_app(config_file=None):
 
     this_dir = os.path.dirname(os.path.abspath(__file__))
     instance_path = os.path.join(this_dir, '..', 'instance')
 
     app = Flask('Review', instance_path=instance_path)
 
-    app.config['PROPAGATE_EXCEPTIONS'] = True
+    app.config.from_pyfile(os.path.join(this_dir, '..', 'conf/common.py'))
 
-    app.config['pdfjs_version'] = '1.0.473'
+    if config_file:
+        app.config.from_pyfile(config_file)
 
     # CSRF & WTForms
-    if testing:
-        key_file_name = 'secret-test.key'
-    else:
-        key_file_name = 'secret.key'
-    key_file = os.path.join(app.instance_path, key_file_name)
+    key_file = os.path.join(app.instance_path, 'secret.key')
     app.config['SECRET_KEY'] = get_secret_key(key_file)
-
 
     # flask-uploads
     configure_uploads(app, [documents])
 
     # flask-sqlalchemy
-    if db_backend == 'sql_file':
-        uri = 'sqlite:///' + os.path.join(app.instance_path, 'app.db')
-    elif db_backend == 'sql_memory':
-        uri = 'sqlite://'  # In-memory DB
-    elif db_backend == 'postgres':
-        dbname = 'ranko'
-        uri = 'postgresql+psycopg2://ranko:@/{}'.format(dbname)
-    else:
-        assert False, 'Unknown DB backend: {}'.format(db_backend)
-    app.config['SQLALCHEMY_DATABASE_URI'] = uri
+    if app.config.get('SQLALCHEMY_DATABASE_URI') == '@sql_file':
+        here_db = 'sqlite:///' + os.path.join(app.instance_path, 'app.db')
+        app.config['SQLALCHEMY_DATABASE_URI'] = here_db
     db.init_app(app)
 
     # flask-assets
@@ -58,14 +47,7 @@ def create_app(db_backend=None, testing=False):
     # flask-migrate
     migrate = Migrate(app, db)
 
-    # disable stuff for tests
-    if testing:
-        app.config['TESTING'] = True
-        app.config['CSRF_ENABLED'] = False
-        app.config['WTF_CSRF_ENABLED'] = False
-
     from views import bp
     app.register_blueprint(bp)
-    assert(len(app.url_map._rules) == 11), app.url_map
 
     return app

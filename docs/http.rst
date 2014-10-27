@@ -1,6 +1,6 @@
 HTTP endpoints
 --------------
 
-.. autoflask:: app:factory.create_app(db_backend='sql_memory')
+.. autoflask:: app:factory.create_app()
    :include-empty-docstring:
    :endpoints:

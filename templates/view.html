@@ -43,7 +43,7 @@
 </div>
 </div>
 
-<script src="{{url_for('static', filename='vendor/pdfjs-' + config.pdfjs_version + '-dist/build/pdf.js')}}"></script>
+<script src="{{url_for('static', filename='vendor/pdfjs-' + config.X_PDFJS_VERSION + '-dist/build/pdf.js')}}"></script>
 <script src="{{url_for('static', filename='js/text_layer_builder.js')}}"></script>
 <script src="{{url_for('static', filename='js/ui_utils.js')}}"></script>
 <script src="{{url_for('static', filename='vendor/jquery.jeditable.mini.js')}}"></script>
@@ -52,7 +52,7 @@
 <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets %}
 <script type="text/javascript">
-PDFJS.workerSrc = "{{url_for('static', filename='vendor/pdfjs-' + config.pdfjs_version + '-dist/build/pdf.worker.js')}}";
+PDFJS.workerSrc = "{{url_for('static', filename='vendor/pdfjs-' + config.X_PDFJS_VERSION + '-dist/build/pdf.worker.js')}}";
 view_init({{doc.id}});
 </script>
 
