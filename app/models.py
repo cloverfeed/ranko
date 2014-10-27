@@ -17,7 +17,7 @@ class Document(db.Model):
     filename = db.Column(db.String, nullable=False)
 
     def __init__(self, filename):
-        self.id = random.randint(0, 0xffffffff)
+        self.id = random.randint(0, 0x7fffffff)
         self.filename = filename
 
 
