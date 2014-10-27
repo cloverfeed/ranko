@@ -1,0 +1,9 @@
+#!/bin/bash
+set -ex
+branch=$1
+git checkout master
+vagrant up
+python scripts/deploy.py --to test
+git checkout "$branch"
+vagrant provision
+python scripts/deploy.py --branch "$branch" --to test

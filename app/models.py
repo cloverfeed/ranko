@@ -1,8 +1,13 @@
 """
 SQLAlchemy models
 """
-from app import db
 import random
+from flask.ext.sqlalchemy import SQLAlchemy
+
+"""
+The main DB object. It gets initialized in create_app.
+"""
+db = SQLAlchemy()
 
 """
 A document. The actual file is stored in the application's instance path.
@@ -12,7 +17,7 @@ class Document(db.Model):
     filename = db.Column(db.String, nullable=False)
 
     def __init__(self, filename):
-        self.id = random.randint(0, 0xffffffff)
+        self.id = random.randint(0, 0x7fffffff)
         self.filename = filename
 
 

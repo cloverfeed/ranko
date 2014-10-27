@@ -1,6 +1,6 @@
 HTTP endpoints
 --------------
 
-.. autoflask:: app:app
+.. autoflask:: app:factory.create_app()
    :include-empty-docstring:
    :endpoints:

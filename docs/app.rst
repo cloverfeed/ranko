@@ -4,6 +4,14 @@ app package
 Submodules
 ----------
 
+app.factory module
+------------------
+
+.. automodule:: app.factory
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 app.key module
 --------------
 
@@ -24,6 +32,14 @@ app.tests module
 ----------------
 
 .. automodule:: app.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+app.uploads module
+------------------
+
+.. automodule:: app.uploads
     :members:
     :undoc-members:
     :show-inheritance:
