@@ -8,7 +8,7 @@ from flask.ext.assets import Environment, Bundle
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 
-def create_app(db_backend=None):
+def create_app(db_backend=None, testing=False):
 
     this_dir = os.path.dirname(os.path.abspath(__file__))
     instance_path = os.path.join(this_dir, '..', 'instance')
@@ -20,14 +20,18 @@ def create_app(db_backend=None):
     app.config['pdfjs_version'] = '1.0.473'
 
     # CSRF & WTForms
-    key_file = os.path.join(app.instance_path, 'secret.key')
+    if testing:
+        key_file_name = 'secret-test.key'
+    else:
+        key_file_name = 'secret.key'
+    key_file = os.path.join(app.instance_path, key_file_name)
     app.config['SECRET_KEY'] = get_secret_key(key_file)
 
 
     # flask-uploads
     configure_uploads(app, [documents])
 
-    # flask-sqlalchemyTrue
+    # flask-sqlalchemy
     if db_backend == 'sql_file':
         uri = 'sqlite:///' + os.path.join(app.instance_path, 'app.db')
     elif db_backend == 'sql_memory':
@@ -55,6 +59,12 @@ def create_app(db_backend=None):
     # flask-script
     manager = Manager(app)
     manager.add_command('db', MigrateCommand)
+
+    # disable stuff for tests
+    if testing:
+        app.config['TESTING'] = True
+        app.config['CSRF_ENABLED'] = False
+        app.config['WTF_CSRF_ENABLED'] = False
 
     from views import bp
     app.register_blueprint(bp)

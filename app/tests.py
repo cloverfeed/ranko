@@ -1,6 +1,5 @@
 from factory import create_app
 from models import db
-from key import get_secret_key
 import os
 from flask.ext.testing import TestCase
 from flask.ext.uploads import TestingFileStorage
@@ -11,16 +10,9 @@ import json
 
 class TestCase(TestCase):
     def create_app(self):
-        app = create_app(db_backend='sql_memory')
-
-        app.config['TESTING'] = True
-        app.config['CSRF_ENABLED'] = False
-        app.config['WTF_CSRF_ENABLED'] = False
-
-        self.key_file = os.path.join(app.instance_path, 'secret-test.key')
-        app.config['SECRET_KEY'] = get_secret_key(self.key_file)
-
-        return app
+        return create_app(db_backend='sql_memory',
+                          testing=True,
+                          )
 
     def setUp(self):
         db.create_all()
