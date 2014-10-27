@@ -62,6 +62,14 @@
       sudo_user: postgres
       postgresql_user: name={{dbuser}} role_attr_flags=NOSUPERUSER,NOCREATEDB
 
+    - name: configure postgres auth
+      action: template
+      args:
+          src: templates/pg_hba.conf
+          dest: /etc/postgresql/9.4/main/pg_hba.conf
+      notify:
+        - restart postgres
+
     - name: run DB migrations
       action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py db upgrade
       args:
@@ -108,3 +116,6 @@
 
     - name: restart nginx
       action: service name=nginx state=restarted
+
+    - name: restart postgres
+      action: service name=postgresql state=restarted
