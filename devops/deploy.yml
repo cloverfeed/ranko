@@ -63,12 +63,6 @@
       postgresql_db: name={{dbname}}
       register: createdbuser
 
-    - name: create Postgres DB
-      action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py -c {{app_config_file}} create
-      args:
-          chdir: "{{webapps_dir}}/{{app_name}}/src"
-      when: config_file.stat.exists and createdbuser.changed
-
     - name: ensure user has access to database
       sudo_user: postgres
       postgresql_user: db={{dbname}} name={{dbuser}} priv=ALL
@@ -84,6 +78,12 @@
           dest: /etc/postgresql/9.4/main/pg_hba.conf
       notify:
         - restart postgres
+
+    - name: create Postgres DB
+      action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py -c {{app_config_file}} create
+      args:
+          chdir: "{{webapps_dir}}/{{app_name}}/src"
+      when: config_file.stat.exists and createdbuser.changed
 
     - name: run DB migrations
       action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py db upgrade
