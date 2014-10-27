@@ -35,6 +35,9 @@ def create_app(db_backend=None, testing=False):
         uri = 'sqlite:///' + os.path.join(app.instance_path, 'app.db')
     elif db_backend == 'sql_memory':
         uri = 'sqlite://'  # In-memory DB
+    elif db_backend == 'postgres':
+        dbname = 'ranko'
+        uri = 'postgresql+psycopg2://ranko:@/{}'.format(dbname)
     else:
         assert False, 'Unknown DB backend: {}'.format(db_backend)
     app.config['SQLALCHEMY_DATABASE_URI'] = uri
