@@ -9,3 +9,4 @@ flask-uploads
 flask-wtf
 koremutake
 nose
+psycopg2
