@@ -37,6 +37,19 @@
           virtualenv: "{{webapps_dir}}/{{app_name}}/venv"
           state: present
 
+    - name: check if config exists
+      action: stat
+      args:
+          path: "{{webapps_dir}}/{{app_name}}/src/{{config_file}}"
+      register: config_file
+
+    - name: create SQLite DB
+      action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/makedb.py
+      args:
+          chdir: "{{webapps_dir}}/{{app_name}}/src"
+          creates: "{{webapps_dir}}/{{app_name}}/src/instance/app.db"
+      when: not config_file.stat.exists
+
     - name: give vagrant user access to postgres
       action: lineinfile
       args:
@@ -50,11 +63,11 @@
       postgresql_db: name={{dbname}}
       register: createdbuser
 
-    - name: create DB
+    - name: create Postgres DB
       action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py -c {{config_file}} create
       args:
           chdir: "{{webapps_dir}}/{{app_name}}/src"
-      when: createdbuser.changed
+      when: config_file.stat.exists and createdbuser.changed
 
     - name: ensure user has access to database
       sudo_user: postgres
