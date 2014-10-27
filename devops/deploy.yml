@@ -14,7 +14,7 @@
     server_name: ranko.emillon.org
     dbname: ranko
     dbuser: ranko
-    config_file: conf/production.py
+    app_config_file: conf/production.py
 
   tasks:
     - name: ensure log directory
@@ -64,7 +64,7 @@
       register: createdbuser
 
     - name: create Postgres DB
-      action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py -c {{config_file}} create
+      action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py -c {{app_config_file}} create
       args:
           chdir: "{{webapps_dir}}/{{app_name}}/src"
       when: config_file.stat.exists and createdbuser.changed
