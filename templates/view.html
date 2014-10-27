@@ -27,7 +27,7 @@
     </div>
 
     <h3><span class="glyphicon glyphicon-comment"></span> Comments</h3>
-    <form method="POST" action="{{ url_for('post_comment') }}" id="post_comment_form">
+    <form method="POST" action="{{ url_for('.post_comment') }}" id="post_comment_form">
         {{form.hidden_tag()}}
         <p>{{form.comment()}}</p>
         {{form.docid()}}
