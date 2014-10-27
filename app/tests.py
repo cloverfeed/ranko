@@ -2,14 +2,15 @@ from app import app, db
 from .key import get_secret_key
 import unittest
 import os
+from flask.ext.testing import TestCase
 from flask.ext.uploads import TestingFileStorage
 import re
 import koremutake
 import json
 
 
-class TestCase(unittest.TestCase):
-    def setUp(self):
+class TestCase(TestCase):
+    def create_app(self):
         app.config['TESTING'] = True
         app.config['CSRF_ENABLED'] = False
         app.config['WTF_CSRF_ENABLED'] = False
@@ -20,6 +21,9 @@ class TestCase(unittest.TestCase):
         self.key_file = os.path.join(app.instance_path, 'secret-test.key')
         app.config['SECRET_KEY'] = get_secret_key(self.key_file)
 
+        return app
+
+    def setUp(self):
         self.app = app.test_client()
         db.create_all()
 

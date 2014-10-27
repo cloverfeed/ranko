@@ -4,6 +4,7 @@ flask-assets
 flask-migrate
 flask-script
 flask-sqlalchemy
+flask-testing
 flask-uploads
 flask-wtf
 koremutake
