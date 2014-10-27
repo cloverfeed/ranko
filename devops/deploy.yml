@@ -40,7 +40,7 @@
     - name: check if config exists
       action: stat
       args:
-          path: "{{webapps_dir}}/{{app_name}}/src/{{config_file}}"
+          path: "{{webapps_dir}}/{{app_name}}/src/{{app_config_file}}"
       register: config_file
 
     - name: create SQLite DB
