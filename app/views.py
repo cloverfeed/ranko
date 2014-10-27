@@ -1,12 +1,14 @@
-from app import app, db, documents
 from flask import flash, redirect, url_for, render_template, request
-from flask import send_from_directory, jsonify
 from flask import Blueprint
+from flask import jsonify
+from flask import send_from_directory
+from flask import current_app
 from flask.ext.wtf import Form
 from flask_wtf.file import FileField
 from wtforms import TextAreaField, HiddenField
-from .models import Comment, Document, Annotation
+from .models import db, Comment, Document, Annotation
 import os.path
+from .uploads import documents, documents_dir
 import koremutake
 
 
@@ -100,8 +102,7 @@ def rawdoc(id):
     """
     id = kore_id(id)
     doc = Document.query.get_or_404(id)
-    docdir = os.path.join(app.instance_path, 'uploads')
-    return send_from_directory(docdir, doc.filename)
+    return send_from_directory(documents_dir(current_app), doc.filename)
 
 
 @bp.route('/annotation/new', methods=['POST'])

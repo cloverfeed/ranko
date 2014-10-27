@@ -1,8 +1,8 @@
-from app import app
+from app.factory import create_app
 
 
 def main():
-    pass
+    app = create_app()
     app.run(debug=True)
 
 if __name__ == '__main__':
