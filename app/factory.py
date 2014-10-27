@@ -5,7 +5,6 @@ from uploads import documents
 from models import db
 from flask.ext.uploads import configure_uploads
 from flask.ext.assets import Environment, Bundle
-from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 
 def create_app(db_backend=None, testing=False):
@@ -55,10 +54,6 @@ def create_app(db_backend=None, testing=False):
 
     # flask-migrate
     migrate = Migrate(app, db)
-
-    # flask-script
-    manager = Manager(app)
-    manager.add_command('db', MigrateCommand)
 
     # disable stuff for tests
     if testing:
