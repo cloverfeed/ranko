@@ -79,6 +79,8 @@
       notify:
         - restart postgres
 
+    - meta: flush_handlers
+
     - name: create Postgres DB
       action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py -c {{app_config_file}} create
       args:
