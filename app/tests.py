@@ -11,14 +11,11 @@ import json
 
 class TestCase(TestCase):
     def create_app(self):
-        app = create_app()
+        app = create_app(db_backend='sql_memory')
 
         app.config['TESTING'] = True
         app.config['CSRF_ENABLED'] = False
         app.config['WTF_CSRF_ENABLED'] = False
-
-        uri = 'sqlite://'  # In-memory DB
-        app.config['SQLALCHEMY_DATABASE_URI'] = uri
 
         self.key_file = os.path.join(app.instance_path, 'secret-test.key')
         app.config['SECRET_KEY'] = get_secret_key(self.key_file)

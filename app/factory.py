@@ -8,7 +8,7 @@ from flask.ext.assets import Environment, Bundle
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 
-def create_app():
+def create_app(db_backend=None):
 
     this_dir = os.path.dirname(os.path.abspath(__file__))
     instance_path = os.path.join(this_dir, '..', 'instance')
@@ -27,8 +27,13 @@ def create_app():
     # flask-uploads
     configure_uploads(app, [documents])
 
-    # flask-sqlalchemy
-    uri = 'sqlite:///' + os.path.join(app.instance_path, 'app.db')
+    # flask-sqlalchemyTrue
+    if db_backend == 'sql_file':
+        uri = 'sqlite:///' + os.path.join(app.instance_path, 'app.db')
+    elif db_backend == 'sql_memory':
+        uri = 'sqlite://'  # In-memory DB
+    else:
+        assert False, 'Unknown DB backend: {}'.format(db_backend)
     app.config['SQLALCHEMY_DATABASE_URI'] = uri
     db.init_app(app)
 
