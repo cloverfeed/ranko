@@ -4,6 +4,9 @@
   sudo: True
 
   tasks:
+    - name: add backports
+      apt_repository: repo="deb http://http.debian.net/debian wheezy-backports main"
+
     - name: install common packages needed for python application development
       action: apt pkg={{item}} state=installed update_cache=yes
       with_items:
@@ -14,7 +17,7 @@
         - uwsgi
         - uwsgi-plugin-python
         - coffeescript
-        - postgresql-9.4
+        - postgresql-9.1
         - python-psycopg2
         - libpq-dev
         - python-dev
