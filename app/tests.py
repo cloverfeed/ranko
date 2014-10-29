@@ -6,6 +6,7 @@ from werkzeug import FileStorage
 import re
 import koremutake
 import json
+from io import BytesIO
 
 
 class TestCase(TestCase):
@@ -23,9 +24,8 @@ class TestCase(TestCase):
         r = self.client.get('/')
         self.assertIn('Upload and review', r.data)
 
-    # FIXME If called > 1, it yields a "file closed" error
     def _upload(self, filename):
-        storage = FileStorage(filename=filename)
+        storage = FileStorage(filename=filename, stream=BytesIO())
         r = self.client.post('/upload', data={'file': storage})
         return r
 
@@ -104,3 +104,26 @@ class TestCase(TestCase):
         r = self.client.get('/view/1/annotations')
         d = json.loads(r.data)
         self.assertNotIn('2', d['data'])
+
+    def test_upload_rev(self):
+        r = self._upload('toto.pdf')
+        m = re.search('/view/(\w+)', r.location)
+        self.assertIsNotNone(m)
+        docid = m.group(1)
+        r = self.client.get(r.location)
+        data = {'file': FileStorage(filename='totov2.pdf', stream=BytesIO())}
+        r = self.client.post('/upload',
+                            data=data,
+                            query_string={'revises': docid},
+                            )
+        self.assertStatus(r, 302)
+        m = re.search('/view/(\w+)', r.location)
+        self.assertIsNotNone(m)
+        docid2 = m.group(1)
+
+        # Check that each rev points to each rev
+        for doca in [docid, docid2]:
+            r = self.client.get('/view/{}/revisions'.format(doca))
+            self.assert200(r)
+            for docb in [docid, docid2]:
+                self.assertIn(docb, r.data)

@@ -26,6 +26,16 @@
         </a>
     </div>
 
+    <h3><span class="glyphicon glyphicon-pencil"></span> History</h3>
+
+    <p>
+    <a href="{{url_for('.view_revisions', id=doc.id)}}">Revisions</a>
+    </p>
+
+    <p>
+    <a href="{{url_for('.upload', revises=doc.id)}}">Upload a new version</a>
+    </p>
+
     <h3><span class="glyphicon glyphicon-comment"></span> Comments</h3>
     <form method="POST" action="{{ url_for('.post_comment') }}" id="post_comment_form">
         {{form.hidden_tag()}}
