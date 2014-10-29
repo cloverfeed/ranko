@@ -6,7 +6,7 @@ from flask import current_app
 from flask.ext.wtf import Form
 from flask_wtf.file import FileField
 from wtforms import TextAreaField, HiddenField
-from .models import db, Comment, Document, Annotation
+from .models import db, Comment, Document, Annotation, Revision
 import os.path
 from .uploads import documents, documents_dir
 import koremutake
@@ -43,6 +43,8 @@ class UploadForm(Form):
 def upload():
     """
     Form to upload a document.
+
+    :query revises: ID this doc is a new revision of.
     """
     form = UploadForm()
     if form.validate_on_submit():
@@ -50,6 +52,13 @@ def upload():
         doc = Document(filename)
         db.session.add(doc)
         db.session.commit()
+        revises = request.args.get('revises')
+        if revises is not None:
+            revises = kore_id(revises)
+            (project, oldrev) = Revision.project_for(revises)
+            revision = Revision(project, oldrev+1, doc.id)
+            db.session.add(revision)
+            db.session.commit()
         flash('Uploaded')
         return redirect(url_for('.view_doc', id=koremutake.encode(doc.id)))
     return render_template('upload.html', form=form)
@@ -165,3 +174,14 @@ def annotation_edit(id):
     ann.load_json(request.form)
     db.session.commit()
     return jsonify(status='ok')
+
+
+@bp.route('/view/<id>/revisions')
+def view_revisions(id):
+    """
+    View all the Revisions associated to a document.
+    """
+    id = kore_id(id)
+    history = Revision.history(id)
+    revs = ((koremutake.encode(rev.doc), rev.version) for rev in history)
+    return render_template('revisions.html', revs=revs)

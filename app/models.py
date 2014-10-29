@@ -65,3 +65,43 @@ class Annotation(db.Model):
         self.width = data['width']
         self.height = data['height']
         self.text = data['value']
+
+
+"""
+History of a document.
+
+A project is several docs, each of one has a version.
+Version numbers are integers, and history is sequential.
+"""
+class Revision(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    project = db.Column(db.Integer, nullable=False)
+    version = db.Column(db.Integer, nullable=False)
+    doc = db.Column(db.Integer, db.ForeignKey('document.id'), nullable=False)
+
+    def __init__(self, project, version, doc):
+        self.project = project
+        self.version = version
+        self.doc = doc
+
+    @staticmethod
+    def project_for(doc):
+        """
+        Find the project associated to a given doc.
+        Returns (project id, current version)
+        Insert the initial revision if it does not exist.
+        """
+        rev = Revision.query.filter_by(doc=doc).first()
+        if rev is not None:
+            return (rev.project, rev.version)
+        else:
+            v1 = Revision(doc, 1, doc)
+            db.session.add(v1)
+            db.session.commit()
+            return (doc, 1)
+
+    @staticmethod
+    def history(doc):
+        (project, _) = Revision.project_for(doc)
+        revs = Revision.query.filter_by(project=project)
+        return revs
