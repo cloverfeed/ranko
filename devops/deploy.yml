@@ -88,7 +88,7 @@
       when: config_file.stat.exists and createdbuser.changed
 
     - name: run DB migrations
-      action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py db upgrade
+      action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py -c {{app_config_file}} db upgrade
       args:
           chdir: "{{webapps_dir}}/{{app_name}}/src"
 
