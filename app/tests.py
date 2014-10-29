@@ -2,7 +2,7 @@ from factory import create_app
 from models import db
 import os
 from flask.ext.testing import TestCase
-from flask.ext.uploads import TestingFileStorage
+from werkzeug import FileStorage
 import re
 import koremutake
 import json
@@ -25,7 +25,7 @@ class TestCase(TestCase):
 
     # FIXME If called > 1, it yields a "file closed" error
     def _upload(self, filename):
-        storage = TestingFileStorage(filename=filename)
+        storage = FileStorage(filename=filename)
         r = self.client.post('/upload', data={'file': storage})
         return r
 
