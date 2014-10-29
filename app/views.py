@@ -32,14 +32,14 @@ def home():
     """
     Home page.
     """
-    return render_template('home.html')
+    return render_template('home.html', form=UploadForm())
 
 
 class UploadForm(Form):
     file = FileField('The file to review')
 
 
-@bp.route('/upload', methods=['GET', 'POST'])
+@bp.route('/upload', methods=['POST'])
 def upload():
     """
     Form to upload a document.
@@ -61,7 +61,6 @@ def upload():
             db.session.commit()
         flash('Uploaded')
         return redirect(url_for('.view_doc', id=koremutake.encode(doc.id)))
-    return render_template('upload.html', form=form)
 
 
 class CommentForm(Form):
@@ -78,11 +77,17 @@ def view_doc(id):
     """
     id = kore_id(id)
     doc = Document.query.get_or_404(id)
-    form = CommentForm(docid=id)
+    form_comm = CommentForm(docid=id)
+    form_up = UploadForm()
     comments = Comment.query.filter_by(doc=id)
     annotations = Annotation.query.filter_by(doc=id)
-    return render_template('view.html', doc=doc, form=form,
-                           comments=comments, annotations=annotations)
+    return render_template('view.html',
+                           doc=doc,
+                           form_comm=form_comm,
+                           form_up=form_up,
+                           comments=comments,
+                           annotations=annotations,
+                           )
 
 
 @bp.route('/comment/new', methods=['POST'])
