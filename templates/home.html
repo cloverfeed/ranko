@@ -1,6 +1,15 @@
+{% from 'macros.html' import upload_form %}
 {% extends "base.html" %}
 {% block content %}
 Upload and review PDF documents in your browser.
 
-<a href="{{url_for('.upload')}}">Upload a PDF</a>
+<a href="#" id="upload_link">Upload a PDF</a>
+
+<div id="upload_dialog" title="Upload a PDF file">
+    {{ upload_form (form, url_for('.upload')) }}
+</div>
+
+{% endblock %}
+{% block js_end %}
+<script>upload_form_init();</script>
 {% endblock %}

@@ -39,6 +39,7 @@ def create_app(config_file=None):
         'coffee/selection.coffee',
         'coffee/annotation.coffee',
         'coffee/pdfpage.coffee',
+        'coffee/upload.coffee',
         filters='coffeescript',
         output='gen/app.js'
         )

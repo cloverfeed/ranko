@@ -1,6 +1,5 @@
-{% extends "base.html" %}
-{% block content %}
-<form method="post" method="POST" enctype="multipart/form-data">
+{% macro upload_form(form, action) %}
+<form method="post" action="{{action}}" method="POST" enctype="multipart/form-data">
     {{form.hidden_tag()}}
     <p>
         <label>
@@ -10,4 +9,4 @@
     </p>
     <p><input type="submit" value="Upload"></p>
 </form>
-{% endblock %}
+{% endmacro %}

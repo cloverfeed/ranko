@@ -26,23 +26,10 @@ class PdfPage
       @addAnnotation "", null, geom
     @$div.append selection.$div
 
-    page.getTextContent().then (textContent) =>
-      @handleTextContent textContent, viewport
-    .then null, (error) ->
-      console.log ("Error while rendering PDF: " + error)
     anns = annotations[@i]
     if anns
       for ann in anns
         @addAnnotation ann.text, ann.id, ann
-
-  handleTextContent: (textContent, viewport) ->
-    pageNumber = @i
-    pageIndex = pageNumber - 1
-    textLayer = new TextLayerBuilder
-      textLayerDiv: @$textLayerDiv.get(0)
-      pageIndex: pageIndex
-      viewport: viewport
-    textLayer.setTextContent textContent
 
   addAnnotation: (text, id, geom) ->
     ann = new Annotation @$textLayerDiv, @docid, @i, text, id, geom

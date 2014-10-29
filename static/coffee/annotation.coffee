@@ -24,6 +24,8 @@ class Annotation
       @text = value
       @submitChanges()
       return value
+    ,
+      onblur: 'submit'
     @$div.draggable
       stop: (ev, ui) =>
         @updateGeom(ev, ui)

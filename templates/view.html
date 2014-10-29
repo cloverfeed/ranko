@@ -1,3 +1,4 @@
+{% from 'macros.html' import upload_form %}
 {% extends "base.html" %}
 {% block content %}
 
@@ -33,14 +34,18 @@
     </p>
 
     <p>
-    <a href="{{url_for('.upload', revises=doc.id)}}">Upload a new version</a>
+    <a href="#" id="upload_link">Upload a new version</a>
     </p>
+
+    <div id="upload_dialog" title="Upload a new version">
+        {{ upload_form (form_up, url_for('.upload', revises=doc.id)) }}
+    </div>
 
     <h3><span class="glyphicon glyphicon-comment"></span> Comments</h3>
     <form method="POST" action="{{ url_for('.post_comment') }}" id="post_comment_form">
-        {{form.hidden_tag()}}
-        <p>{{form.comment()}}</p>
-        {{form.docid()}}
+        {{form_comm.hidden_tag()}}
+        <p>{{form_comm.comment()}}</p>
+        {{form_comm.docid()}}
         <p><input type="submit" value="Comment"></p>
     </form>
     <ul id="comments">
@@ -53,17 +58,12 @@
 </div>
 </div>
 
-<script src="{{url_for('static', filename='vendor/pdfjs-' + config.X_PDFJS_VERSION + '-dist/build/pdf.js')}}"></script>
-<script src="{{url_for('static', filename='js/text_layer_builder.js')}}"></script>
-<script src="{{url_for('static', filename='js/ui_utils.js')}}"></script>
-<script src="{{url_for('static', filename='vendor/jquery.jeditable.mini.js')}}"></script>
-<script src="{{url_for('static', filename='vendor/jquery-ui-1.11.2/jquery-ui.min.js')}}"></script>
-{% assets "coffee_app" %}
-<script type="text/javascript" src="{{ ASSET_URL }}"></script>
-{% endassets %}
+{% endblock %}
+
+{% block js_end %}
 <script type="text/javascript">
+upload_form_init();
 PDFJS.workerSrc = "{{url_for('static', filename='vendor/pdfjs-' + config.X_PDFJS_VERSION + '-dist/build/pdf.worker.js')}}";
 view_init({{doc.id}});
 </script>
-
 {% endblock %}
