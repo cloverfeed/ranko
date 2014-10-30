@@ -6,7 +6,7 @@ from flask.ext.script import Manager
 from app.factory import create_app
 from app.models import db, User, ROLE_ADMIN
 from mixer.backend.sqlalchemy import Mixer
-from app.models import Document, Comment
+from app.models import Document, Comment, Annotation
 import faker
 import string
 import random
@@ -68,10 +68,22 @@ def main():
             comm = Comment(doc, text)
             return comm
 
+        def generate_annotation(docs):
+            doc = random_id(docs)
+            page = fake.random_int(1, 5)
+            posx = fake.random_int(0, 300)
+            posy = fake.random_int(0, 600)
+            width = fake.random_int(50, 300)
+            height = fake.random_int(50, 300)
+            text = fake.text()
+            ann = Annotation(doc, page, posx, posy, width, height, text)
+            return ann
+
         docs = [generate_document() for _ in range(0, 10)]
         comments = [generate_comment(docs) for _ in range(0, 20)]
+        annotations = [generate_annotation(docs) for _ in range(0, 50)]
 
-        for obj in docs + comments:
+        for obj in docs + comments + annotations:
             db.session.add(obj)
         db.session.commit()
 
