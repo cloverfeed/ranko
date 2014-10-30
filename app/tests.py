@@ -60,7 +60,6 @@ class TestCase(TestCase):
         self.assert404(r)
 
     def test_annotation(self):
-        self._login('username', 'password', signup=True)
         data = { 'doc': 1
                , 'page': 2
                , 'posx': 3
@@ -70,10 +69,28 @@ class TestCase(TestCase):
                , 'value': 'Oh oh'
                }
         r = self.client.post('/annotation/new', data=data)
+        self.assert401(r)
+        self._login('username', 'password', signup=True)
+        r = self.client.post('/annotation/new', data=data)
         self.assert200(r)
         d = json.loads(r.data)
         self.assertIn('id', d)
         id_resp = d['id']
+
+        bad_data = { 'doc': 1
+                   , 'page': 2
+                   , 'posx': 3
+                   , 'posy': 4
+                   , 'width': 5
+                   , 'height': 6
+                   , 'value': 'Oh oh'
+                   }
+        for key in ['doc', 'page', 'posx', 'posy', 'width', 'height']:
+            ok = bad_data[key]
+            bad_data[key] = 0.5
+            r = self.client.post('/annotation/new', data=bad_data)
+            self.assert400(r)
+            bad_data[key] = ok
 
         r = self.client.get('/view/1/annotations')
         d = json.loads(r.data)

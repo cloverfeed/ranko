@@ -55,10 +55,10 @@ class Annotation
       type: type
       url: url
       data:
-        posx: @geom.posx
-        posy: @geom.posy
-        width: @geom.width
-        height: @geom.height
+        posx: @geom.posx | 0
+        posy: @geom.posy | 0
+        width: @geom.width | 0
+        height: @geom.height | 0
         doc: @docid
         page: @page
         value: @text
