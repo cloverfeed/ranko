@@ -16,6 +16,24 @@
     <div class="navbar-header">
         <a class="navbar-brand" href="/">Review</a>
     </div>
+    <div class="collapse navbar-collapse navbar-ex1-collapse">
+{% if g.user.is_authenticated() %}
+        <ul class="nav navbar-nav">
+{% if g.user.is_admin() %}
+            <li><a href="/admin">Admin panel</a></li>
+{% endif %}
+        </ul>
+{% endif %}
+        <ul class="nav navbar-nav navbar-right">
+{% if g.user.is_authenticated() %}
+            <li><p class="navbar-text">Signed in as {{g.user.name}}</p></li>
+            <li><a href="{{url_for('auth.logout')}}">Log out</a></li>
+{% else %}
+            <li><a href="{{url_for('auth.signup')}}">Sign up</a></li>
+            <li><a href="{{url_for('auth.login')}}">Log in</a></li>
+{% endif %}
+        </ul>
+    </div>
 </nav>
 {% with messages = get_flashed_messages() %}
 {% for message in messages %}

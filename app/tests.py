@@ -127,3 +127,46 @@ class TestCase(TestCase):
             self.assert200(r)
             for docb in [docid, docid2]:
                 self.assertIn(docb, r.data)
+
+    def _signup(self, username, password):
+        return self.client.post('/signup', data=dict(
+            username=username,
+            password=password,
+            confirm=password
+            ), follow_redirects=True)
+
+    def _login(self, username, password, signup=False):
+        if signup:
+            self.signup(username, password)
+        return self.client.post('/login', data=dict(
+            username=username,
+            password=password
+            ), follow_redirects=True)
+
+    def _logout(self):
+        return self.client.get('/logout', follow_redirects=True)
+
+    def test_signup_login_logout(self):
+        r = self.client.get('/')
+        self.assertIn('Log in', r.data)
+        self.assertNotIn('Log out', r.data)
+        self.assertNotIn('Admin panel', r.data)
+        r = self._signup('a', 'a')
+        self.assertIn('User successfully created', r.data)
+        r = self._login('a', 'a')
+        self.assertIn('Signed in as a', r.data)
+        self.assertNotIn('Log in', r.data)
+        self.assertIn('Log out', r.data)
+        self.assertNotIn('Admin panel', r.data)
+        r = self._logout()
+        self.assertIn('Log in', r.data)
+        self.assertNotIn('Log out', r.data)
+
+    def test_login_nonexistent(self):
+        r = self._login('doesnt', 'exist')
+        self.assertIn('Bad login or password', r.data)
+
+    def test_login_bad_pass(self):
+        self._signup('a', 'a')
+        r = self._login('a', 'b')
+        self.assertIn('Bad login or password', r.data)

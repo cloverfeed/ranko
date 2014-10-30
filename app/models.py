@@ -3,11 +3,58 @@ SQLAlchemy models
 """
 import random
 from flask.ext.sqlalchemy import SQLAlchemy
+import bcrypt
+
 
 """
 The main DB object. It gets initialized in create_app.
 """
 db = SQLAlchemy()
+
+
+ROLE_USER = 0
+ROLE_ADMIN = 1
+
+
+class User(db.Model):
+    """
+    Application user. Someone that can log in.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=True, nullable=False)
+    password = db.Column(db.String, nullable=False)
+    role = db.Column(db.SmallInteger, default=ROLE_USER, nullable=False)
+
+    def __init__(self, login, password, workfactor=12):
+        self.name = login
+        salt = bcrypt.gensalt(workfactor)
+        self.password = bcrypt.hashpw(password.encode('utf-8'), salt)
+
+    def is_active(self):
+        """
+        Needed for flask-login.
+        """
+        return True
+
+    def is_authenticated(self):
+        """
+        Needed for flask-login.
+        """
+        return True
+
+    def get_id(self):
+        """
+        Needed for flask-login.
+        """
+        return unicode(self.id)
+
+    def is_admin(self):
+        """
+        Has the user got administrative rights?
+        This grants access to admin panel, so careful.
+        """
+        return (self.role == ROLE_ADMIN)
+
 
 """
 A document. The actual file is stored in the application's instance path.

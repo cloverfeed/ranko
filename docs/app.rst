@@ -4,6 +4,14 @@ app package
 Submodules
 ----------
 
+app.auth module
+---------------
+
+.. automodule:: app.auth
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 app.factory module
 ------------------
 

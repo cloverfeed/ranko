@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, g
 import os
 from key import get_secret_key
 from uploads import documents
@@ -8,6 +8,8 @@ from flask.ext.assets import Environment, Bundle
 from flask.ext.migrate import Migrate, MigrateCommand
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib.sqla import ModelView
+from flask.ext.login import current_user
+from auth import lm
 
 def create_app(config_file=None):
 
@@ -50,6 +52,19 @@ def create_app(config_file=None):
     # flask-migrate
     migrate = Migrate(app, models.db)
 
+    # auth
+    lm.init_app(app)
+    @lm.user_loader
+    def load_user(userid):
+        """
+        Needed for flask-login.
+        """
+        return models.User.query.get(int(userid))
+
+    @app.before_request
+    def set_g_user():
+        g.user = current_user
+
     # flask-admin
     admin = Admin(app, name=app.name + ' Admin')
     admin_models = [models.Document,
@@ -59,12 +74,14 @@ def create_app(config_file=None):
 
     class RestrictedModelView(ModelView):
         def is_accessible(self):
-            return True # FIXME when auth is done
+            return current_user.is_authenticated() and current_user.is_admin()
 
     for model in admin_models:
         admin.add_view(RestrictedModelView(model, models.db.session))
 
     from views import bp
     app.register_blueprint(bp)
+    from auth import auth
+    app.register_blueprint(auth)
 
     return app
