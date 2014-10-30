@@ -5,18 +5,11 @@ from flask.ext.migrate import MigrateCommand, stamp
 from flask.ext.script import Manager
 from app.factory import create_app
 from app.models import db, User, ROLE_ADMIN
-from mixer.backend.sqlalchemy import Mixer
 from app.models import Document, Comment, Annotation
 import faker
 import random
 import base64
 import string
-
-class AppMixer(Mixer):
-    def populate_target(self, values):
-        import ipdb;ipdb.set_trace()
-        target = self.__scheme(**values)
-        return target
 
 EMPTY_PDF = """
 JVBERi0xLjIKJcfsj6IKNSAwIG9iago8PC9MZW5ndGggNiAwIFIvRmlsdGVyIC9GbGF0ZURlY29k
