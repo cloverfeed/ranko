@@ -1,0 +1,50 @@
+- name: install packages
+  tags: provision
+  action: apt pkg={{item}} state=installed update_cache=yes
+  with_items:
+    - postgresql-9.1
+    - python-psycopg2
+    - libpq-dev
+    - python-dev
+
+- name: give vagrant user access to postgres
+  action: lineinfile
+  args:
+      dest: /etc/sudoers
+      regexp: "^%vagrant"
+      line: "%vagrant ALL = (postgres) NOPASSWD: ALL"
+      state: present
+
+- name: create Postgresql DB
+  sudo_user: postgres
+  postgresql_db: name={{dbname}}
+  register: createdbuser
+
+- name: ensure user has access to database
+  sudo_user: postgres
+  postgresql_user: db={{dbname}} name={{dbuser}} priv=ALL
+
+- name: ensure user does not have unnecessary privilege
+  sudo_user: postgres
+  postgresql_user: name={{dbuser}} role_attr_flags=NOSUPERUSER,NOCREATEDB
+
+- name: configure postgres auth
+  action: template
+  args:
+      src: templates/pg_hba.conf
+      dest: /etc/postgresql/9.1/main/pg_hba.conf
+  notify:
+    - restart postgres
+
+- meta: flush_handlers
+
+- name: create Postgres DB
+  action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py -c {{app_config_file}} create
+  args:
+      chdir: "{{webapps_dir}}/{{app_name}}/src"
+  when: createdbuser.changed
+
+- name: run DB migrations
+  action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py -c {{app_config_file}} db upgrade
+  args:
+      chdir: "{{webapps_dir}}/{{app_name}}/src"
