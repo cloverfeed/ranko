@@ -10,7 +10,7 @@ from .models import db, Comment, Document, Annotation, Revision
 import os.path
 from .uploads import documents, documents_dir
 import koremutake
-from flask.ext.login import current_user
+from flask.ext.login import current_user, login_required
 from .auth import lm
 
 
@@ -122,6 +122,7 @@ def rawdoc(id):
 
 
 @bp.route('/annotation/new', methods=['POST'])
+@login_required
 def annotation_new():
     """
     Create a new annotation.
