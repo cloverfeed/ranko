@@ -8,9 +8,7 @@ from app.models import db, User, ROLE_ADMIN
 from mixer.backend.sqlalchemy import Mixer
 from app.models import Document, Comment, Annotation
 import faker
-import string
 import random
-import os.path
 import base64
 
 class AppMixer(Mixer):
@@ -64,42 +62,12 @@ def main():
         "Populate tables using fake data"
         fake = faker.Faker()
 
-        def fake_filename():
-            letters = string.ascii_lowercase
-            length = 8
-            extension = '.pdf'
-            base = ''.join(random.choice(letters) for _ in range(length))
-            return base + extension
-
-        def generate_document():
-            filename = fake_filename()
-            fullname = os.path.join(manager.app.instance_path, 'uploads', filename)
-            with open(fullname, 'w') as file:
-                pdfdata = base64.decodestring(EMPTY_PDF.strip())
-                file.write(pdfdata)
-            doc = Document(filename)
-            return doc
-
-        def generate_comment(doc):
-            text = fake.text()
-            comm = Comment(doc, text)
-            return comm
-
-        def generate_annotation(doc):
-            page = fake.random_int(1, 5)
-            posx = fake.random_int(0, 300)
-            posy = fake.random_int(0, 600)
-            width = fake.random_int(50, 300)
-            height = fake.random_int(50, 300)
-            text = fake.text()
-            ann = Annotation(doc, page, posx, posy, width, height, text)
-            return ann
-
-        docs = [generate_document() for _ in range(0, 10)]
+        pdfdata = base64.decodestring(EMPTY_PDF.strip())
+        docs = [Document.generate(pdfdata) for _ in range(0, 10)]
 
         for doc in docs:
-            comments = [generate_comment(doc.id) for _ in range(0, 4)]
-            annotations = [generate_annotation(doc.id) for _ in range(0, 2)]
+            comments = [Comment.generate(fake, doc.id) for _ in range(0, 4)]
+            annotations = [Annotation.generate(fake, doc.id) for _ in range(0, 2)]
 
         for obj in docs + comments + annotations:
             db.session.add(obj)
