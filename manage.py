@@ -10,12 +10,31 @@ from app.models import Document, Comment, Annotation
 import faker
 import string
 import random
+import os.path
+import base64
 
 class AppMixer(Mixer):
     def populate_target(self, values):
         import ipdb;ipdb.set_trace()
         target = self.__scheme(**values)
         return target
+
+EMPTY_PDF = """
+JVBERi0xLjIKJcfsj6IKNSAwIG9iago8PC9MZW5ndGggNiAwIFIvRmlsdGVyIC9GbGF0ZURlY29k
+ZT4+CnN0cmVhbQp4nCtUMNAzVDAAQSidnMsVyAUANUkEZWVuZHN0cmVhbQplbmRvYmoKNiAwIG9i
+agoyMwplbmRvYmoKNCAwIG9iago8PC9UeXBlL1BhZ2UvTWVkaWFCb3ggWzAgMCA1OTUuMjggODQx
+Ljg5XQovUGFyZW50IDMgMCBSCi9SZXNvdXJjZXM8PC9Qcm9jU2V0Wy9QREZdCj4+Ci9Db250ZW50
+cyA1IDAgUgo+PgplbmRvYmoKMyAwIG9iago8PCAvVHlwZSAvUGFnZXMgL0tpZHMgWwo0IDAgUgpd
+IC9Db3VudCAxCj4+CmVuZG9iagoxIDAgb2JqCjw8L1R5cGUgL0NhdGFsb2cgL1BhZ2VzIDMgMCBS
+Cj4+CmVuZG9iagoyIDAgb2JqCjw8L1Byb2R1Y2VyKEdQTCBHaG9zdHNjcmlwdCA5LjA2KQovQ3Jl
+YXRpb25EYXRlKEQ6MjAxNDEwMzAxMDM0MDgrMDEnMDAnKQovTW9kRGF0ZShEOjIwMTQxMDMwMTAz
+NDA4KzAxJzAwJyk+PmVuZG9iagp4cmVmCjAgNwowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAz
+MDUgMDAwMDAgbiAKMDAwMDAwMDM1MyAwMDAwMCBuIAowMDAwMDAwMjQ2IDAwMDAwIG4gCjAwMDAw
+MDAxMjYgMDAwMDAgbiAKMDAwMDAwMDAxNSAwMDAwMCBuIAowMDAwMDAwMTA4IDAwMDAwIG4gCnRy
+YWlsZXIKPDwgL1NpemUgNyAvUm9vdCAxIDAgUiAvSW5mbyAyIDAgUgovSUQgWzxCRDRERjFGODJB
+QTQzMTY1Q0Y1QzkzNzY4QUU5MzQ5MD48QkQ0REYxRjgyQUE0MzE2NUNGNUM5Mzc2OEFFOTM0OTA+
+XQo+PgpzdGFydHhyZWYKNDc2CiUlRU9GCg==
+"""
 
 def main():
     manager = Manager(create_app)
@@ -58,6 +77,10 @@ def main():
 
         def generate_document():
             filename = fake_filename()
+            fullname = os.path.join(manager.app.instance_path, 'uploads', filename)
+            with open(fullname, 'w') as file:
+                pdfdata = base64.decodestring(EMPTY_PDF.strip())
+                file.write(pdfdata)
             doc = Document(filename)
             return doc
 
