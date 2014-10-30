@@ -1,5 +1,6 @@
 bcrypt
 coverage
+fake-factory
 flask
 flask-admin
 flask-assets
