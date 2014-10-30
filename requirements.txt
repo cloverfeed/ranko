@@ -1,6 +1,9 @@
+bcrypt
 coverage
 flask
+flask-admin
 flask-assets
+flask-login
 flask-migrate
 flask-script
 flask-sqlalchemy

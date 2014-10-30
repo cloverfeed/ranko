@@ -44,6 +44,17 @@
       chdir: "{{webapps_dir}}/{{app_name}}/src"
   when: createdbuser.changed
 
+- name: generate admin user
+  action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py -c {{app_config_file}} makeadmin
+  args:
+      chdir: "{{webapps_dir}}/{{app_name}}/src"
+  when: createdbuser.changed
+  register: admin_password
+
+- name: display admin password
+  debug: var=admin_password.stdout
+  when: createdbuser.changed
+
 - name: run DB migrations
   action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py -c {{app_config_file}} db upgrade
   args:

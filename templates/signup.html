@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "form_errors.html" %}
+<form method="post">
+    {{form.hidden_tag()}}
+    <p> <label> Username {{form.username()}} </label> </p>
+    <p> <label> Password {{form.password()}} </label> </p>
+    <p> <label> Confirm password {{form.confirm()}} </label> </p>
+    <p><input type="submit" value="Log in"></p>
+</form>
+{% endblock %}
