@@ -4,9 +4,6 @@
   sudo: True
 
   tasks:
-    - name: add backports
-      apt_repository: repo="deb http://http.debian.net/debian wheezy-backports main"
-
     - name: install common packages needed for python application development
       action: apt pkg={{item}} state=installed update_cache=yes
       with_items:
