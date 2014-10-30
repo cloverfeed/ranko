@@ -1,2 +1,3 @@
 ---
 delete_default_site: true
+generate_fake_data: true

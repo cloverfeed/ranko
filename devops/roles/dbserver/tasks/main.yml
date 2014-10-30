@@ -55,6 +55,12 @@
   debug: var=admin_password.stdout
   when: createdbuser.changed
 
+- name: generate fake data
+  action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py -c {{app_config_file}} fake
+  args:
+      chdir: "{{webapps_dir}}/{{app_name}}/src"
+  when: generate_fake_data is defined and generate_fake_data and createdbuser.changed
+
 - name: run DB migrations
   action: command env VIRTUAL_ENV={{webapps_dir}}/{{app_name}}/venv {{webapps_dir}}/{{app_name}}/venv/bin/python {{webapps_dir}}/{{app_name}}/src/manage.py -c {{app_config_file}} db upgrade
   args:
