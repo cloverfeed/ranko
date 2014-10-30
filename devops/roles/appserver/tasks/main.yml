@@ -9,6 +9,7 @@
     - uwsgi
     - uwsgi-plugin-python
     - coffeescript
+    - libffi-dev
 
 - name: start supervisord service and have it run during system startup
   tags: provision
