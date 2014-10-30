@@ -12,6 +12,7 @@ from .uploads import documents, documents_dir
 import koremutake
 from flask.ext.login import current_user, login_required
 from .auth import lm
+from werkzeug.exceptions import BadRequest
 
 
 bp = Blueprint('bp', __name__)
@@ -27,6 +28,20 @@ def kore_id(s):
     except ValueError:
         r = int(s)
     return r
+
+
+def coerce_to(typ, val):
+    """
+    Raise a BadRequest (400) exception if the value cannot be converted to the
+    given type.
+    Return unconverted value
+    """
+    try:
+        typ(val)
+    except ValueError:
+        raise BadRequest()
+    return val
+
 
 
 @bp.route('/')
@@ -129,12 +144,12 @@ def annotation_new():
 
     :>json int id: The new ID.
     """
-    doc = request.form['doc']
-    page = request.form['page']
-    posx = request.form['posx']
-    posy = request.form['posy']
-    width = request.form['width']
-    height = request.form['height']
+    doc = coerce_to(int, request.form['doc'])
+    page = coerce_to(int, request.form['page'])
+    posx = coerce_to(int, request.form['posx'])
+    posy = coerce_to(int, request.form['posy'])
+    width = coerce_to(int, request.form['width'])
+    height = coerce_to(int, request.form['height'])
     text = request.form['value']
     user = current_user.id
     ann = Annotation(doc, page, posx, posy, width, height, text, user)
