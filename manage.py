@@ -10,6 +10,8 @@ import faker
 import random
 import base64
 import string
+import os.path
+import os
 
 EMPTY_PDF = """
 JVBERi0xLjIKJcfsj6IKNSAwIG9iago8PC9MZW5ndGggNiAwIFIvRmlsdGVyIC9GbGF0ZURlY29k
@@ -55,6 +57,10 @@ def main():
     def fake():
         "Populate tables using fake data"
         fake = faker.Faker()
+
+        upload_dir = os.path.join(manager.app.instance_path, 'uploads')
+        if not os.path.isdir(upload_dir):
+            os.mkdir(upload_dir)
 
         users = [User.generate(fake) for _ in range(0, 10)]
         user = users[0]
