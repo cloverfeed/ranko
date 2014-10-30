@@ -4,7 +4,9 @@ SQLAlchemy models
 import random
 from flask.ext.sqlalchemy import SQLAlchemy
 import bcrypt
-
+import string
+import os.path
+from flask import current_app
 
 """
 The main DB object. It gets initialized in create_app.
@@ -55,6 +57,13 @@ class User(db.Model):
         """
         return (self.role == ROLE_ADMIN)
 
+    @staticmethod
+    def generate(fake):
+        username = fake.user_name()
+        password = fake.password()
+        user = User(username, password, workfactor=4)
+        return user
+
 
 """
 A document. The actual file is stored in the application's instance path.
@@ -67,15 +76,38 @@ class Document(db.Model):
         self.id = random.randint(0, 0x7fffffff)
         self.filename = filename
 
+    @staticmethod
+    def generate(pdfdata):
+        def fake_filename():
+            letters = string.ascii_lowercase
+            length = 8
+            extension = '.pdf'
+            base = ''.join(random.choice(letters) for _ in range(length))
+            return base + extension
+
+        filename = fake_filename()
+        fullname = os.path.join(current_app.instance_path, 'uploads', filename)
+        with open(fullname, 'w') as file:
+            file.write(pdfdata)
+        doc = Document(filename)
+        return doc
+
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    doc = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=False)
+    doc = db.Column(db.Integer, db.ForeignKey('document.id'), nullable=False)
     text = db.Column(db.String, nullable=False)
+    doc_obj = db.relationship('Document', backref=db.backref('documents', lazy='dynamic'))
 
     def __init__(self, doc, text):
         self.doc = doc
         self.text = text
+
+    @staticmethod
+    def generate(fake, doc):
+        text = fake.text()
+        comm = Comment(doc, text)
+        return comm
 
 
 class Annotation(db.Model):
@@ -87,7 +119,10 @@ class Annotation(db.Model):
     width = db.Column(db.Integer, nullable=False)
     height = db.Column(db.Integer, nullable=False)
     text = db.Column(db.String, nullable=False)
-    user = db.Column(db.Integer, db.ForeignKey('document.id'))
+    user = db.Column(db.Integer, db.ForeignKey(User.id))
+    doc_obj = db.relationship('Document', backref=db.backref('document', lazy='dynamic'))
+    user_obj = db.relationship('User', backref=db.backref('annotations', lazy='dynamic'))
+
 
     def __init__(self, doc, page, posx, posy, width, height, text, user):
         self.doc = doc
@@ -117,6 +152,17 @@ class Annotation(db.Model):
 
     def editable_by(self, user):
         return user.is_authenticated() and user.id == self.user
+
+    @staticmethod
+    def generate(fake, doc, user):
+        page = fake.random_int(1, 5)
+        posx = fake.random_int(0, 300)
+        posy = fake.random_int(0, 600)
+        width = fake.random_int(50, 300)
+        height = fake.random_int(50, 300)
+        text = fake.text()
+        ann = Annotation(doc, page, posx, posy, width, height, text, user)
+        return ann
 
 
 """

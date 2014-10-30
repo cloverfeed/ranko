@@ -67,7 +67,8 @@ def create_app(config_file=None):
 
     # flask-admin
     admin = Admin(app, name=app.name + ' Admin')
-    admin_models = [models.Document,
+    admin_models = [models.User,
+                    models.Document,
                     models.Comment,
                     models.Annotation,
                     ]
