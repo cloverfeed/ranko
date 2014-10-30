@@ -71,10 +71,6 @@ def main():
             base = ''.join(random.choice(letters) for _ in range(length))
             return base + extension
 
-        def random_id(objs):
-            obj = random.choice(objs)
-            return obj.id
-
         def generate_document():
             filename = fake_filename()
             fullname = os.path.join(manager.app.instance_path, 'uploads', filename)
@@ -84,15 +80,12 @@ def main():
             doc = Document(filename)
             return doc
 
-        def generate_comment(docs):
-            doc = random_id(docs)
-            assert doc is not None
+        def generate_comment(doc):
             text = fake.text()
             comm = Comment(doc, text)
             return comm
 
-        def generate_annotation(docs):
-            doc = random_id(docs)
+        def generate_annotation(doc):
             page = fake.random_int(1, 5)
             posx = fake.random_int(0, 300)
             posy = fake.random_int(0, 600)
@@ -103,8 +96,10 @@ def main():
             return ann
 
         docs = [generate_document() for _ in range(0, 10)]
-        comments = [generate_comment(docs) for _ in range(0, 20)]
-        annotations = [generate_annotation(docs) for _ in range(0, 50)]
+
+        for doc in docs:
+            comments = [generate_comment(doc.id) for _ in range(0, 4)]
+            annotations = [generate_annotation(doc.id) for _ in range(0, 2)]
 
         for obj in docs + comments + annotations:
             db.session.add(obj)
