@@ -22,14 +22,16 @@ def main():
                '--private-key=~/.vagrant.d/insecure_private_key',
                '-u', 'vagrant',
                '-i', 'vagrant_ansible_inventory_default',
-               'devops/deploy.yml',
+               '--skip-tags', 'provision',
+               'devops/site.yml',
                '-e', 'repo_version={}'.format(branch),
                ]
         subprocess.check_call(cmd)
     elif where == 'prod':
         cmd = ['ansible-playbook',
                '-i', 'devops/hosts',
-               'devops/deploy.yml',
+               '--skip-tags', 'provision',
+               'devops/site.yml',
                ]
         subprocess.check_call(cmd)
     else:

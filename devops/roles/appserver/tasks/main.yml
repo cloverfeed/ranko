@@ -1,3 +1,27 @@
+- name: install packages
+  tags: provision
+  action: apt pkg={{item}} state=installed update_cache=yes
+  with_items:
+    - git-core
+    - nginx
+    - python-virtualenv
+    - supervisor
+    - uwsgi
+    - uwsgi-plugin-python
+    - coffeescript
+
+- name: start supervisord service and have it run during system startup
+  tags: provision
+  action: service name=supervisor state=started enabled=yes
+
+- name: start nginx service and have it run during system startup
+  tags: provision
+  action: service name=nginx state=started enabled=yes
+
+- name: create webapps directory
+  tags: provision
+  action: file dest=/srv/webapps state=directory
+
 - name: ensure log directory
   action: file dest={{webapps_dir}}/{{app_name}}/log state=directory
 
