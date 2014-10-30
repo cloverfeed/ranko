@@ -10,6 +10,7 @@ from app.models import Document, Comment, Annotation
 import faker
 import random
 import base64
+import string
 
 class AppMixer(Mixer):
     def populate_target(self, values):
@@ -62,12 +63,19 @@ def main():
         "Populate tables using fake data"
         fake = faker.Faker()
 
+        users = [User.generate(fake) for _ in range(0, 10)]
+        user = users[0]
+
+        for obj in users:
+            db.session.add(obj)
+        db.session.commit()
+
         pdfdata = base64.decodestring(EMPTY_PDF.strip())
         docs = [Document.generate(pdfdata) for _ in range(0, 10)]
 
         for doc in docs:
             comments = [Comment.generate(fake, doc.id) for _ in range(0, 4)]
-            annotations = [Annotation.generate(fake, doc.id) for _ in range(0, 2)]
+            annotations = [Annotation.generate(fake, doc.id, user.id) for _ in range(0, 2)]
 
         for obj in docs + comments + annotations:
             db.session.add(obj)

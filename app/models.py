@@ -57,6 +57,13 @@ class User(db.Model):
         """
         return (self.role == ROLE_ADMIN)
 
+    @staticmethod
+    def generate(fake):
+        username = fake.user_name()
+        password = fake.password()
+        user = User(username, password, workfactor=4)
+        return user
+
 
 """
 A document. The actual file is stored in the application's instance path.
@@ -143,14 +150,14 @@ class Annotation(db.Model):
         return user.is_authenticated() and user.id == self.user
 
     @staticmethod
-    def generate(fake, doc):
+    def generate(fake, doc, user):
         page = fake.random_int(1, 5)
         posx = fake.random_int(0, 300)
         posy = fake.random_int(0, 600)
         width = fake.random_int(50, 300)
         height = fake.random_int(50, 300)
         text = fake.text()
-        ann = Annotation(doc, page, posx, posy, width, height, text)
+        ann = Annotation(doc, page, posx, posy, width, height, text, user)
         return ann
 
 
