@@ -87,8 +87,9 @@ class Annotation(db.Model):
     width = db.Column(db.Integer, nullable=False)
     height = db.Column(db.Integer, nullable=False)
     text = db.Column(db.String, nullable=False)
+    user = db.Column(db.Integer, db.ForeignKey('document.id'))
 
-    def __init__(self, doc, page, posx, posy, width, height, text):
+    def __init__(self, doc, page, posx, posy, width, height, text, user):
         self.doc = doc
         self.page = page
         self.posx = posx
@@ -96,6 +97,7 @@ class Annotation(db.Model):
         self.width = width
         self.height = height
         self.text = text
+        self.user = user
 
     def to_json(self):
         return {'id': self.id,
@@ -112,6 +114,9 @@ class Annotation(db.Model):
         self.width = data['width']
         self.height = data['height']
         self.text = data['value']
+
+    def editable_by(self, user):
+        return user.is_authenticated() and user.id == self.user
 
 
 """

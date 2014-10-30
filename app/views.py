@@ -10,6 +10,8 @@ from .models import db, Comment, Document, Annotation, Revision
 import os.path
 from .uploads import documents, documents_dir
 import koremutake
+from flask.ext.login import current_user
+from .auth import lm
 
 
 bp = Blueprint('bp', __name__)
@@ -133,7 +135,8 @@ def annotation_new():
     width = request.form['width']
     height = request.form['height']
     text = request.form['value']
-    ann = Annotation(doc, page, posx, posy, width, height, text)
+    user = current_user.id
+    ann = Annotation(doc, page, posx, posy, width, height, text, user)
     db.session.add(ann)
     db.session.commit()
     return jsonify(id=ann.id)
@@ -165,6 +168,8 @@ def annotation_delete(id):
     :>json string status: The string 'ok'
     """
     ann = Annotation.query.get(id)
+    if not ann.editable_by(current_user):
+        return lm.unauthorized()
     db.session.delete(ann)
     db.session.commit()
     return jsonify(status='ok')
@@ -176,6 +181,8 @@ def annotation_edit(id):
     Edit an Annotation.
     """
     ann = Annotation.query.get(id)
+    if not ann.editable_by(current_user):
+        return lm.unauthorized()
     ann.load_json(request.form)
     db.session.commit()
     return jsonify(status='ok')

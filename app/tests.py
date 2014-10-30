@@ -60,6 +60,7 @@ class TestCase(TestCase):
         self.assert404(r)
 
     def test_annotation(self):
+        self._login('username', 'password', signup=True)
         data = { 'doc': 1
                , 'page': 2
                , 'posx': 3
@@ -92,6 +93,7 @@ class TestCase(TestCase):
                , 'value': 'Oh oh'
                }
         r = self.client.put('/annotation/{}'.format(id_retr), data=data)
+        self.assert200(r)
         r = self.client.get('/view/1/annotations')
         d = json.loads(r.data)
         anns = d['data']['2']
@@ -137,7 +139,7 @@ class TestCase(TestCase):
 
     def _login(self, username, password, signup=False):
         if signup:
-            self.signup(username, password)
+            self._signup(username, password)
         return self.client.post('/login', data=dict(
             username=username,
             password=password
