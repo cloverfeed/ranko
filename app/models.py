@@ -22,7 +22,7 @@ class User(db.Model):
     """
     Application user. Someone that can log in.
     """
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
     name = db.Column(db.String, unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
     role = db.Column(db.SmallInteger, default=ROLE_USER, nullable=False)
@@ -95,8 +95,9 @@ class Document(db.Model):
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    doc = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=False)
+    doc = db.Column(db.Integer, db.ForeignKey('document.id'), nullable=False)
     text = db.Column(db.String, nullable=False)
+    doc_obj = db.relationship('Document', backref=db.backref('documents', lazy='dynamic'))
 
     def __init__(self, doc, text):
         self.doc = doc
@@ -118,7 +119,10 @@ class Annotation(db.Model):
     width = db.Column(db.Integer, nullable=False)
     height = db.Column(db.Integer, nullable=False)
     text = db.Column(db.String, nullable=False)
-    user = db.Column(db.Integer, db.ForeignKey('document.id'))
+    user = db.Column(db.Integer, db.ForeignKey(User.id))
+    doc_obj = db.relationship('Document', backref=db.backref('document', lazy='dynamic'))
+    user_obj = db.relationship('User', backref=db.backref('annotations', lazy='dynamic'))
+
 
     def __init__(self, doc, page, posx, posy, width, height, text, user):
         self.doc = doc
