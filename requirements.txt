@@ -1,5 +1,6 @@
 coverage
 flask
+flask-admin
 flask-assets
 flask-migrate
 flask-script
