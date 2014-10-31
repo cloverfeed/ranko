@@ -107,6 +107,20 @@ def view_doc(id):
                            )
 
 
+@bp.route('/view/<id>/list')
+def view_list(id):
+    """
+    View the set of annotations on a document.
+    """
+    id = kore_id(id)
+    doc = Document.query.get_or_404(id)
+    annotations = Annotation.query.filter_by(doc=id)
+    return render_template('list.html',
+                           doc=doc,
+                           annotations=annotations,
+                           )
+
+
 @bp.route('/comment/new', methods=['POST'])
 def post_comment():
     """
@@ -142,6 +156,17 @@ def annotation_new():
     """
     Create a new annotation.
 
+    Note that the geometry depends on a particular scale, as they are in pixels.
+
+    :<json int doc: Document ID.
+    :<json int page: Page it's on.
+    :<json int posx: X position on the page.
+    :<json int posy: Y position on the page.
+    :<json int width: Width of the annotation.
+    :<json int height: Height of the annotation.
+    :<json string value: The text content of the annotation.
+    :<json string state: Optional state: "open" (default), "closed"
+
     :>json int id: The new ID.
     """
     doc = coerce_to(int, request.form['doc'])
@@ -151,8 +176,12 @@ def annotation_new():
     width = coerce_to(int, request.form['width'])
     height = coerce_to(int, request.form['height'])
     text = request.form['value']
+    state = Annotation.STATE_OPEN
+    if 'state' in request.form:
+        state = Annotation.state_decode(request.form['state'])
     user = current_user.id
-    ann = Annotation(doc, page, posx, posy, width, height, text, user)
+    ann = Annotation(doc, page, posx, posy, width, height, text, user,
+                     state=state)
     db.session.add(ann)
     db.session.commit()
     return jsonify(id=ann.id)
@@ -195,6 +224,10 @@ def annotation_delete(id):
 def annotation_edit(id):
     """
     Edit an Annotation.
+
+    For JSON parameters, see :py:func:`annotation_new`.
+
+    :>json string status: The string 'ok'
     """
     ann = Annotation.query.get(id)
     if not ann.editable_by(current_user):

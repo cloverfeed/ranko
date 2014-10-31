@@ -1,6 +1,7 @@
 class Annotation
-  constructor: (@$tld, @docid, @page, @text, @annid, @geom) ->
+  constructor: (@$tld, @docid, @page, @text, @annid, @geom, @state) ->
     @$div = jQuery('<div>').addClass 'annotation'
+    @$div = jQuery('<div>').addClass ('annotation-' + @state)
     setGeom @$div, @geom
     $closeBtn = jQuery('<a>').text '[X]'
     @$div.append $closeBtn

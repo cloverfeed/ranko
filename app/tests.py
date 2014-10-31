@@ -99,6 +99,7 @@ class TestCase(TestCase):
         ann = anns[0]
         id_retr = ann['id']
         self.assertEqual(ann['height'], 6)
+        self.assertEqual(ann['state'], 'open')
         self.assertEqual(id_retr, id_resp)
 
         data = { 'doc': 1
@@ -108,6 +109,7 @@ class TestCase(TestCase):
                , 'width': 5
                , 'height': 60
                , 'value': 'Oh oh'
+               , 'state': 'closed'
                }
         r = self.client.put('/annotation/{}'.format(id_retr), data=data)
         self.assert200(r)
@@ -117,6 +119,7 @@ class TestCase(TestCase):
         self.assertEqual(len(anns), 1)
         ann = anns[0]
         self.assertEqual(ann['height'], 60)
+        self.assertEqual(ann['state'], 'closed')
 
         r = self.client.delete('/annotation/{}'.format(id_retr))
         self.assert200(r)

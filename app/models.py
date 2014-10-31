@@ -120,11 +120,28 @@ class Annotation(db.Model):
     height = db.Column(db.Integer, nullable=False)
     text = db.Column(db.String, nullable=False)
     user = db.Column(db.Integer, db.ForeignKey(User.id))
+    state = db.Column(db.SmallInteger, nullable=False, default=0)
     doc_obj = db.relationship('Document', backref=db.backref('document', lazy='dynamic'))
     user_obj = db.relationship('User', backref=db.backref('annotations', lazy='dynamic'))
 
+    STATE_OPEN = 0
+    STATE_CLOSED = 1
 
-    def __init__(self, doc, page, posx, posy, width, height, text, user):
+    @staticmethod
+    def state_encode(state):
+        d = {Annotation.STATE_OPEN: 'open'
+            ,Annotation.STATE_CLOSED: 'closed'
+             }
+        return d[state]
+
+    @staticmethod
+    def state_decode(string):
+        d = {'open': Annotation.STATE_OPEN
+            ,'closed': Annotation.STATE_CLOSED
+             }
+        return d[string]
+
+    def __init__(self, doc, page, posx, posy, width, height, text, user, state):
         self.doc = doc
         self.page = page
         self.posx = posx
@@ -133,6 +150,7 @@ class Annotation(db.Model):
         self.height = height
         self.text = text
         self.user = user
+        self.state = state
 
     def to_json(self):
         return {'id': self.id,
@@ -141,14 +159,22 @@ class Annotation(db.Model):
                 'width': self.width,
                 'height': self.height,
                 'text': self.text,
+                'state': Annotation.state_encode(self.state)
                 }
 
     def load_json(self, data):
-        self.posx = data['posx']
-        self.posy = data['posy']
-        self.width = data['width']
-        self.height = data['height']
-        self.text = data['value']
+        if 'posx' in data:
+            self.posx = data['posx']
+        if 'posy' in data:
+            self.posy = data['posy']
+        if 'width' in data:
+            self.width = data['width']
+        if 'height' in data:
+            self.height = data['height']
+        if 'value' in data:
+            self.text = data['value']
+        if 'state' in data:
+            self.state = Annotation.state_decode(data['state'])
 
     def editable_by(self, user):
         return user.is_authenticated() and user.id == self.user
@@ -164,6 +190,8 @@ class Annotation(db.Model):
         ann = Annotation(doc, page, posx, posy, width, height, text, user)
         return ann
 
+    def is_closed(self):
+        return self.state == Annotation.STATE_CLOSED
 
 """
 History of a document.

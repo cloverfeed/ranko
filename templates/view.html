@@ -21,10 +21,17 @@
             <span class="glyphicon glyphicon-fullscreen"></span>
             Full screen
         </a>
-        <a id="toggle_annotations_button" href="#" class="list-group-item">
-            <span class="glyphicon glyphicon-eye-open"></span>
-            Toggle annotations
+        <a href="{{url_for('.view_list', id=doc.id)}}" class="list-group-item">
+            <span class="glyphicon glyphicon-list"></span>
+            List mode
         </a>
+    </div>
+    <h3><span class="glyphicon glyphicon-eye-open"></span> View</h3>
+
+    <div class="btn-group">
+        <button class="view-states-btn btn btn-default" data-view="nothing">Nothing</button>
+        <button class="view-states-btn btn btn-default" data-view="only-open">Only open</button>
+        <button class="view-states-btn btn btn-default" data-view="everything">Everything</button>
     </div>
 
     <h3><span class="glyphicon glyphicon-pencil"></span> History</h3>

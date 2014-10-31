@@ -10,3 +10,11 @@
     <p><input type="submit" value="Upload"></p>
 </form>
 {% endmacro %}
+
+{% macro annotation_state(ann) %}
+<input class="ann-state-checkbox"
+       data-annid={{ann.id}}
+       type="checkbox"
+       {% if ann.is_closed() %} checked{% endif %}
+       >
+{% endmacro %}

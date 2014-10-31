@@ -50,6 +50,13 @@
 }
 
 .annotation {
-    background-color: orange;
     position: absolute !important; /* important is needed for http://bugs.jqueryui.com/ticket/6939 */
+}
+
+.annotation-open {
+    background-color: orange;
+}
+
+.annotation-closed {
+    background-color: lightgreen;
 }
