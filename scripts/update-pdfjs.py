@@ -2,11 +2,12 @@
 Download latest pdf.js into a relevant subdirectory of static/vendor.
 """
 
-import bs4
 import os
-import requests
 import tempfile
 import zipfile
+
+import bs4
+import requests
 
 
 def latest_pdfjs_url():

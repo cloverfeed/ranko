@@ -1,5 +1,6 @@
-from flask.ext.uploads import UploadSet
 import os.path
+
+from flask.ext.uploads import UploadSet
 
 
 def documents_dir(app):

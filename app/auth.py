@@ -1,11 +1,22 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, request
-from flask.ext.login import LoginManager, login_user, logout_user
-from flask.ext.wtf import Form
-from wtforms import TextField, PasswordField
-from wtforms.validators import Required, EqualTo
-from models import db, User
 import bcrypt
+from flask import Blueprint
+from flask import flash
+from flask import redirect
+from flask import render_template
+from flask import request
+from flask import url_for
+from flask.ext.login import login_user
+from flask.ext.login import LoginManager
+from flask.ext.login import logout_user
+from flask.ext.wtf import Form
 from sqlalchemy.orm.exc import NoResultFound
+from wtforms import PasswordField
+from wtforms import TextField
+from wtforms.validators import EqualTo
+from wtforms.validators import Required
+
+from models import db
+from models import User
 
 lm = LoginManager()
 

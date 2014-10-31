@@ -1,17 +1,25 @@
 """
 Flask-script stuff
 """
-from flask.ext.migrate import MigrateCommand, stamp
-from flask.ext.script import Manager
-from app.factory import create_app
-from app.models import db, User, ROLE_ADMIN
-from app.models import Document, Comment, Annotation
-import faker
-import random
 import base64
-import string
-import os.path
 import os
+import os.path
+import random
+import string
+
+import faker
+from flask.ext.migrate import MigrateCommand
+from flask.ext.migrate import stamp
+from flask.ext.script import Manager
+
+from app.factory import create_app
+from app.models import Annotation
+from app.models import Comment
+from app.models import db
+from app.models import Document
+from app.models import ROLE_ADMIN
+from app.models import User
+
 
 EMPTY_PDF = """
 JVBERi0xLjIKJcfsj6IKNSAwIG9iago8PC9MZW5ndGggNiAwIFIvRmlsdGVyIC9GbGF0ZURlY29k

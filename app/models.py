@@ -1,12 +1,13 @@
 """
 SQLAlchemy models
 """
-import random
-from flask.ext.sqlalchemy import SQLAlchemy
-import bcrypt
-import string
 import os.path
+import random
+import string
+
+import bcrypt
 from flask import current_app
+from flask.ext.sqlalchemy import SQLAlchemy
 
 """
 The main DB object. It gets initialized in create_app.

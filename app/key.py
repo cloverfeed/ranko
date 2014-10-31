@@ -1,5 +1,6 @@
 from random import choice
-from string import ascii_uppercase, digits
+from string import ascii_uppercase
+from string import digits
 
 
 def generate_key(n):

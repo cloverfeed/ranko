@@ -1,19 +1,31 @@
-from flask import flash, redirect, url_for, render_template, request
+import os.path
+
+import koremutake
 from flask import Blueprint
-from flask import jsonify
-from flask import send_from_directory
 from flask import current_app
+from flask import flash
+from flask import jsonify
+from flask import redirect
+from flask import render_template
+from flask import request
+from flask import send_from_directory
+from flask import url_for
+from flask.ext.login import current_user
+from flask.ext.login import login_required
 from flask.ext.wtf import Form
 from flask_wtf.file import FileField
-from wtforms import TextAreaField, HiddenField
-from .models import db, Comment, Document, Annotation, Revision
-import os.path
-from .uploads import documents, documents_dir
-import koremutake
-from flask.ext.login import current_user, login_required
-from .auth import lm
 from werkzeug.exceptions import BadRequest
+from wtforms import HiddenField
+from wtforms import TextAreaField
 
+from .auth import lm
+from .models import Annotation
+from .models import Comment
+from .models import db
+from .models import Document
+from .models import Revision
+from .uploads import documents
+from .uploads import documents_dir
 
 bp = Blueprint('bp', __name__)
 

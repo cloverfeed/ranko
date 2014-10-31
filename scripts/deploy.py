@@ -8,9 +8,10 @@ Options:
     --provision        run provision commands too
 """
 
-import docopt
 import os
 import subprocess
+
+import docopt
 
 
 def main():

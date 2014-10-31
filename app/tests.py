@@ -1,12 +1,14 @@
-from factory import create_app
-from models import db
+import json
 import os
+import re
+from io import BytesIO
+
+import koremutake
 from flask.ext.testing import TestCase
 from werkzeug import FileStorage
-import re
-import koremutake
-import json
-from io import BytesIO
+
+from factory import create_app
+from models import db
 
 
 class TestCase(TestCase):
