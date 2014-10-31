@@ -43,5 +43,14 @@ view_init = (docid) ->
     $('#subnav').show()
     $('#exitfullscreen').hide()
 
-  $('#toggle_annotations_button').click (e) ->
-    $('.annotation').toggle()
+  $('.view-states-btn').click ->
+    switch $(this).data 'view'
+      when 'everything'
+        $('.annotation-open').show()
+        $('.annotation-closed').show()
+      when 'only-open'
+        $('.annotation-open').show()
+        $('.annotation-closed').hide()
+      when 'nothing'
+        $('.annotation-open').hide()
+        $('.annotation-closed').hide()
