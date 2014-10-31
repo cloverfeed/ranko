@@ -191,8 +191,12 @@ class Annotation(db.Model):
         posy = fake.random_int(0, 600)
         width = fake.random_int(50, 300)
         height = fake.random_int(50, 300)
+        if fake.boolean():
+            state = Annotation.STATE_OPEN
+        else:
+            state = Annotation.STATE_CLOSED
         text = fake.text()
-        ann = Annotation(doc, page, posx, posy, width, height, text, user)
+        ann = Annotation(doc, page, posx, posy, width, height, text, user, state)
         return ann
 
     def is_closed(self):
