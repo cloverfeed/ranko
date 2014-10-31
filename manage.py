@@ -30,6 +30,7 @@ QTQzMTY1Q0Y1QzkzNzY4QUU5MzQ5MD48QkQ0REYxRjgyQUE0MzE2NUNGNUM5Mzc2OEFFOTM0OTA+
 XQo+PgpzdGFydHhyZWYKNDc2CiUlRU9GCg==
 """
 
+
 def main():
     manager = Manager(create_app)
     manager.add_command('db', MigrateCommand)
@@ -74,7 +75,8 @@ def main():
 
         for doc in docs:
             comments = [Comment.generate(fake, doc.id) for _ in range(0, 4)]
-            annotations = [Annotation.generate(fake, doc.id, user.id) for _ in range(0, 2)]
+            annotations = [Annotation.generate(fake, doc.id, user.id)
+                           for _ in range(0, 2)]
 
         for obj in docs + comments + annotations:
             db.session.add(obj)

@@ -40,9 +40,9 @@ class TestCase(TestCase):
         self.assertEqual(r.content_type, 'application/pdf')
         comm = 'bla bla bla'
         r = self.client.post('/comment/new',
-                          data={'docid': docid,
-                                'comment': comm
-                                })
+                             data={'docid': docid,
+                                   'comment': comm
+                                   })
         self.assertStatus(r, 302)
         r = self.client.get(r.location)
         self.assert200(r)
@@ -60,14 +60,14 @@ class TestCase(TestCase):
         self.assert404(r)
 
     def test_annotation(self):
-        data = { 'doc': 1
-               , 'page': 2
-               , 'posx': 3
-               , 'posy': 4
-               , 'width': 5
-               , 'height': 6
-               , 'value': 'Oh oh'
-               }
+        data = {'doc': 1,
+                'page': 2,
+                'posx': 3,
+                'posy': 4,
+                'width': 5,
+                'height': 6,
+                'value': 'Oh oh',
+                }
         r = self.client.post('/annotation/new', data=data)
         self.assert401(r)
         self._login('username', 'password', signup=True)
@@ -77,14 +77,14 @@ class TestCase(TestCase):
         self.assertIn('id', d)
         id_resp = d['id']
 
-        bad_data = { 'doc': 1
-                   , 'page': 2
-                   , 'posx': 3
-                   , 'posy': 4
-                   , 'width': 5
-                   , 'height': 6
-                   , 'value': 'Oh oh'
-                   }
+        bad_data = {'doc': 1,
+                    'page': 2,
+                    'posx': 3,
+                    'posy': 4,
+                    'width': 5,
+                    'height': 6,
+                    'value': 'Oh oh',
+                    }
         for key in ['doc', 'page', 'posx', 'posy', 'width', 'height']:
             ok = bad_data[key]
             bad_data[key] = 0.5
@@ -102,15 +102,15 @@ class TestCase(TestCase):
         self.assertEqual(ann['state'], 'open')
         self.assertEqual(id_retr, id_resp)
 
-        data = { 'doc': 1
-               , 'page': 2
-               , 'posx': 3
-               , 'posy': 4
-               , 'width': 5
-               , 'height': 60
-               , 'value': 'Oh oh'
-               , 'state': 'closed'
-               }
+        data = {'doc': 1,
+                'page': 2,
+                'posx': 3,
+                'posy': 4,
+                'width': 5,
+                'height': 60,
+                'value': 'Oh oh',
+                'state': 'closed',
+                }
         r = self.client.put('/annotation/{}'.format(id_retr), data=data)
         self.assert200(r)
         r = self.client.get('/view/1/annotations')
@@ -135,9 +135,9 @@ class TestCase(TestCase):
         r = self.client.get(r.location)
         data = {'file': FileStorage(filename='totov2.pdf', stream=BytesIO())}
         r = self.client.post('/upload',
-                            data=data,
-                            query_string={'revises': docid},
-                            )
+                             data=data,
+                             query_string={'revises': docid},
+                             )
         self.assertStatus(r, 302)
         m = re.search('/view/(\w+)', r.location)
         self.assertIsNotNone(m)

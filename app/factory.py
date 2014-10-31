@@ -11,6 +11,7 @@ from flask.ext.admin.contrib.sqla import ModelView
 from flask.ext.login import current_user
 from auth import lm
 
+
 def create_app(config_file=None):
 
     this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -55,6 +56,7 @@ def create_app(config_file=None):
 
     # auth
     lm.init_app(app)
+
     @lm.user_loader
     def load_user(userid):
         """

@@ -43,7 +43,6 @@ def coerce_to(typ, val):
     return val
 
 
-
 @bp.route('/')
 def home():
     """
@@ -156,7 +155,8 @@ def annotation_new():
     """
     Create a new annotation.
 
-    Note that the geometry depends on a particular scale, as they are in pixels.
+    Note that the geometry depends on a particular scale,
+    as they are in pixels.
 
     :<json int doc: Document ID.
     :<json int page: Page it's on.

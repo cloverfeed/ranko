@@ -21,7 +21,7 @@ def main():
     if provision:
         provision_args = []
     else:
-        provision_args = ['--skip-tags', 'provision',]
+        provision_args = ['--skip-tags', 'provision']
     if where == 'test':
         os.putenv('ANSIBLE_HOST_KEY_CHECKING', 'no')
         cmd = ['ansible-playbook',
@@ -37,7 +37,7 @@ def main():
     elif where == 'prod':
         cmd = ['ansible-playbook',
                '-i', 'devops/hosts',
-              ]
+               ]
         cmd += provision_args
         cmd += ['devops/site.yml',
                 ]

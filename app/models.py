@@ -65,10 +65,10 @@ class User(db.Model):
         return user
 
 
-"""
-A document. The actual file is stored in the application's instance path.
-"""
 class Document(db.Model):
+    """
+    A document. The actual file is stored in the application's instance path.
+    """
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     filename = db.Column(db.String, nullable=False)
 
@@ -97,7 +97,8 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     doc = db.Column(db.Integer, db.ForeignKey('document.id'), nullable=False)
     text = db.Column(db.String, nullable=False)
-    doc_obj = db.relationship('Document', backref=db.backref('documents', lazy='dynamic'))
+    doc_obj = db.relationship('Document', backref=db.backref('documents',
+                                                             lazy='dynamic'))
 
     def __init__(self, doc, text):
         self.doc = doc
@@ -121,27 +122,30 @@ class Annotation(db.Model):
     text = db.Column(db.String, nullable=False)
     user = db.Column(db.Integer, db.ForeignKey(User.id))
     state = db.Column(db.SmallInteger, nullable=False, default=0)
-    doc_obj = db.relationship('Document', backref=db.backref('document', lazy='dynamic'))
-    user_obj = db.relationship('User', backref=db.backref('annotations', lazy='dynamic'))
+    doc_obj = db.relationship('Document', backref=db.backref('document',
+                                                             lazy='dynamic'))
+    user_obj = db.relationship('User', backref=db.backref('annotations',
+                                                          lazy='dynamic'))
 
     STATE_OPEN = 0
     STATE_CLOSED = 1
 
     @staticmethod
     def state_encode(state):
-        d = {Annotation.STATE_OPEN: 'open'
-            ,Annotation.STATE_CLOSED: 'closed'
+        d = {Annotation.STATE_OPEN: 'open',
+             Annotation.STATE_CLOSED: 'closed',
              }
         return d[state]
 
     @staticmethod
     def state_decode(string):
-        d = {'open': Annotation.STATE_OPEN
-            ,'closed': Annotation.STATE_CLOSED
+        d = {'open': Annotation.STATE_OPEN,
+             'closed': Annotation.STATE_CLOSED,
              }
         return d[string]
 
-    def __init__(self, doc, page, posx, posy, width, height, text, user, state):
+    def __init__(self, doc, page, posx, posy,
+                 width, height, text, user, state):
         self.doc = doc
         self.page = page
         self.posx = posx
@@ -193,13 +197,14 @@ class Annotation(db.Model):
     def is_closed(self):
         return self.state == Annotation.STATE_CLOSED
 
-"""
-History of a document.
 
-A project is several docs, each of one has a version.
-Version numbers are integers, and history is sequential.
-"""
 class Revision(db.Model):
+    """
+    History of a document.
+
+    A project is several docs, each of one has a version.
+    Version numbers are integers, and history is sequential.
+    """
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     project = db.Column(db.Integer, nullable=False)
     version = db.Column(db.Integer, nullable=False)
