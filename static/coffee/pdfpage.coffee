@@ -23,14 +23,14 @@ class PdfPage
     @$div.append @$textLayerDiv
 
     selection = new Selection @$textLayerDiv, (geom) =>
-      @addAnnotation "", null, geom
+      @addAnnotation "", null, geom, 'open'
     @$div.append selection.$div
 
     anns = annotations[@i]
     if anns
       for ann in anns
-        @addAnnotation ann.text, ann.id, ann
+        @addAnnotation ann.text, ann.id, ann, ann.state
 
-  addAnnotation: (text, id, geom) ->
-    ann = new Annotation @$textLayerDiv, @docid, @i, text, id, geom
+  addAnnotation: (text, id, geom, state) ->
+    ann = new Annotation @$textLayerDiv, @docid, @i, text, id, geom, state
     @$div.append ann.$div
