@@ -165,6 +165,7 @@ def annotation_new():
     :<json int width: Width of the annotation.
     :<json int height: Height of the annotation.
     :<json string value: The text content of the annotation.
+    :<json string state: Optional state: "open" (default), "closed"
 
     :>json int id: The new ID.
     """
@@ -175,8 +176,12 @@ def annotation_new():
     width = coerce_to(int, request.form['width'])
     height = coerce_to(int, request.form['height'])
     text = request.form['value']
+    state = Annotation.STATE_OPEN
+    if 'state' in request.form:
+        state = Annotation.state_decode(request.form['state'])
     user = current_user.id
-    ann = Annotation(doc, page, posx, posy, width, height, text, user)
+    ann = Annotation(doc, page, posx, posy, width, height, text, user,
+                     state=state)
     db.session.add(ann)
     db.session.commit()
     return jsonify(id=ann.id)
