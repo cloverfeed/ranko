@@ -1,15 +1,21 @@
-from flask import Flask, g
 import os
-from key import get_secret_key
-from uploads import documents
-import models
-from flask.ext.uploads import configure_uploads
-from flask.ext.assets import Environment, Bundle
-from flask.ext.migrate import Migrate, MigrateCommand
+
+from flask import Flask
+from flask import g
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib.sqla import ModelView
+from flask.ext.assets import Bundle
+from flask.ext.assets import Environment
 from flask.ext.login import current_user
+from flask.ext.migrate import Migrate
+from flask.ext.migrate import MigrateCommand
+from flask.ext.uploads import configure_uploads
+
+import models
 from auth import lm
+from key import get_secret_key
+from uploads import documents
+
 
 def create_app(config_file=None):
 
@@ -55,6 +61,7 @@ def create_app(config_file=None):
 
     # auth
     lm.init_app(app)
+
     @lm.user_loader
     def load_user(userid):
         """

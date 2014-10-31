@@ -1,17 +1,25 @@
 """
 Flask-script stuff
 """
-from flask.ext.migrate import MigrateCommand, stamp
-from flask.ext.script import Manager
-from app.factory import create_app
-from app.models import db, User, ROLE_ADMIN
-from app.models import Document, Comment, Annotation
-import faker
-import random
 import base64
-import string
-import os.path
 import os
+import os.path
+import random
+import string
+
+import faker
+from flask.ext.migrate import MigrateCommand
+from flask.ext.migrate import stamp
+from flask.ext.script import Manager
+
+from app.factory import create_app
+from app.models import Annotation
+from app.models import Comment
+from app.models import db
+from app.models import Document
+from app.models import ROLE_ADMIN
+from app.models import User
+
 
 EMPTY_PDF = """
 JVBERi0xLjIKJcfsj6IKNSAwIG9iago8PC9MZW5ndGggNiAwIFIvRmlsdGVyIC9GbGF0ZURlY29k
@@ -29,6 +37,7 @@ YWlsZXIKPDwgL1NpemUgNyAvUm9vdCAxIDAgUiAvSW5mbyAyIDAgUgovSUQgWzxCRDRERjFGODJB
 QTQzMTY1Q0Y1QzkzNzY4QUU5MzQ5MD48QkQ0REYxRjgyQUE0MzE2NUNGNUM5Mzc2OEFFOTM0OTA+
 XQo+PgpzdGFydHhyZWYKNDc2CiUlRU9GCg==
 """
+
 
 def main():
     manager = Manager(create_app)
@@ -74,7 +83,8 @@ def main():
 
         for doc in docs:
             comments = [Comment.generate(fake, doc.id) for _ in range(0, 4)]
-            annotations = [Annotation.generate(fake, doc.id, user.id) for _ in range(0, 2)]
+            annotations = [Annotation.generate(fake, doc.id, user.id)
+                           for _ in range(0, 2)]
 
         for obj in docs + comments + annotations:
             db.session.add(obj)
