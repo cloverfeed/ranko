@@ -163,12 +163,18 @@ class Annotation(db.Model):
                 }
 
     def load_json(self, data):
-        self.posx = data['posx']
-        self.posy = data['posy']
-        self.width = data['width']
-        self.height = data['height']
-        self.text = data['value']
-        self.state = Annotation.state_decode(data['state'])
+        if 'posx' in data:
+            self.posx = data['posx']
+        if 'posy' in data:
+            self.posy = data['posy']
+        if 'width' in data:
+            self.width = data['width']
+        if 'height' in data:
+            self.height = data['height']
+        if 'value' in data:
+            self.text = data['value']
+        if 'state' in data:
+            self.state = Annotation.state_decode(data['state'])
 
     def editable_by(self, user):
         return user.is_authenticated() and user.id == self.user
@@ -184,6 +190,8 @@ class Annotation(db.Model):
         ann = Annotation(doc, page, posx, posy, width, height, text, user)
         return ann
 
+    def is_closed(self):
+        return self.state == Annotation.STATE_CLOSED
 
 """
 History of a document.

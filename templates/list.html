@@ -1,3 +1,4 @@
+{% from 'macros.html' import annotation_state %}
 {% extends "base.html" %}
 {% block content %}
 
@@ -7,6 +8,7 @@
         <tr>
             <th>Page</th>
             <th>Text</th>
+            <th>Done?</th>
         </tr>
     </thead>
     <tbody>
@@ -14,6 +16,7 @@
         <tr>
             <td>{{ann.page}}</td>
             <td>{{ann.text}}</td>
+            <td>{{annotation_state(ann)}}</td>
         </tr>
         {% endfor %}
     </tbody>
@@ -31,4 +34,9 @@
 </div>
 </div>
 
+{% endblock %}
+{% block js_end %}
+<script>
+list_view_init();
+</script>
 {% endblock %}
