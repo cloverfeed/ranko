@@ -156,6 +156,16 @@ def annotation_new():
     """
     Create a new annotation.
 
+    Note that the geometry depends on a particular scale, as they are in pixels.
+
+    :<json int doc: Document ID.
+    :<json int page: Page it's on.
+    :<json int posx: X position on the page.
+    :<json int posy: Y position on the page.
+    :<json int width: Width of the annotation.
+    :<json int height: Height of the annotation.
+    :<json string value: The text content of the annotation.
+
     :>json int id: The new ID.
     """
     doc = coerce_to(int, request.form['doc'])
@@ -209,6 +219,10 @@ def annotation_delete(id):
 def annotation_edit(id):
     """
     Edit an Annotation.
+
+    For JSON parameters, see :py:func:`annotation_new`.
+
+    :>json string status: The string 'ok'
     """
     ann = Annotation.query.get(id)
     if not ann.editable_by(current_user):
