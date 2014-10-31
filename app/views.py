@@ -107,6 +107,20 @@ def view_doc(id):
                            )
 
 
+@bp.route('/view/<id>/list')
+def view_list(id):
+    """
+    View the set of annotations on a document.
+    """
+    id = kore_id(id)
+    doc = Document.query.get_or_404(id)
+    annotations = Annotation.query.filter_by(doc=id)
+    return render_template('list.html',
+                           doc=doc,
+                           annotations=annotations,
+                           )
+
+
 @bp.route('/comment/new', methods=['POST'])
 def post_comment():
     """

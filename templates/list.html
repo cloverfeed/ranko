@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="col-md-9">
+<table class="table">
+    <thead>
+        <tr>
+            <th>Page</th>
+            <th>Text</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ann in annotations %}
+        <tr>
+            <td>{{ann.page}}</td>
+            <td>{{ann.text}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+<div class="col-md-3">
+<div id="subnav" data-spy="affix">
+
+    <div class="list-group">
+        <a href="{{url_for('.view_doc', id=doc.id)}}" class="list-group-item">
+            <span class="glyphicon glyphicon-file"></span>
+            Document mode
+        </a>
+    </div>
+</div>
+</div>
+
+{% endblock %}
