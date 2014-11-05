@@ -3,7 +3,7 @@
 {% block content %}
 
 
-<div id="pdfview" class="col-md-9"></div>
+<div id="docview" class="col-md-9"></div>
 
 <div class="col-md-3">
 <div id="exitfullscreen">
@@ -71,6 +71,6 @@
 <script type="text/javascript">
 upload_form_init();
 PDFJS.workerSrc = "{{url_for('static', filename='vendor/pdfjs-' + config.X_PDFJS_VERSION + '-dist/build/pdf.worker.js')}}";
-view_init({{doc.id}});
+view_init({{doc.id}}, "{{doc.filetype}}");
 </script>
 {% endblock %}

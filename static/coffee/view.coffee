@@ -6,15 +6,41 @@ setGeom = ($div, geom) ->
     height: geom.height + "px"
 
 render_page = (docid, $pv, pdf, i, page, annotations) ->
-  pp = new PdfPage docid, i, page, annotations
+  pp = new Page docid, i,
+    page: page
+    annotations: annotations
   $pv.append pp.$div
 
   if (i + 1 <= pdf.numPages)
     pdf.getPage(i + 1).then (page) ->
       render_page docid, $pv, pdf, i + 1, page, annotations
 
-view_init = (docid) ->
-  $pv = $('#pdfview')
+view_init = (docid, filetype) ->
+  switch filetype
+    when "pdf"
+      view_init_pdf docid
+    when "image"
+      view_init_image docid
+  view_init_common()
+
+view_init_image = (docid) ->
+  GET_ANN_URL = '/view/' + docid + '/annotations'
+  $img = $('<img>')
+  $pv = $('#docview')
+  $img.mousedown (e) ->
+    e.preventDefault()
+  $img.load ->
+    image = this
+    $.getJSON GET_ANN_URL, (annotations) ->
+      page = new Page docid, 0,
+        image: image
+        annotations: annotations.data
+      page.$div.append $img
+      $pv.append page.$div
+  $img.attr('src', '/raw/' + docid)
+
+view_init_pdf = (docid) ->
+  $pv = $('#docview')
   PDFJS.getDocument('/raw/' + docid).then (pdf) ->
     GET_ANN_URL = '/view/' + docid + '/annotations'
     $.getJSON GET_ANN_URL, (annotations) ->
@@ -22,6 +48,8 @@ view_init = (docid) ->
         render_page docid, $pv, pdf, 1, page, annotations.data
   .then null, ->
     $pv.text "Error loading the document."
+
+view_init_common = ->
   $('#post_comment_form').submit (e) ->
     e.preventDefault()
     $.ajax

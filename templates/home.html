@@ -5,17 +5,17 @@
 <div class="jumbotron">
 <div class="row">
     <div class="col-md-8">
-        <p> Upload and review PDF documents in your browser. </p>
+        <p> Upload and review documents in your browser. </p>
     </div>
     <div class="col-md-4">
         <button type="button" class="btn btn-primary btn-lg" id="upload_link">
-              <span class="glyphicon glyphicon-upload"></span> Upload a PDF file
+              <span class="glyphicon glyphicon-upload"></span> Upload a file
         </button>
     </div>
 </div>
 </div>
 
-<div id="upload_dialog" title="Upload a PDF file">
+<div id="upload_dialog" title="Upload a PDF or image">
     {{ upload_form (form, url_for('.upload')) }}
 </div>
 
@@ -23,7 +23,7 @@
     <div class="col-md-3">
         <h2>Upload</h2>
 
-        Host a PDF file in a single click.
+        Host a file in a single click: PDFs and images are supported.
         Your document will be displayed in your browser.
         No plugins needed.
     </div>

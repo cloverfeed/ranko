@@ -8,6 +8,6 @@ def documents_dir(app):
 
 
 documents = UploadSet('documents',
-                      extensions=['pdf'],
+                      extensions=['pdf', 'png'],
                       default_dest=documents_dir,
                       )
