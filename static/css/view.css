@@ -4,14 +4,21 @@
 
 /* CSS classes used by TextLayerBuilder to style the text layer divs */
 
-.pdfPage {
+.docPage {
     position: relative;
     overflow: visible;
     border: 1px solid #000000;
 }
 
-.pdfPage > canvas {
+.docPage > canvas {
     position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.docPage > img {
+    position: absolute;
+    z-index: -1;
     top: 0;
     left: 0;
 }

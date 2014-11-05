@@ -48,7 +48,7 @@ def create_app(config_file=None):
         'coffee/view.coffee',
         'coffee/selection.coffee',
         'coffee/annotation.coffee',
-        'coffee/pdfpage.coffee',
+        'coffee/page.coffee',
         'coffee/upload.coffee',
         'coffee/listview.coffee',
         filters='coffeescript',

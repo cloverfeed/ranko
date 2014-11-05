@@ -72,10 +72,19 @@ class Document(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     filename = db.Column(db.String, nullable=False)
+    filetype = db.Column(db.String, nullable=False)
 
     def __init__(self, filename):
         self.id = random.randint(0, 0x7fffffff)
         self.filename = filename
+        self.filetype = Document.detect_filetype(filename)
+
+    @staticmethod
+    def detect_filetype(filename):
+        if filename.endswith('.pdf'):
+            return 'pdf'
+        elif filename.endswith('.png'):
+            return 'image'
 
     @staticmethod
     def generate(pdfdata):
