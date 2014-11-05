@@ -85,6 +85,10 @@ class Document(db.Model):
             return 'pdf'
         elif filename.endswith('.png'):
             return 'image'
+        elif filename.endswith('.mp3'):
+            return 'audio'
+        else:
+            assert False, "Unknown file extension in file {}".format(filename)
 
     @staticmethod
     def generate(pdfdata):
