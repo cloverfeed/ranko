@@ -1,5 +1,5 @@
 {% macro upload_form(form, action) %}
-<form method="post" action="{{action}}" method="POST" enctype="multipart/form-data">
+<form method="post" action="{{action}}" enctype="multipart/form-data">
     {{form.hidden_tag()}}
     <p>
         <label>
