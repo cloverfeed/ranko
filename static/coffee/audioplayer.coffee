@@ -20,7 +20,6 @@ class AudioPlayer
     @chunkDuration = 30
     bufferSize = @chunkDuration * @sampleRate
     offlineCtx = new OfflineAudioContext @channels, bufferSize, @sampleRate
-    audioCtx = new AudioContext()
 
     source = offlineCtx.createBufferSource()
 
@@ -38,7 +37,7 @@ class AudioPlayer
           source.start()
           offlineCtx.startRendering()
 
-        audioCtx.decodeAudioData audioData, ok, (e) ->
+        offlineCtx.decodeAudioData audioData, ok, (e) ->
           console.log("Error with decoding audio data" + e.err)
 
       request.send()
