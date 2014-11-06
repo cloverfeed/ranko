@@ -107,7 +107,7 @@ class AudioPlayer
       if @waveform?
         value = @waveform[y]
       else
-        value = 1
+        value = 0.01
 
       lineSize = value * wf
       offset = (wf / 2) * (1 - value)
