@@ -5,6 +5,10 @@ class AudioPlayer
     url = '/raw/' + docid
     @audio = new Audio url
 
+    @channels = 2
+    @sampleRate = 44100
+    @audio.addEventListener 'loadedmetadata', (=> @startWaveform url), false
+
     $playBtn = $('<button>').addClass('btn btn-default').text('Play')
     $playBtn.click =>
       @audio.play()
@@ -14,38 +18,6 @@ class AudioPlayer
 
     @$div.append $playBtn
     @$div.append $pauseBtn
-
-    @channels = 2
-    @sampleRate = 44100
-    @chunkDuration = 30
-    bufferSize = @chunkDuration * @sampleRate
-    offlineCtx = new OfflineAudioContext @channels, bufferSize, @sampleRate
-
-    source = offlineCtx.createBufferSource()
-
-    getData = ->
-      request = new XMLHttpRequest()
-      request.open 'GET', url, true
-      request.responseType = 'arraybuffer'
-      request.onload = ->
-        audioData = request.response
-
-        ok = (buffer) ->
-          myBuffer = buffer
-          source.buffer = myBuffer
-          source.connect offlineCtx.destination
-          source.start()
-          offlineCtx.startRendering()
-
-        offlineCtx.decodeAudioData audioData, ok, (e) ->
-          console.log("Error with decoding audio data" + e.err)
-
-      request.send()
-
-    getData()
-
-    offlineCtx.oncomplete = (e) =>
-      @drawBuffer e.renderedBuffer
 
     @$debug = $ '<span>'
     @$div.append @$debug
@@ -62,13 +34,14 @@ class AudioPlayer
     @$div.append $canvasDiv
     @ctx = @$canvas[0].getContext '2d'
 
-    delay = 250 # ms
-    interval = window.setInterval (=> @update()), delay
+    @annotations = []
+
+    @audio.addEventListener 'timeupdate', @update, false
+    @update()
 
     @$canvas.mousedown @mousedown
     @$canvas.mouseup @mouseup
 
-    @annotations = []
 
   mousedown: (e) =>
     ec = @eventCoords e
@@ -103,7 +76,8 @@ class AudioPlayer
   pixelsToSeconds: (pixels) ->
     @audio.duration * pixels / @height
 
-  update: ->
+  update: =>
+    console.log "update"
     @ctx.clearRect 0, 0, @width, @height
     currentTime = @audio.currentTime
     totalTime = @audio.duration
@@ -130,9 +104,10 @@ class AudioPlayer
       if y > size
         @ctx.fillStyle = "violet"
 
-      value = 1
-      if @waveform? and y < @waveformLimit
+      if @waveform?
         value = @waveform[y]
+      else
+        value = 1
 
       lineSize = value * wf
       offset = (wf / 2) * (1 - value)
@@ -143,10 +118,39 @@ class AudioPlayer
     totalTime = @audio.duration
     @height * (seconds / totalTime)
 
-  drawBuffer: (buffer) =>
-    maxPix = @secondsToPixels @chunkDuration
-    totalSamples = @chunkDuration * @sampleRate
-    nSamples = (totalSamples / maxPix) | 0
+  startWaveform: (url) ->
+    bufferSize = @audio.duration * @sampleRate
+    offlineCtx = new OfflineAudioContext @channels, bufferSize, @sampleRate
+
+    source = offlineCtx.createBufferSource()
+
+    getData = ->
+      request = new XMLHttpRequest()
+      request.open 'GET', url, true
+      request.responseType = 'arraybuffer'
+      request.onload = ->
+        audioData = request.response
+
+        ok = (buffer) ->
+          myBuffer = buffer
+          source.buffer = myBuffer
+          source.connect offlineCtx.destination
+          source.start()
+          offlineCtx.startRendering()
+
+        offlineCtx.decodeAudioData audioData, ok, (e) ->
+          console.log("Error with decoding audio data" + e.err)
+
+      request.send()
+
+    getData()
+
+    offlineCtx.oncomplete = (e) =>
+      @computeWaveform e.renderedBuffer
+
+  computeWaveform: (buffer) =>
+    totalSamples = @audio.duration * @sampleRate
+    nSamples = (totalSamples / @height) | 0
 
     sumAt = (y) =>
       start = y * nSamples
@@ -158,15 +162,15 @@ class AudioPlayer
           sum += Math.abs s
       return sum
 
-    unnorm = (sumAt y for y in [0 .. maxPix - 1])
+    unnorm = (sumAt y for y in [0 .. @height - 1])
 
     maxi = -1
     for x in unnorm
       if maxi < x
         maxi = x
 
-    @waveformLimit = maxPix
     @waveform = (s / maxi for s in unnorm)
+    @update()
 
 
 class AudioSelection
