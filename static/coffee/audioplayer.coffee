@@ -65,12 +65,33 @@ class AudioPlayer
     delay = 250 # ms
     interval = window.setInterval (=> @update()), delay
 
-    @$canvas.mousedown (e) =>
+    @$canvas.mousedown @mousedown
+    @$canvas.mouseup @mouseup
+
+    @annotations = []
+
+  mousedown: (e) =>
+    ec = @eventCoords e
+    if ec.x / @width < (1 - @annZoneRatio)
+      # Seek
+      totalTime = @audio.duration
+      newTime = totalTime * (ec.y / @height)
+      @audio.currentTime = newTime
+    else
+      # Start annotation
       ec = @eventCoords e
-      if ec.x / @width < (1 - @annZoneRatio)
-        totalTime = @audio.duration
-        newTime = totalTime * (ec.y / @height)
-        @audio.currentTime = newTime
+      time = @pixelsToSeconds ec.y
+      @selection = new AudioSelection time, (startTime, length) =>
+        annotation = new AudioAnnotation startTime, length
+        @annotations.push annotation
+
+  mouseup: (e) =>
+    if !@selection?
+      return
+    ec = @eventCoords e
+    time = @pixelsToSeconds ec.y
+    @selection.mouseup time
+    @selection = null
 
   eventCoords: (e) ->
     canOffset = @$canvas.offset()
@@ -79,6 +100,9 @@ class AudioPlayer
       y: e.pageY - canOffset.top
     )
 
+  pixelsToSeconds: (pixels) ->
+    @audio.duration * pixels / @height
+
   update: ->
     @ctx.clearRect 0, 0, @width, @height
     currentTime = @audio.currentTime
@@ -86,13 +110,20 @@ class AudioPlayer
     size = @height * (currentTime / totalTime)
     @$debug.text size
 
+    aw = @annZoneRatio * @width
     wf = (1 - @annZoneRatio) * @width
 
     @ctx.fillStyle = "lightpink"
-    @ctx.fillRect wf, 0, @annZoneRatio * @width, @height
+    @ctx.fillRect wf, 0, aw, @height
 
     @ctx.fillStyle = "lightsalmon"
-    @ctx.fillRect wf, 0, @annZoneRatio * @width, size
+    @ctx.fillRect wf, 0, aw, size
+
+    for annotation in @annotations
+      @ctx.fillStyle = "orange"
+      annStart = @secondsToPixels annotation.startTime
+      annSize = @secondsToPixels annotation.length
+      @ctx.fillRect wf, annStart, aw, annSize
 
     @ctx.fillStyle = "purple"
     for y in [0 .. @height - 1]
@@ -108,12 +139,12 @@ class AudioPlayer
 
       @ctx.fillRect offset, y, lineSize, 1
 
-  drawBuffer: (buffer) =>
-    secondsToPixels = (seconds) =>
-      totalTime = @audio.duration
-      return @height * (seconds / totalTime)
+  secondsToPixels: (seconds) ->
+    totalTime = @audio.duration
+    @height * (seconds / totalTime)
 
-    maxPix = secondsToPixels @chunkDuration
+  drawBuffer: (buffer) =>
+    maxPix = @secondsToPixels @chunkDuration
     totalSamples = @chunkDuration * @sampleRate
     nSamples = (totalSamples / maxPix) | 0
 
@@ -136,3 +167,16 @@ class AudioPlayer
 
     @waveformLimit = maxPix
     @waveform = (s / maxi for s in unnorm)
+
+
+class AudioSelection
+  constructor: (@down, @success) ->
+
+  mouseup: (up) ->
+    length = Math.abs(up - @down)
+    start = Math.min(up, @down)
+    @success(start, length)
+
+
+class AudioAnnotation
+  constructor: (@startTime, @length) ->
