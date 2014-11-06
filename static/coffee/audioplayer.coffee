@@ -15,6 +15,39 @@ class AudioPlayer
     @$div.append $playBtn
     @$div.append $pauseBtn
 
+    @channels = 2
+    @sampleRate = 44100
+    @chunkDuration = 30
+    bufferSize = @chunkDuration * @sampleRate
+    offlineCtx = new OfflineAudioContext @channels, bufferSize, @sampleRate
+    audioCtx = new AudioContext()
+
+    source = offlineCtx.createBufferSource()
+
+    getData = ->
+      request = new XMLHttpRequest()
+      request.open 'GET', url, true
+      request.responseType = 'arraybuffer'
+      request.onload = ->
+        audioData = request.response
+
+        ok = (buffer) ->
+          myBuffer = buffer
+          source.buffer = myBuffer
+          source.connect offlineCtx.destination
+          source.start()
+          offlineCtx.startRendering()
+
+        audioCtx.decodeAudioData audioData, ok, (e) ->
+          console.log("Error with decoding audio data" + e.err)
+
+      request.send()
+
+    getData()
+
+    offlineCtx.oncomplete = (e) =>
+      @drawBuffer e.renderedBuffer
+
     @$debug = $ '<span>'
     @$div.append @$debug
 
@@ -48,19 +81,59 @@ class AudioPlayer
     )
 
   update: ->
+    @ctx.clearRect 0, 0, @width, @height
     currentTime = @audio.currentTime
     totalTime = @audio.duration
     size = @height * (currentTime / totalTime)
     @$debug.text size
 
-    @ctx.fillStyle = "violet"
-    @ctx.fillRect 0, 0, (1-@annZoneRatio)*@width, @height
-
-    @ctx.fillStyle = "purple"
-    @ctx.fillRect 0, 0, (1-@annZoneRatio)*@width, size
+    wf = (1 - @annZoneRatio) * @width
 
     @ctx.fillStyle = "lightpink"
-    @ctx.fillRect (1-@annZoneRatio)*@width, 0, @annZoneRatio*@width, @height
+    @ctx.fillRect wf, 0, @annZoneRatio * @width, @height
 
     @ctx.fillStyle = "lightsalmon"
-    @ctx.fillRect (1-@annZoneRatio)*@width, 0, @annZoneRatio*@width, size
+    @ctx.fillRect wf, 0, @annZoneRatio * @width, size
+
+    @ctx.fillStyle = "purple"
+    for y in [0 .. @height - 1]
+      if y > size
+        @ctx.fillStyle = "violet"
+
+      value = 1
+      if @waveform? and y < @waveformLimit
+        value = @waveform[y]
+
+      lineSize = value * wf
+      offset = (wf / 2) * (1 - value)
+
+      @ctx.fillRect offset, y, lineSize, 1
+
+  drawBuffer: (buffer) =>
+    secondsToPixels = (seconds) =>
+      totalTime = @audio.duration
+      return @height * (seconds / totalTime)
+
+    maxPix = secondsToPixels @chunkDuration
+    totalSamples = @chunkDuration * @sampleRate
+    nSamples = (totalSamples / maxPix) | 0
+
+    sumAt = (y) =>
+      start = y * nSamples
+      sum = 0
+      for channelNum in [0 .. @channels - 1]
+        channel = buffer.getChannelData channelNum
+        for sample in [start .. start + nSamples - 1]
+          s = channel[sample]
+          sum += Math.abs s
+      return sum
+
+    unnorm = (sumAt y for y in [0 .. maxPix - 1])
+
+    maxi = -1
+    for x in unnorm
+      if maxi < x
+        maxi = x
+
+    @waveformLimit = maxPix
+    @waveform = (s / maxi for s in unnorm)
