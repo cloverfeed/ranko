@@ -38,9 +38,9 @@ class AudioPlayer
     ann_url = '/view/' + docid + '/audioannotations'
     $.getJSON ann_url, (annotations) =>
       for ann in annotations.data
-        @annotations.push ann
         annotation = new AudioAnnotation this, ann.id, ann.start, ann.length, ann.state, ann.text
         @$div.append annotation.$div
+        @annotations.push annotation
 
     @audio.addEventListener 'timeupdate', @update, false
     @update()
@@ -65,6 +65,12 @@ class AudioPlayer
         @$div.append annotation.$div
         @annotations.push annotation
         @update()
+
+  removeAnnotation: (targetId) ->
+    rm = @annotations.filter (ann) ->
+      ann.id != targetId
+    @annotations = rm
+    @update()
 
   mouseup: (e) =>
     if !@selection?
@@ -209,6 +215,7 @@ class AudioAnnotation
 
     $closeBtn.click =>
       @rest.delete this, =>
+        @player.removeAnnotation @id
         @$div.remove()
 
     $textDiv = $('<div>').text(@text)
