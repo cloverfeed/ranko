@@ -38,7 +38,8 @@ class AudioPlayer
     ann_url = '/view/' + docid + '/audioannotations'
     $.getJSON ann_url, (annotations) =>
       for ann in annotations.data
-        annotation = new AudioAnnotation this, ann.id, ann.start, ann.length, ann.state, ann.text
+        annotation = new AudioAnnotation this, ann.id, ann.start,
+                                         ann.length, ann.state, ann.text
         @$div.append annotation.$div
         @annotations.push annotation
         @update()
@@ -262,7 +263,7 @@ class AudioAnnotation
       onblur: 'submit'
 
   update: ->
-    y = @player.secondsToPixels (@start + @length/2)
+    y = @player.secondsToPixels (@start + @length / 2)
     @$div.css
       top: y + "px"
 

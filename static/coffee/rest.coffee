@@ -12,7 +12,7 @@ class RestClient
       type: type
       url: url
       data: data
-      success: (d) =>
+      success: (d) ->
         if type == 'POST'
           obj.id = d.id
 
