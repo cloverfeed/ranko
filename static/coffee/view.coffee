@@ -21,7 +21,14 @@ view_init = (docid, filetype) ->
       view_init_pdf docid
     when "image"
       view_init_image docid
+    when "audio"
+      view_init_audio docid
   view_init_common()
+
+view_init_audio = (docid) ->
+  $pv = $('#docview')
+  audioPlayer = new AudioPlayer docid
+  $pv.append audioPlayer.$div
 
 view_init_image = (docid) ->
   GET_ANN_URL = '/view/' + docid + '/annotations'

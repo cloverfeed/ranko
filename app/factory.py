@@ -51,6 +51,8 @@ def create_app(config_file=None):
         'coffee/page.coffee',
         'coffee/upload.coffee',
         'coffee/listview.coffee',
+        'coffee/audioplayer.coffee',
+        'coffee/rest.coffee',
         filters='coffeescript',
         output='gen/app.js'
         )
@@ -92,5 +94,7 @@ def create_app(config_file=None):
     app.register_blueprint(bp)
     from auth import auth
     app.register_blueprint(auth)
+    from audio_annotation import audioann
+    app.register_blueprint(audioann)
 
     return app

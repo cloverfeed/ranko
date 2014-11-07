@@ -67,3 +67,7 @@
 .annotation-closed {
     background-color: lightgreen;
 }
+
+.audioAnnotation {
+    position: absolute;
+}
