@@ -41,6 +41,7 @@ class AudioPlayer
         annotation = new AudioAnnotation this, ann.id, ann.start, ann.length, ann.state, ann.text
         @$div.append annotation.$div
         @annotations.push annotation
+        @update()
 
     @audio.addEventListener 'timeupdate', @update, false
     @update()
