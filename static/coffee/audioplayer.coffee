@@ -55,8 +55,10 @@ class AudioPlayer
       ec = @eventCoords e
       time = @pixelsToSeconds ec.y
       @selection = new AudioSelection time, (startTime, length) =>
-        annotation = new AudioAnnotation startTime, length
+        annotation = new AudioAnnotation this, startTime, length, 'open', ""
+        @$div.append annotation.$div
         @annotations.push annotation
+        @update()
 
   mouseup: (e) =>
     if !@selection?
@@ -77,7 +79,6 @@ class AudioPlayer
     @audio.duration * pixels / @height
 
   update: =>
-    console.log "update"
     @ctx.clearRect 0, 0, @width, @height
     currentTime = @audio.currentTime
     totalTime = @audio.duration
@@ -183,4 +184,31 @@ class AudioSelection
 
 
 class AudioAnnotation
-  constructor: (@startTime, @length) ->
+  constructor: (@player, @startTime, @length, @state, @text) ->
+    @$div = $('<div>')
+    @$div.addClass 'audioAnnotation'
+    @$div.addClass ('annotation-' + @state)
+    x = @player.width + 50
+    y = @player.secondsToPixels (@startTime + @length/2)
+    @$div.css
+      height: 50
+      width: 50
+      left: x + "px"
+      top: y + "px"
+
+    $textDiv = $('<div>').text(@text)
+    @$div.append $textDiv
+    $textDiv.editable (value, settings) =>
+      @text = value
+      @submitChanges()
+      return value
+    ,
+      onblur: 'submit'
+
+  submitChanges: ->
+    rest_post_or_put this,
+      url_base: '/audioannotation/'
+      data:
+        start: @startTime
+        length: @length
+        text: @text

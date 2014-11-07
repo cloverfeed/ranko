@@ -46,15 +46,8 @@ class Annotation
       @geom.height = ui.size.height
 
   submitChanges: ->
-    if @annid
-      type = 'PUT'
-      url = '/annotation/' + @annid
-    else
-      type = 'POST'
-      url = '/annotation/new'
-    $.ajax
-      type: type
-      url: url
+    rest_post_or_put this,
+      url_base: '/annotation/'
       data:
         posx: @geom.posx | 0
         posy: @geom.posy | 0
@@ -63,6 +56,3 @@ class Annotation
         doc: @docid
         page: @page
         value: @text
-      success: (d) =>
-        if type == 'POST'
-          @annid = d.id
