@@ -6,7 +6,7 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Page</th>
+            <th>Time</th>
             <th>Text</th>
             <th>Done?</th>
         </tr>
@@ -14,7 +14,7 @@
     <tbody>
         {% for ann in annotations %}
         <tr>
-            <td>{{ann.page}}</td>
+            <td>{{ann.start|round(1)}} s</td>
             <td>{{ann.text}}</td>
             <td>{{annotation_state(ann)}}</td>
         </tr>
@@ -37,6 +37,6 @@
 {% endblock %}
 {% block js_end %}
 <script>
-list_view_init('/annotation/');
+list_view_init('/audioannotation/');
 </script>
 {% endblock %}

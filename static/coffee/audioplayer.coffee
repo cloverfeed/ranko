@@ -129,7 +129,11 @@ class AudioPlayer
     @ctx.fillRect wf, 0, aw, size
 
     for annotation in @annotations
-      @ctx.fillStyle = "orange"
+      switch annotation.state
+        when 'open'
+          @ctx.fillStyle = "orange"
+        when 'closed'
+          @ctx.fillStyle = "lightgreen"
       annStart = @secondsToPixels annotation.start
       annSize = @secondsToPixels annotation.length
       @ctx.fillRect wf, annStart, aw, annSize

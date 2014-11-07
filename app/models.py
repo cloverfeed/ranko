@@ -302,3 +302,6 @@ class AudioAnnotation(db.Model):
 
     def editable_by(self, user):
         return user.is_authenticated() and user.id == self.user_id
+
+    def is_closed(self):
+        return self.state == Annotation.STATE_CLOSED

@@ -20,6 +20,7 @@ from wtforms import TextAreaField
 
 from .auth import lm
 from .models import Annotation
+from .models import AudioAnnotation
 from .models import Comment
 from .models import db
 from .models import Document
@@ -125,8 +126,15 @@ def view_list(id):
     """
     id = kore_id(id)
     doc = Document.query.get_or_404(id)
-    annotations = Annotation.query.filter_by(doc=id)
-    return render_template('list.html',
+    if doc.filetype == 'pdf' or doc.filetype == 'image':
+        annotations = Annotation.query.filter_by(doc=id)
+        template = 'list.html'
+    elif doc.filetype == 'audio':
+        annotations = AudioAnnotation.query.filter_by(doc_id=id)
+        template = 'list_audio.html'
+    else:
+        assert False, 'Unknown filetype: {}'.format(doc.filetype)
+    return render_template(template,
                            doc=doc,
                            annotations=annotations,
                            )
