@@ -48,6 +48,13 @@ class AudioPlayer
     @$canvas.mousedown @mousedown
     @$canvas.mouseup @mouseup
 
+  annotationAt: (time) ->
+    ok = (ann) ->
+      (ann.start <= time) && (time <= ann.start + ann.length)
+    for ann in @annotations
+      if ok ann
+        return ann
+    return null
 
   mousedown: (e) =>
     ec = @eventCoords e
@@ -57,14 +64,26 @@ class AudioPlayer
       newTime = totalTime * (ec.y / @height)
       @audio.currentTime = newTime
     else
-      # Start annotation
+      # Annotation stuff
       ec = @eventCoords e
       time = @pixelsToSeconds ec.y
-      @selection = new AudioSelection time, (start, length) =>
-        annotation = new AudioAnnotation this, null, start, length, 'open', ""
-        @$div.append annotation.$div
-        @annotations.push annotation
-        @update()
+      annotation = @annotationAt time
+      if annotation?
+        # Move
+        @audiodrag = new AudioDrag time, (timeDelta) =>
+          console.log "move annotation #{annotation} by #{timeDelta}"
+          originalStart = annotation.start
+          newStart = originalStart + timeDelta
+          annotation.start = newStart
+          annotation.submitChanges()
+          @update()
+      else
+        # New one
+        @selection = new AudioSelection time, (start, length) =>
+          annotation = new AudioAnnotation this, null, start, length, 'open', ""
+          @$div.append annotation.$div
+          @annotations.push annotation
+          @update()
 
   removeAnnotation: (targetId) ->
     rm = @annotations.filter (ann) ->
@@ -73,12 +92,14 @@ class AudioPlayer
     @update()
 
   mouseup: (e) =>
-    if !@selection?
-      return
     ec = @eventCoords e
     time = @pixelsToSeconds ec.y
-    @selection.mouseup time
-    @selection = null
+    if @selection?
+      @selection.mouseup time
+      @selection = null
+    if @audiodrag?
+      @audiodrag.mouseup time
+      @audiodrag = null
 
   eventCoords: (e) ->
     canOffset = @$canvas.offset()
@@ -111,6 +132,7 @@ class AudioPlayer
       annStart = @secondsToPixels annotation.start
       annSize = @secondsToPixels annotation.length
       @ctx.fillRect wf, annStart, aw, annSize
+      annotation.update()
 
     @ctx.fillStyle = "purple"
     for y in [0 .. @height - 1]
@@ -195,18 +217,25 @@ class AudioSelection
     @success(start, length)
 
 
+class AudioDrag
+  constructor: (@down, @success) ->
+
+  mouseup: (up) ->
+    timeDelta = up - @down
+    @success timeDelta
+
+
 class AudioAnnotation
   constructor: (@player, @id, @start, @length, @state, @text) ->
     @$div = $('<div>')
     @$div.addClass 'audioAnnotation'
     @$div.addClass ('annotation-' + @state)
     x = @player.width + 50
-    y = @player.secondsToPixels (@start + @length/2)
     @$div.css
       height: 50
       width: 50
       left: x + "px"
-      top: y + "px"
+    @update()
 
     @rest = new RestClient '/audioannotation/'
 
@@ -226,6 +255,11 @@ class AudioAnnotation
       return value
     ,
       onblur: 'submit'
+
+  update: ->
+    y = @player.secondsToPixels (@start + @length/2)
+    @$div.css
+      top: y + "px"
 
   submitChanges: ->
     @rest.post_or_put this,

@@ -59,3 +59,20 @@ def annotation_delete(id):
     db.session.delete(ann)
     db.session.commit()
     return jsonify(status='ok')
+
+
+@audioann.route('/audioannotation/<id>', methods=['PUT'])
+def audio_annotation_edit(id):
+    """
+    Edit an AudioAnnotation.
+
+    For JSON parameters, see :py:func:`audioann_new`.
+
+    :>json string status: The string 'ok'
+    """
+    ann = AudioAnnotation.query.get(id)
+    if not ann.editable_by(current_user):
+        return lm.unauthorized()
+    ann.load_json(request.form)
+    db.session.commit()
+    return jsonify(status='ok')

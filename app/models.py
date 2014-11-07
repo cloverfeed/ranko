@@ -290,5 +290,15 @@ class AudioAnnotation(db.Model):
                 'state': Annotation.state_encode(self.state)
                 }
 
+    def load_json(self, data):
+        if 'start' in data:
+            self.start = data['start']
+        if 'length' in data:
+            self.length = data['length']
+        if 'text' in data:
+            self.text = data['text']
+        if 'state' in data:
+            self.state = Annotation.state_decode(data['state'])
+
     def editable_by(self, user):
         return user.is_authenticated() and user.id == self.user_id
