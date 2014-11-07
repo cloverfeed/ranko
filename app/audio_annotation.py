@@ -43,3 +43,19 @@ def audio_annotations_for_doc(id):
     for ann in AudioAnnotation.query.filter_by(doc_id=id):
         data.append(ann.to_json())
     return jsonify(data=data)
+
+
+@audioann.route('/audioannotation/<id>', methods=['DELETE'])
+def annotation_delete(id):
+    """
+    Delete an audio annotation.
+
+    :param id: Integer ID
+    :>json string status: The string 'ok'
+    """
+    ann = AudioAnnotation.query.get(id)
+    if not ann.editable_by(current_user):
+        return lm.unauthorized()
+    db.session.delete(ann)
+    db.session.commit()
+    return jsonify(status='ok')

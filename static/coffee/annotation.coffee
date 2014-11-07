@@ -1,5 +1,5 @@
 class Annotation
-  constructor: (@$tld, @docid, @page, @text, @annid, @geom, @state) ->
+  constructor: (@$tld, @docid, @page, @text, @id, @geom, @state) ->
     @$div = jQuery('<div>').addClass 'annotation'
     @$div = jQuery('<div>').addClass ('annotation-' + @state)
     setGeom @$div, @geom
@@ -9,8 +9,8 @@ class Annotation
     $closeBtn.click =>
       delDone = =>
         @$div.remove()
-      if @annid
-        ANN_URL = '/annotation/' + @annid
+      if @id
+        ANN_URL = '/annotation/' + @id
         $.ajax
           url: ANN_URL
           type: 'DELETE'

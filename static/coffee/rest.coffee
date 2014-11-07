@@ -1,7 +1,7 @@
 rest_post_or_put = (obj, params) ->
-  if obj.annid
+  if obj.id
     type = 'PUT'
-    url = params.url_base + obj.annid
+    url = params.url_base + obj.id
   else
     type = 'POST'
     url = params.url_base + 'new'
@@ -11,4 +11,4 @@ rest_post_or_put = (obj, params) ->
     data: params.data
     success: (d) =>
       if type == 'POST'
-        obj.annid = d.id
+        obj.id = d.id

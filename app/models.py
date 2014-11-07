@@ -289,3 +289,6 @@ class AudioAnnotation(db.Model):
                 'text': self.text,
                 'state': Annotation.state_encode(self.state)
                 }
+
+    def editable_by(self, user):
+        return user.is_authenticated() and user.id == self.user_id

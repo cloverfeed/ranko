@@ -39,7 +39,7 @@ class AudioPlayer
     $.getJSON ann_url, (annotations) =>
       for ann in annotations.data
         @annotations.push ann
-        annotation = new AudioAnnotation this, ann.start, ann.length, ann.state, ann.text
+        annotation = new AudioAnnotation this, ann.id, ann.start, ann.length, ann.state, ann.text
         @$div.append annotation.$div
 
     @audio.addEventListener 'timeupdate', @update, false
@@ -61,7 +61,7 @@ class AudioPlayer
       ec = @eventCoords e
       time = @pixelsToSeconds ec.y
       @selection = new AudioSelection time, (start, length) =>
-        annotation = new AudioAnnotation this, start, length, 'open', ""
+        annotation = new AudioAnnotation this, null, start, length, 'open', ""
         @$div.append annotation.$div
         @annotations.push annotation
         @update()
@@ -190,7 +190,7 @@ class AudioSelection
 
 
 class AudioAnnotation
-  constructor: (@player, @start, @length, @state, @text) ->
+  constructor: (@player, @id, @start, @length, @state, @text) ->
     @$div = $('<div>')
     @$div.addClass 'audioAnnotation'
     @$div.addClass ('annotation-' + @state)
@@ -201,6 +201,21 @@ class AudioAnnotation
       width: 50
       left: x + "px"
       top: y + "px"
+
+    $closeBtn = jQuery('<a>').text '[X]'
+    @$div.append $closeBtn
+
+    $closeBtn.click =>
+      delDone = =>
+        @$div.remove()
+      if @id
+        ANN_URL = '/audioannotation/' + @id
+        $.ajax
+          url: ANN_URL
+          type: 'DELETE'
+          success: -> delDone()
+      else
+        delDone()
 
     $textDiv = $('<div>').text(@text)
     @$div.append $textDiv
