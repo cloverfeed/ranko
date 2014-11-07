@@ -202,20 +202,14 @@ class AudioAnnotation
       left: x + "px"
       top: y + "px"
 
+    @rest = new RestClient '/audioannotation/'
+
     $closeBtn = jQuery('<a>').text '[X]'
     @$div.append $closeBtn
 
     $closeBtn.click =>
-      delDone = =>
+      @rest.delete this, =>
         @$div.remove()
-      if @id
-        ANN_URL = '/audioannotation/' + @id
-        $.ajax
-          url: ANN_URL
-          type: 'DELETE'
-          success: -> delDone()
-      else
-        delDone()
 
     $textDiv = $('<div>').text(@text)
     @$div.append $textDiv
@@ -227,10 +221,8 @@ class AudioAnnotation
       onblur: 'submit'
 
   submitChanges: ->
-    rest_post_or_put this,
-      url_base: '/audioannotation/'
-      data:
-        doc: @player.docid
-        start: @start
-        length: @length
-        text: @text
+    @rest.post_or_put this,
+      doc: @player.docid
+      start: @start
+      length: @length
+      text: @text

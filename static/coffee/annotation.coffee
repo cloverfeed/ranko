@@ -6,17 +6,11 @@ class Annotation
     $closeBtn = jQuery('<a>').text '[X]'
     @$div.append $closeBtn
 
+    @rest = new RestClient '/annotation/'
+
     $closeBtn.click =>
-      delDone = =>
+      @rest.delete this, =>
         @$div.remove()
-      if @id
-        ANN_URL = '/annotation/' + @id
-        $.ajax
-          url: ANN_URL
-          type: 'DELETE'
-          success: -> delDone()
-      else
-        delDone()
 
     $annText = jQuery('<div>').text(@text)
     @$div.append $annText
@@ -46,13 +40,11 @@ class Annotation
       @geom.height = ui.size.height
 
   submitChanges: ->
-    rest_post_or_put this,
-      url_base: '/annotation/'
-      data:
-        posx: @geom.posx | 0
-        posy: @geom.posy | 0
-        width: @geom.width | 0
-        height: @geom.height | 0
-        doc: @docid
-        page: @page
-        value: @text
+    @rest.post_or_put this,
+      posx: @geom.posx | 0
+      posy: @geom.posy | 0
+      width: @geom.width | 0
+      height: @geom.height | 0
+      doc: @docid
+      page: @page
+      value: @text
