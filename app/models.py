@@ -254,3 +254,38 @@ class Revision(db.Model):
         (project, _) = Revision.project_for(doc)
         revs = Revision.query.filter_by(project=project)
         return revs
+
+
+class AudioAnnotation(db.Model):
+    """
+    Annotation for an audio document.
+
+    This is somehow simpler than for pdf documents since they are 1D only.
+
+    start and length are in seconds.
+    """
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    doc_id = db.Column(db.Integer, db.ForeignKey('document.id'), nullable=False)
+    start = db.Column(db.Integer, nullable=False)
+    length = db.Column(db.Integer, nullable=False)
+    text = db.Column(db.String, nullable=False)
+    state = db.Column(db.SmallInteger, nullable=False, default=0)
+
+    def __init__(self, user_id, doc_id, start, length, text):
+        self.user_id = user_id
+        self.doc_id = doc_id
+        self.start = start
+        self.length = length
+        self.text = text
+        self.state = Annotation.STATE_OPEN
+
+    def to_json(self):
+        return {'id': self.id,
+                'user': self.user_id,
+                'doc': self.doc_id,
+                'start': self.start,
+                'length': self.length,
+                'text': self.text,
+                'state': Annotation.state_encode(self.state)
+                }

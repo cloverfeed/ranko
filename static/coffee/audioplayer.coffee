@@ -1,8 +1,8 @@
 class AudioPlayer
-  constructor: (docid) ->
+  constructor: (@docid) ->
     @$div = $ '<div>'
 
-    url = '/raw/' + docid
+    url = '/raw/' + @docid
     @audio = new Audio url
 
     @channels = 2
@@ -35,6 +35,12 @@ class AudioPlayer
     @ctx = @$canvas[0].getContext '2d'
 
     @annotations = []
+    ann_url = '/view/' + docid + '/audioannotations'
+    $.getJSON ann_url, (annotations) =>
+      for ann in annotations.data
+        @annotations.push ann
+        annotation = new AudioAnnotation this, ann.start, ann.length, ann.state, ann.text
+        @$div.append annotation.$div
 
     @audio.addEventListener 'timeupdate', @update, false
     @update()
@@ -54,8 +60,8 @@ class AudioPlayer
       # Start annotation
       ec = @eventCoords e
       time = @pixelsToSeconds ec.y
-      @selection = new AudioSelection time, (startTime, length) =>
-        annotation = new AudioAnnotation this, startTime, length, 'open', ""
+      @selection = new AudioSelection time, (start, length) =>
+        annotation = new AudioAnnotation this, start, length, 'open', ""
         @$div.append annotation.$div
         @annotations.push annotation
         @update()
@@ -96,7 +102,7 @@ class AudioPlayer
 
     for annotation in @annotations
       @ctx.fillStyle = "orange"
-      annStart = @secondsToPixels annotation.startTime
+      annStart = @secondsToPixels annotation.start
       annSize = @secondsToPixels annotation.length
       @ctx.fillRect wf, annStart, aw, annSize
 
@@ -184,12 +190,12 @@ class AudioSelection
 
 
 class AudioAnnotation
-  constructor: (@player, @startTime, @length, @state, @text) ->
+  constructor: (@player, @start, @length, @state, @text) ->
     @$div = $('<div>')
     @$div.addClass 'audioAnnotation'
     @$div.addClass ('annotation-' + @state)
     x = @player.width + 50
-    y = @player.secondsToPixels (@startTime + @length/2)
+    y = @player.secondsToPixels (@start + @length/2)
     @$div.css
       height: 50
       width: 50
@@ -209,6 +215,7 @@ class AudioAnnotation
     rest_post_or_put this,
       url_base: '/audioannotation/'
       data:
-        start: @startTime
+        doc: @player.docid
+        start: @start
         length: @length
         text: @text

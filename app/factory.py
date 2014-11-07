@@ -94,5 +94,7 @@ def create_app(config_file=None):
     app.register_blueprint(bp)
     from auth import auth
     app.register_blueprint(auth)
+    from audio_annotation import audioann
+    app.register_blueprint(audioann)
 
     return app
