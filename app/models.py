@@ -231,6 +231,11 @@ class Annotation(db.Model):
     def is_closed(self):
         return self.state == Annotation.STATE_CLOSED
 
+    @staticmethod
+    def mine():
+        assert(current_user.is_authenticated())
+        return Annotation.query.filter_by(user=current_user.id)
+
 
 class Revision(db.Model):
     """
