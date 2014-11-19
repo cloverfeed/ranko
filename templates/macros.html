@@ -18,3 +18,7 @@
        {% if ann.is_closed() %} checked{% endif %}
        >
 {% endmacro %}
+
+{% macro link_to_doc(doc) %}
+<a href="{{ url_for('bp.view_doc', id=doc.id) }}">{{ doc.title() }}</a>
+{% endmacro %}

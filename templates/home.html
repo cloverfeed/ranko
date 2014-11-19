@@ -1,7 +1,37 @@
+{% from 'macros.html' import link_to_doc %}
 {% from 'macros.html' import upload_form %}
 {% extends "base.html" %}
 {% block content %}
-
+{% if g.user.is_authenticated() %}
+<button type="button" class="btn btn-primary btn-lg" id="upload_link">
+      <span class="glyphicon glyphicon-upload"></span> Upload a file
+</button>
+<div id="upload_dialog" title="Upload a file">
+    {{ upload_form (form, url_for('.upload')) }}
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <h2>Your documents</h2>
+        <ul>
+        {% for doc in documents %}
+        <li>
+            {{ link_to_doc(doc) }}
+        </li>
+        {% endfor %}
+        </ul>
+    </div>
+    <div class="col-md-6">
+        <h2>Your reviews</h2>
+        <ul>
+        {% for ann in annotations %}
+        <li>
+            "{{ ann.text }}" on {{ link_to_doc(ann.doc_obj) }}
+        </li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+{% else %}
 <div class="jumbotron">
 <div class="row">
     <div class="col-md-8">
@@ -44,6 +74,7 @@
         Annotations turn into a todo-list so you can prepare the next version.
     </div>
 </div>
+{% endif %}
 
 {% endblock %}
 {% block js_end %}

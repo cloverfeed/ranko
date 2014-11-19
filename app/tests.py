@@ -194,3 +194,8 @@ class TestCase(TestCase):
         self._signup('a', 'a')
         r = self._login('a', 'b')
         self.assertIn('Bad login or password', r.data)
+
+    def test_home_logged_in(self):
+        self._login('a', 'b', signup=True)
+        r = self.client.get('/')
+        self.assertNotIn('jumbotron', r.data)  # Jumbotron = landing

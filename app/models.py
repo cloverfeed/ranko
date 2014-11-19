@@ -6,7 +6,9 @@ import random
 import string
 
 import bcrypt
+import koremutake
 from flask import current_app
+from flask.ext.login import current_user
 from flask.ext.sqlalchemy import SQLAlchemy
 
 """
@@ -73,11 +75,16 @@ class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     filename = db.Column(db.String, nullable=False)
     filetype = db.Column(db.String, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
     def __init__(self, filename):
         self.id = random.randint(0, 0x7fffffff)
         self.filename = filename
         self.filetype = Document.detect_filetype(filename)
+        user_id = None
+        if current_user.is_authenticated():
+            user_id = current_user.id
+        self.user_id = user_id
 
     @staticmethod
     def detect_filetype(filename):
@@ -105,6 +112,15 @@ class Document(db.Model):
             file.write(pdfdata)
         doc = Document(filename)
         return doc
+
+    @staticmethod
+    def mine():
+        assert(current_user.is_authenticated())
+        uid = current_user.id
+        return Document.query.filter_by(user_id=uid)
+
+    def title(self):
+        return koremutake.encode(self.id)
 
 
 class Comment(db.Model):
@@ -214,6 +230,11 @@ class Annotation(db.Model):
 
     def is_closed(self):
         return self.state == Annotation.STATE_CLOSED
+
+    @staticmethod
+    def mine():
+        assert(current_user.is_authenticated())
+        return Annotation.query.filter_by(user=current_user.id)
 
 
 class Revision(db.Model):
