@@ -7,6 +7,7 @@ import string
 
 import bcrypt
 from flask import current_app
+from flask.ext.login import current_user
 from flask.ext.sqlalchemy import SQLAlchemy
 
 """
@@ -73,11 +74,16 @@ class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     filename = db.Column(db.String, nullable=False)
     filetype = db.Column(db.String, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
     def __init__(self, filename):
         self.id = random.randint(0, 0x7fffffff)
         self.filename = filename
         self.filetype = Document.detect_filetype(filename)
+        user_id = None
+        if current_user.is_authenticated():
+            user_id = current_user.id
+        self.user_id = user_id
 
     @staticmethod
     def detect_filetype(filename):
