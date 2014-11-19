@@ -64,6 +64,11 @@ def home():
     return render_template('home.html', form=UploadForm())
 
 
+@bp.route('/favicon.ico')
+def view_favicon():
+    return redirect(url_for('static', filename='favicon.ico'))
+
+
 class UploadForm(Form):
     file = FileField('The file to review')
 
