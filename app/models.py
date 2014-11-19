@@ -6,6 +6,7 @@ import random
 import string
 
 import bcrypt
+import koremutake
 from flask import current_app
 from flask.ext.login import current_user
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -111,6 +112,15 @@ class Document(db.Model):
             file.write(pdfdata)
         doc = Document(filename)
         return doc
+
+    @staticmethod
+    def mine():
+        assert(current_user.is_authenticated())
+        uid = current_user.id
+        return Document.query.filter_by(user_id=uid)
+
+    def title(self):
+        return koremutake.encode(self.id)
 
 
 class Comment(db.Model):

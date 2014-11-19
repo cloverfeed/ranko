@@ -61,7 +61,11 @@ def home():
     """
     Home page.
     """
-    return render_template('home.html', form=UploadForm())
+    kwargs = {'form': UploadForm()}
+    if current_user.is_authenticated():
+        documents = Document.mine()
+        kwargs['documents'] = documents
+    return render_template('home.html', **kwargs)
 
 
 @bp.route('/favicon.ico')
