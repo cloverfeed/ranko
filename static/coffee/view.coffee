@@ -5,20 +5,21 @@ setGeom = ($div, geom) ->
     width: geom.width + "px"
     height: geom.height + "px"
 
-render_page = (docid, $pv, pdf, i, page, annotations) ->
+render_page = (docid, $pv, pdf, i, page, annotations, readOnly) ->
   pp = new Page docid, i,
     page: page
     annotations: annotations
+    readOnly: readOnly
   $pv.append pp.$div
 
   if (i + 1 <= pdf.numPages)
     pdf.getPage(i + 1).then (page) ->
-      render_page docid, $pv, pdf, i + 1, page, annotations
+      render_page docid, $pv, pdf, i + 1, page, annotations, readOnly
 
-view_init = (docid, filetype) ->
+view_init = (docid, filetype, readOnly) ->
   switch filetype
     when "pdf"
-      view_init_pdf docid
+      view_init_pdf docid, readOnly
     when "image"
       view_init_image docid
     when "audio"
@@ -46,13 +47,13 @@ view_init_image = (docid) ->
       $pv.append page.$div
   $img.attr('src', '/raw/' + docid)
 
-view_init_pdf = (docid) ->
+view_init_pdf = (docid, readOnly) ->
   $pv = $('#docview')
   PDFJS.getDocument('/raw/' + docid).then (pdf) ->
     GET_ANN_URL = '/view/' + docid + '/annotations'
     $.getJSON GET_ANN_URL, (annotations) ->
       pdf.getPage(1).then (page) ->
-        render_page docid, $pv, pdf, 1, page, annotations.data
+        render_page docid, $pv, pdf, 1, page, annotations.data, readOnly
   .then null, ->
     $pv.text "Error loading the document."
 

@@ -121,12 +121,14 @@ def view_doc(id):
     form_up = UploadForm()
     comments = Comment.query.filter_by(doc=id)
     annotations = Annotation.query.filter_by(doc=id)
+    readOnly = not current_user.is_authenticated()
     return render_template('view.html',
                            doc=doc,
                            form_comm=form_comm,
                            form_up=form_up,
                            comments=comments,
                            annotations=annotations,
+                           readOnly=readOnly,
                            )
 
 

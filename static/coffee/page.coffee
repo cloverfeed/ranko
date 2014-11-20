@@ -25,6 +25,9 @@ class Page
       params.page.render
         canvasContext: canvas.getContext '2d'
         viewport: viewport
+    @readOnly = false
+    if params.readOnly?
+      @readOnly = params.readOnly
     @$textLayerDiv = jQuery("<div />")
       .addClass("textLayer")
       .css
@@ -42,5 +45,5 @@ class Page
         @addAnnotation ann.text, ann.id, ann, ann.state
 
   addAnnotation: (text, id, geom, state) ->
-    ann = new Annotation @$textLayerDiv, @docid, @i, text, id, geom, state
+    ann = new Annotation @$textLayerDiv, @docid, @i, text, id, geom, state, @readOnly
     @$div.append ann.$div

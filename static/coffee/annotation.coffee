@@ -1,5 +1,5 @@
 class Annotation
-  constructor: (@$tld, @docid, @page, @text, @id, @geom, @state) ->
+  constructor: (@$tld, @docid, @page, @text, @id, @geom, @state, readOnly) ->
     @$div = jQuery('<div>').addClass 'annotation'
     @$div = jQuery('<div>').addClass ('annotation-' + @state)
     setGeom @$div, @geom
@@ -23,16 +23,18 @@ class Annotation
     $annText = jQuery('<div>').text(@text)
     @$div.append $annText
 
-    $annText.editable (value, settings) =>
-      @text = value
-      @submitChanges()
-      return value
-    ,
-      onblur: 'submit'
-    @$div.draggable
-      stop: (ev, ui) =>
-        @updateGeom(ev, ui)
+    if !readOnly
+      $annText.editable (value, settings) =>
+        @text = value
         @submitChanges()
+        return value
+      ,
+        onblur: 'submit'
+      @$div.draggable
+        stop: (ev, ui) =>
+          @updateGeom(ev, ui)
+          @submitChanges()
+    # necessary to keep out of the if because of bug #44
     @$div.resizable
       stop: (ev, ui) =>
         @updateGeom(ev, ui)
