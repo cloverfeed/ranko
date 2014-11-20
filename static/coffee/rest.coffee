@@ -17,9 +17,7 @@ class RestClient
       success: (d) ->
         if type == 'POST'
           obj.id = d.id
-      error: (jq, reason, text) =>
-        if @error?
-          @error text
+      error: @handle_ajax_error
 
   delete: (obj, success) ->
     if obj.id
@@ -27,5 +25,10 @@ class RestClient
         url: @url_base + obj.id
         type: 'DELETE'
         success: success
+        error: @handle_ajax_error
     else
       success()
+
+  handle_ajax_error: (jq, reason, text) =>
+    if @error?
+      @error text
