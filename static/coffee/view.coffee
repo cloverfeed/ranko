@@ -21,7 +21,7 @@ view_init = (docid, filetype, readOnly) ->
     when "pdf"
       view_init_pdf docid, readOnly
     when "image"
-      view_init_image docid
+      view_init_image docid, readOnly
     when "audio"
       view_init_audio docid
   view_init_common()
@@ -31,7 +31,7 @@ view_init_audio = (docid) ->
   audioPlayer = new AudioPlayer docid
   $pv.append audioPlayer.$div
 
-view_init_image = (docid) ->
+view_init_image = (docid, readOnly) ->
   GET_ANN_URL = '/view/' + docid + '/annotations'
   $img = $('<img>')
   $pv = $('#docview')
@@ -43,6 +43,7 @@ view_init_image = (docid) ->
       page = new Page docid, 0,
         image: image
         annotations: annotations.data
+        readOnly: readOnly
       page.$div.append $img
       $pv.append page.$div
   $img.attr('src', '/raw/' + docid)
