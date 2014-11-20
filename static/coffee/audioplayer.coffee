@@ -250,18 +250,17 @@ class AudioAnnotation
       error: (msg) ->
         flash_message "Error: #{msg}"
 
-    $closeBtn = jQuery('<a>').text '[X]'
-    @$div.append $closeBtn
-
-    $closeBtn.click =>
-      @rest.delete this, =>
-        @player.removeAnnotation @id
-        @$div.remove()
-
     $textDiv = $('<div>').text(@text)
     @$div.append $textDiv
 
     if !readOnly
+      $closeBtn = jQuery('<a>').text '[X]'
+      @$div.prepend $closeBtn
+      $closeBtn.click =>
+        @rest.delete this, =>
+          @player.removeAnnotation @id
+          @$div.remove()
+
       $textDiv.editable (value, settings) =>
         @text = value
         @submitChanges()
