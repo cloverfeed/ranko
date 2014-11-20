@@ -35,9 +35,10 @@ class Page
         width: width + "px"
     @$div.append @$textLayerDiv
 
-    selection = new Selection @$textLayerDiv, (geom) =>
-      @addAnnotation "", null, geom, 'open'
-    @$div.append selection.$div
+    if !@readOnly
+      selection = new Selection @$textLayerDiv, (geom) =>
+        @addAnnotation "", null, geom, 'open'
+      @$div.append selection.$div
 
     anns = annotations[@i]
     if anns
