@@ -43,7 +43,7 @@ class AudioPlayer
     $.getJSON ann_url, (annotations) =>
       for ann in annotations.data
         annotation = new AudioAnnotation this, ann.id, ann.start,
-                                         ann.length, ann.state, ann.text
+                                         ann.length, ann.state, ann.text, @readOnly
         @$div.append annotation.$div
         @annotations.push annotation
         @update()
@@ -85,7 +85,7 @@ class AudioPlayer
       else
         # New one
         @selection = new AudioSelection time, (start, length) =>
-          annotation = new AudioAnnotation this, null, start, length, 'open', ""
+          annotation = new AudioAnnotation this, null, start, length, 'open', "", @readOnly
           @$div.append annotation.$div
           @annotations.push annotation
           @update()
@@ -235,7 +235,7 @@ class AudioDrag
 
 
 class AudioAnnotation
-  constructor: (@player, @id, @start, @length, @state, @text) ->
+  constructor: (@player, @id, @start, @length, @state, @text, readOnly) ->
     @$div = $('<div>')
     @$div.addClass 'audioAnnotation'
     @$div.addClass ('annotation-' + @state)
@@ -260,12 +260,14 @@ class AudioAnnotation
 
     $textDiv = $('<div>').text(@text)
     @$div.append $textDiv
-    $textDiv.editable (value, settings) =>
-      @text = value
-      @submitChanges()
-      return value
-    ,
-      onblur: 'submit'
+
+    if !readOnly
+      $textDiv.editable (value, settings) =>
+        @text = value
+        @submitChanges()
+        return value
+      ,
+        onblur: 'submit'
 
   update: ->
     y = @player.secondsToPixels (@start + @length / 2)
