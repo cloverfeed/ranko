@@ -1,5 +1,9 @@
 class AudioPlayer
-  constructor: (@docid) ->
+  constructor: (@docid, params) ->
+    @readOnly = false
+    if params? and params.readOnly?
+      @readOnly = params.readOnly
+
     @$div = $ '<div>'
 
     url = '/raw/' + @docid
@@ -70,10 +74,9 @@ class AudioPlayer
       ec = @eventCoords e
       time = @pixelsToSeconds ec.y
       annotation = @annotationAt time
-      if annotation?
+      if annotation? and !@readOnly
         # Move
         @audiodrag = new AudioDrag time, (timeDelta) =>
-          console.log "move annotation #{annotation} by #{timeDelta}"
           originalStart = annotation.start
           newStart = originalStart + timeDelta
           annotation.start = newStart
@@ -243,7 +246,9 @@ class AudioAnnotation
       left: x + "px"
     @update()
 
-    @rest = new RestClient '/audioannotation/'
+    @rest = new RestClient '/audioannotation/',
+      error: (msg) ->
+        flash_message "Error: #{msg}"
 
     $closeBtn = jQuery('<a>').text '[X]'
     @$div.append $closeBtn

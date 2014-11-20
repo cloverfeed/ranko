@@ -23,12 +23,13 @@ view_init = (docid, filetype, readOnly) ->
     when "image"
       view_init_image docid, readOnly
     when "audio"
-      view_init_audio docid
+      view_init_audio docid, readOnly
   view_init_common()
 
-view_init_audio = (docid) ->
+view_init_audio = (docid, readOnly) ->
   $pv = $('#docview')
-  audioPlayer = new AudioPlayer docid
+  audioPlayer = new AudioPlayer docid,
+    readOnly: readOnly
   $pv.append audioPlayer.$div
 
 view_init_image = (docid, readOnly) ->

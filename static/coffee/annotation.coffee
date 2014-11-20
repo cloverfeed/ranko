@@ -6,13 +6,7 @@ class Annotation
 
     @rest = new RestClient '/annotation/',
       error: (msg) ->
-        $msg = $ '<div>'
-        $msg.text "Error: #{msg}"
-        $msg.addClass 'flashMessage'
-        $('body').append $msg
-        window.setTimeout ->
-          $msg.hide()
-        , 2000
+        flash_message "Error: #{msg}"
 
     $annText = jQuery('<div>').text(@text)
     @$div.append $annText

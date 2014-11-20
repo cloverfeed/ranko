@@ -53,6 +53,7 @@ def create_app(config_file=None):
         'coffee/listview.coffee',
         'coffee/audioplayer.coffee',
         'coffee/rest.coffee',
+        'coffee/flash.coffee',
         filters='coffeescript',
         output='gen/app.js'
         )
