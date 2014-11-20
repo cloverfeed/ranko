@@ -122,6 +122,14 @@ class Document(db.Model):
     def title(self):
         return koremutake.encode(self.id)
 
+    def icon_class_filetype(self):
+        if self.filetype == 'pdf':
+            return 'glyphicon glyphicon-file'
+        if self.filetype == 'image':
+            return 'glyphicon glyphicon-picture'
+        if self.filetype == 'audio':
+            return 'glyphicon glyphicon-music'
+
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
