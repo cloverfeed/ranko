@@ -22,3 +22,10 @@
 {% macro link_to_doc(doc) %}
 <a href="{{ url_for('bp.view_doc', id=doc.id) }}">{{ doc.title() }}</a>
 {% endmacro %}
+{% macro js_bool(obj) %}
+{% if obj %}
+true
+{% else %}
+false
+{% endif %}
+{% endmacro %}

@@ -1,30 +1,35 @@
 class Annotation
-  constructor: (@$tld, @docid, @page, @text, @id, @geom, @state) ->
+  constructor: (@$tld, @docid, @page, @text, @id, @geom, @state, readOnly) ->
     @$div = jQuery('<div>').addClass 'annotation'
     @$div = jQuery('<div>').addClass ('annotation-' + @state)
     setGeom @$div, @geom
-    $closeBtn = jQuery('<a>').text '[X]'
-    @$div.append $closeBtn
 
-    @rest = new RestClient '/annotation/'
-
-    $closeBtn.click =>
-      @rest.delete this, =>
-        @$div.remove()
+    @rest = new RestClient '/annotation/',
+      error: (msg) ->
+        flash_message "Error: #{msg}"
 
     $annText = jQuery('<div>').text(@text)
     @$div.append $annText
 
-    $annText.editable (value, settings) =>
-      @text = value
-      @submitChanges()
-      return value
-    ,
-      onblur: 'submit'
-    @$div.draggable
-      stop: (ev, ui) =>
-        @updateGeom(ev, ui)
+    if !readOnly
+      $closeBtn = jQuery('<a>').text '[X]'
+      @$div.prepend $closeBtn
+      $closeBtn.click =>
+        @rest.delete this, =>
+          @$div.remove()
+
+      $annText.editable (value, settings) =>
+        @text = value
         @submitChanges()
+        return value
+      ,
+        onblur: 'submit'
+
+      @$div.draggable
+        stop: (ev, ui) =>
+          @updateGeom(ev, ui)
+          @submitChanges()
+    # necessary to keep out of the if because of bug #44
     @$div.resizable
       stop: (ev, ui) =>
         @updateGeom(ev, ui)

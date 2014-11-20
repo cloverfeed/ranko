@@ -15,6 +15,7 @@
         <ul>
         {% for doc in documents %}
         <li>
+            <span class="{{ doc.icon_class_filetype() }}"></span>
             {{ link_to_doc(doc) }}
         </li>
         {% endfor %}

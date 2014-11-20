@@ -71,3 +71,13 @@
 .audioAnnotation {
     position: absolute;
 }
+
+.flashMessage {
+    position: absolute;
+    top: 0;
+    left: 30%;
+    color:#f00;
+    border: 1px solid #f00;
+    background-color:#fdd;
+    padding: 20px;
+}

@@ -1,5 +1,9 @@
 class AudioPlayer
-  constructor: (@docid) ->
+  constructor: (@docid, params) ->
+    @readOnly = false
+    if params? and params.readOnly?
+      @readOnly = params.readOnly
+
     @$div = $ '<div>'
 
     url = '/raw/' + @docid
@@ -39,7 +43,7 @@ class AudioPlayer
     $.getJSON ann_url, (annotations) =>
       for ann in annotations.data
         annotation = new AudioAnnotation this, ann.id, ann.start,
-                                         ann.length, ann.state, ann.text
+                                         ann.length, ann.state, ann.text, @readOnly
         @$div.append annotation.$div
         @annotations.push annotation
         @update()
@@ -66,6 +70,8 @@ class AudioPlayer
       newTime = totalTime * (ec.y / @height)
       @audio.currentTime = newTime
     else
+      if @readOnly
+        return
       # Annotation stuff
       ec = @eventCoords e
       time = @pixelsToSeconds ec.y
@@ -73,7 +79,6 @@ class AudioPlayer
       if annotation?
         # Move
         @audiodrag = new AudioDrag time, (timeDelta) =>
-          console.log "move annotation #{annotation} by #{timeDelta}"
           originalStart = annotation.start
           newStart = originalStart + timeDelta
           annotation.start = newStart
@@ -82,7 +87,7 @@ class AudioPlayer
       else
         # New one
         @selection = new AudioSelection time, (start, length) =>
-          annotation = new AudioAnnotation this, null, start, length, 'open', ""
+          annotation = new AudioAnnotation this, null, start, length, 'open', "", @readOnly
           @$div.append annotation.$div
           @annotations.push annotation
           @update()
@@ -232,7 +237,7 @@ class AudioDrag
 
 
 class AudioAnnotation
-  constructor: (@player, @id, @start, @length, @state, @text) ->
+  constructor: (@player, @id, @start, @length, @state, @text, readOnly) ->
     @$div = $('<div>')
     @$div.addClass 'audioAnnotation'
     @$div.addClass ('annotation-' + @state)
@@ -243,24 +248,27 @@ class AudioAnnotation
       left: x + "px"
     @update()
 
-    @rest = new RestClient '/audioannotation/'
-
-    $closeBtn = jQuery('<a>').text '[X]'
-    @$div.append $closeBtn
-
-    $closeBtn.click =>
-      @rest.delete this, =>
-        @player.removeAnnotation @id
-        @$div.remove()
+    @rest = new RestClient '/audioannotation/',
+      error: (msg) ->
+        flash_message "Error: #{msg}"
 
     $textDiv = $('<div>').text(@text)
     @$div.append $textDiv
-    $textDiv.editable (value, settings) =>
-      @text = value
-      @submitChanges()
-      return value
-    ,
-      onblur: 'submit'
+
+    if !readOnly
+      $closeBtn = jQuery('<a>').text '[X]'
+      @$div.prepend $closeBtn
+      $closeBtn.click =>
+        @rest.delete this, =>
+          @player.removeAnnotation @id
+          @$div.remove()
+
+      $textDiv.editable (value, settings) =>
+        @text = value
+        @submitChanges()
+        return value
+      ,
+        onblur: 'submit'
 
   update: ->
     y = @player.secondsToPixels (@start + @length / 2)

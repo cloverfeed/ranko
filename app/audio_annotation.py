@@ -3,6 +3,7 @@ from flask import jsonify
 from flask import request
 from flask.ext.login import current_user
 
+from auth import lm
 from models import AudioAnnotation
 from models import db
 
