@@ -7,7 +7,14 @@ class Annotation
     @$div.append $closeBtn
 
     @rest = new RestClient '/annotation/',
-      error: (msg) -> alert "Error: #{msg}"
+      error: (msg) ->
+        $msg = $ '<div>'
+        $msg.text "Error: #{msg}"
+        $msg.addClass 'flashMessage'
+        $('body').append $msg
+        window.setTimeout ->
+          $msg.hide()
+        , 2000
 
     $closeBtn.click =>
       @rest.delete this, =>
