@@ -70,11 +70,13 @@ class AudioPlayer
       newTime = totalTime * (ec.y / @height)
       @audio.currentTime = newTime
     else
+      if @readOnly
+        return
       # Annotation stuff
       ec = @eventCoords e
       time = @pixelsToSeconds ec.y
       annotation = @annotationAt time
-      if annotation? and !@readOnly
+      if annotation?
         # Move
         @audiodrag = new AudioDrag time, (timeDelta) =>
           originalStart = annotation.start
