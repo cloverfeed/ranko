@@ -3,8 +3,6 @@ class Annotation
     @$div = jQuery('<div>').addClass 'annotation'
     @$div = jQuery('<div>').addClass ('annotation-' + @state)
     setGeom @$div, @geom
-    $closeBtn = jQuery('<a>').text '[X]'
-    @$div.append $closeBtn
 
     @rest = new RestClient '/annotation/',
       error: (msg) ->
@@ -16,20 +14,23 @@ class Annotation
           $msg.hide()
         , 2000
 
-    $closeBtn.click =>
-      @rest.delete this, =>
-        @$div.remove()
-
     $annText = jQuery('<div>').text(@text)
     @$div.append $annText
 
     if !readOnly
+      $closeBtn = jQuery('<a>').text '[X]'
+      @$div.prepend $closeBtn
+      $closeBtn.click =>
+        @rest.delete this, =>
+          @$div.remove()
+
       $annText.editable (value, settings) =>
         @text = value
         @submitChanges()
         return value
       ,
         onblur: 'submit'
+
       @$div.draggable
         stop: (ev, ui) =>
           @updateGeom(ev, ui)
