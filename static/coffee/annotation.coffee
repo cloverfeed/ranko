@@ -6,7 +6,8 @@ class Annotation
     $closeBtn = jQuery('<a>').text '[X]'
     @$div.append $closeBtn
 
-    @rest = new RestClient '/annotation/'
+    @rest = new RestClient '/annotation/',
+      error: (msg) -> alert "Error: #{msg}"
 
     $closeBtn.click =>
       @rest.delete this, =>

@@ -1,5 +1,7 @@
 class RestClient
-  constructor: (@url_base) ->
+  constructor: (@url_base, params) ->
+    if params? and params.error?
+      @error = params.error
 
   post_or_put: (obj, data) ->
     if obj.id
@@ -15,6 +17,9 @@ class RestClient
       success: (d) ->
         if type == 'POST'
           obj.id = d.id
+      error: (jq, reason, text) =>
+        if @error?
+          @error text
 
   delete: (obj, success) ->
     if obj.id
