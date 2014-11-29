@@ -12,7 +12,7 @@ before_script:
     - npm install casperjs
     - export PATH=node_modules/phantomjs/bin:node_modules/casperjs/bin:$PATH
     - wget https://bitcoin.org/bitcoin.pdf
-    - python -c conf/development.py create
+    - python manage.py -c conf/development.py create
     - python run.py &
 script:
     - nosetests --with-coverage --cover-package=app
