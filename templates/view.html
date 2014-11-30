@@ -1,6 +1,7 @@
 {% from 'macros.html' import js_bool %}
 {% from 'macros.html' import upload_form %}
 {% extends "base.html" %}
+{% block title %}Document{% endblock %}
 {% block content %}
 
 
@@ -70,8 +71,10 @@
 
 {% block js_end %}
 <script type="text/javascript">
-upload_form_init();
-PDFJS.workerSrc = "{{url_for('static', filename='vendor/pdfjs-' + config.X_PDFJS_VERSION + '-dist/build/pdf.worker.js')}}";
-view_init({{doc.id}}, "{{doc.filetype}}", {{js_bool(readOnly)}});
+$( document ).ready(function(){
+    upload_form_init();
+    PDFJS.workerSrc = "{{url_for('static', filename='vendor/pdfjs-' + config.X_PDFJS_VERSION + '-dist/build/pdf.worker.js')}}";
+    view_init({{doc.id}}, "{{doc.filetype}}", {{js_bool(readOnly)}});
+}
 </script>
 {% endblock %}

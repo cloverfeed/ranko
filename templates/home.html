@@ -1,6 +1,7 @@
 {% from 'macros.html' import link_to_doc %}
 {% from 'macros.html' import upload_form %}
 {% extends "base.html" %}
+{% block title %}Home{% endblock %}
 {% block content %}
 {% if g.user.is_authenticated() %}
 <button type="button" class="btn btn-primary btn-lg" id="upload_link">

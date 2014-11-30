@@ -18,7 +18,9 @@ Unit tests:
 Coverage is nice but not absolute. A metric that becomes an objective is not a
 metric anymore.
 
-Some kind of tests for the coffeescript part would be nice (casperjs, etc).
+UI tests are ran with:
+
+    casperjs test tests.coffee
 
 Linters are available but not enforced: pep8, coffeelint.
 
