@@ -6,6 +6,8 @@ import os
 import os.path
 import random
 import string
+import sys
+from random import choice
 
 import faker
 from flask.ext.migrate import MigrateCommand
@@ -39,6 +41,13 @@ XQo+PgpzdGFydHhyZWYKNDc2CiUlRU9GCg==
 """
 
 
+def generate_password():
+    letters = string.ascii_letters + string.digits
+    length = 20
+    password = ''.join(random.choice(letters) for _ in range(length))
+    return password
+
+
 def main():
     manager = Manager(create_app)
     manager.add_command('db', MigrateCommand)
@@ -53,9 +62,7 @@ def main():
     @manager.command
     def makeadmin():
         "Create an admin user with a random password"
-        letters = string.ascii_letters + string.digits
-        length = 20
-        password = ''.join(random.choice(letters) for _ in range(length))
+        password = generate_password()
         user = User('admin', password)
         user.role = ROLE_ADMIN
         db.session.add(user)
@@ -89,6 +96,18 @@ def main():
         for obj in docs + comments + annotations:
             db.session.add(obj)
         db.session.commit()
+
+    @manager.command
+    def resetpassword(username):
+        "Reset password for a user"
+        user = User.query.filter_by(name=username).first()
+        if user is None:
+            print "No such user."
+            sys.exit(1)
+        password = generate_password()
+        user.set_password(password)
+        db.session.commit()
+        print password
 
     manager.run()
 
