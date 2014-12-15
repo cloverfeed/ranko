@@ -4,6 +4,9 @@
 {% block title %}Document{% endblock %}
 {% block content %}
 
+{% if doc.title %}
+<h1>{{doc.title}}</h1>
+{% endif %}
 
 <div id="docview" class="col-md-9"></div>
 
@@ -27,6 +30,12 @@
             <span class="glyphicon glyphicon-list"></span>
             List mode
         </a>
+        <a href="{{url_for('.edit_doc', id=doc.id)}}" class="list-group-item">
+            <span class="glyphicon glyphicon-pencil"></span>
+            Edit
+        </a>
+
+
     </div>
     <h3><span class="glyphicon glyphicon-eye-open"></span> View</h3>
 

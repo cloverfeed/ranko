@@ -129,11 +129,15 @@ class TestCase(TestCase):
         d = json.loads(r.data)
         self.assertNotIn('2', d['data'])
 
-    def test_upload_rev(self):
-        r = self._upload('toto.pdf')
+    def _extract_docid(self, r):
         m = re.search('/view/(\w+)', r.location)
         self.assertIsNotNone(m)
         docid = m.group(1)
+        return docid
+
+    def test_upload_rev(self):
+        r = self._upload('toto.pdf')
+        docid = self._extract_docid(r)
         r = self.client.get(r.location)
         data = {'file': FileStorage(filename='totov2.pdf', stream=BytesIO())}
         r = self.client.post('/upload',
@@ -199,3 +203,23 @@ class TestCase(TestCase):
         self._login('a', 'b', signup=True)
         r = self.client.get('/')
         self.assertNotIn('jumbotron', r.data)  # Jumbotron = landing
+
+    def test_edit_title(self):
+        self._login('a', 'b', signup=True)
+        r = self._upload('toto.pdf')
+        self.assertStatus(r, 302)
+        docid = self._extract_docid(r)
+
+        edit_path = '/view/{}/edit'.format(docid)
+        r = self.client.get(edit_path)
+        self.assert200(r)
+
+        r = self.client.post(edit_path, data={'title': 'New awesome title'})
+        self.assertStatus(r, 302)
+        r = self.client.get(r.location)
+        self.assert200(r)
+        self.assertIn('New awesome title', r.data)
+
+        r = self.client.get('/')
+        self.assert200(r)
+        self.assertIn('New awesome title', r.data)

@@ -79,6 +79,7 @@ class Document(db.Model):
     filename = db.Column(db.String, nullable=False)
     filetype = db.Column(db.String, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    title = db.Column(db.String, nullable=True)
 
     def __init__(self, filename):
         self.id = random.randint(0, 0x7fffffff)
@@ -122,8 +123,10 @@ class Document(db.Model):
         uid = current_user.id
         return Document.query.filter_by(user_id=uid)
 
-    def title(self):
-        return koremutake.encode(self.id)
+    def title_or_id(self):
+        if self.title is None:
+            return koremutake.encode(self.id)
+        return self.title
 
     def icon_class_filetype(self):
         if self.filetype == 'pdf':
