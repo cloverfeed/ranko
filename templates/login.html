@@ -1,9 +1,11 @@
+{% from 'macros.html' import form_field %}
 {% extends "base.html" %}
 {% block content %}
 <form method="post">
-    {{form.hidden_tag()}}
-    <p> <label> Username {{form.username()}} </label> </p>
-    <p> <label> Password {{form.password()}} </label> </p>
-    <p><input type="submit" value="Log in"></p>
+    {{ form.hidden_tag() }}
+    {{ form_field(form.username) }}
+    {{ form_field(form.password) }}
+
+    <button type="submit" class="btn btn-primary">Log in</button>
 </form>
 {% endblock %}

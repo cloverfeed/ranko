@@ -27,6 +27,7 @@ from .models import Comment
 from .models import db
 from .models import Document
 from .models import Revision
+from .tasks import extract_title
 from .uploads import documents
 from .uploads import documents_dir
 
@@ -79,6 +80,7 @@ def view_favicon():
 
 class UploadForm(Form):
     file = FileField('The file to review')
+    title = TextField('Title', description='The title of your document (may be blank)')
 
 
 @bp.route('/upload', methods=['POST'])
@@ -95,7 +97,13 @@ def upload():
         except UploadNotAllowed:
             flash('Unsupported file type')
             return redirect(url_for('.home'))
-        doc = Document(filename)
+        title = form.title.data
+        if title == '':
+            full_path = Document.full_path_to(filename)
+            title = extract_title(full_path)
+        if title == '':
+            title = None
+        doc = Document(filename, title=title)
         db.session.add(doc)
         db.session.commit()
         revises = request.args.get('revises')
@@ -298,9 +306,32 @@ def edit_doc(id):
     """
     id = kore_id(id)
     form = EditForm()
+    delete_form = DeleteForm()
     if form.validate_on_submit():
         doc = Document.query.get(id)
         doc.title = form.title.data
         db.session.commit()
         return redirect(url_for('.view_doc', id=id))
-    return render_template('edit.html', form=form)
+    delete_action = url_for('.delete_doc', id=id)
+    return render_template('edit.html',
+                           form=form,
+                           delete_form=delete_form,
+                           delete_action=delete_action)
+
+
+class DeleteForm(Form):
+    pass
+
+
+@bp.route('/view/<id>/delete', methods=['POST'])
+def delete_doc(id):
+    """
+    Delete the document.
+    """
+    id = kore_id(id)
+    form = DeleteForm()
+    if form.validate_on_submit():
+        doc = Document.query.get(id)
+        doc.delete()
+        return redirect(url_for('.home'))
+    return redirect(url_for('.view_doc', id=id))

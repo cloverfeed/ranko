@@ -1,18 +1,23 @@
+{% from 'macros.html' import form_field %}
 {% extends "base.html" %}
 {% block content %}
 <div class="col-md-4">
-    <form method="post" action="{{action}}" enctype="multipart/form-data" role="form">
-        {{form.hidden_tag()}}
+    <form method="post" enctype="multipart/form-data" role="form">
+        {{ form.hidden_tag() }}
+        {{ form_field(form.title) }}
+        <p><button type="submit" class="btn btn-primary">Submit changes</button></p>
+    </form>
 
-        <div class="form-group">
-            {{form.title.label()}}
-            {{form.title(class_='form-control')}}
-        </div>
+    <hr>
+
+    <form method="post" action="{{delete_action}}" enctype="multipart/form-data" role="form">
+        {{delete_form.hidden_tag()}}
         <p class="help-block">
-            {{form.title.description}}
+        You can also delete this document. This is irreversible.
         </p>
-
-        <p><input type="submit" value="Submit changes"></p>
+        <p>
+        <button type="submit" class="btn btn-danger">Delete this document</button>
+        </p>
     </form>
 </div>
 {% endblock %}

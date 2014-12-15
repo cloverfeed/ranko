@@ -26,6 +26,7 @@
 {% endif %}
         <ul class="nav navbar-nav navbar-right">
 {% if g.user.is_authenticated() %}
+            <li><a href="{{url_for('bp.home')}}">Home</a></li>
             <li><p class="navbar-text">Signed in as {{g.user.name}}</p></li>
             <li><a href="{{url_for('auth.logout')}}">Log out</a></li>
 {% else %}

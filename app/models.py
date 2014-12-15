@@ -1,6 +1,7 @@
 """
 SQLAlchemy models
 """
+import os
 import os.path
 import random
 import string
@@ -81,7 +82,7 @@ class Document(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     title = db.Column(db.String, nullable=True)
 
-    def __init__(self, filename):
+    def __init__(self, filename, title=None):
         self.id = random.randint(0, 0x7fffffff)
         self.filename = filename
         self.filetype = Document.detect_filetype(filename)
@@ -89,6 +90,22 @@ class Document(db.Model):
         if current_user.is_authenticated():
             user_id = current_user.id
         self.user_id = user_id
+        self.title = title
+
+    def delete(self):
+        """
+        Remove this document from the DB and filesystem.
+        """
+        db.session.delete(self)
+        db.session.commit()
+        os.unlink(self.full_path())
+
+    def full_path(self):
+        return Document.full_path_to(self.filename)
+
+    @staticmethod
+    def full_path_to(filename):
+        return os.path.join(current_app.instance_path, 'uploads', filename)
 
     @staticmethod
     def detect_filetype(filename):
@@ -111,7 +128,7 @@ class Document(db.Model):
             return base + extension
 
         filename = fake_filename()
-        fullname = os.path.join(current_app.instance_path, 'uploads', filename)
+        fullname = Document.full_path_to(filename)
         with open(fullname, 'w') as file:
             file.write(pdfdata)
         doc = Document(filename)

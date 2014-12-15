@@ -26,9 +26,12 @@ class TestCase(TestCase):
         r = self.client.get('/')
         self.assertIn('Upload and review', r.data)
 
-    def _upload(self, filename):
+    def _upload(self, filename, title=None):
         storage = FileStorage(filename=filename, stream=BytesIO())
-        r = self.client.post('/upload', data={'file': storage})
+        post_data = {'file': storage}
+        if title is not None:
+            post_data['title'] = title
+        r = self.client.post('/upload', data=post_data)
         return r
 
     def test_upload(self):
@@ -181,7 +184,6 @@ class TestCase(TestCase):
         self.assertNotIn('Admin panel', r.data)
         r = self._signup('a', 'a')
         self.assertIn('User successfully created', r.data)
-        r = self._login('a', 'a')
         self.assertIn('Signed in as a', r.data)
         self.assertNotIn('Log in', r.data)
         self.assertIn('Log out', r.data)
@@ -223,3 +225,46 @@ class TestCase(TestCase):
         r = self.client.get('/')
         self.assert200(r)
         self.assertIn('New awesome title', r.data)
+
+    def test_delete(self):
+        self._login('a', 'b', signup=True)
+        r = self._upload('toto.pdf')
+        self.assertStatus(r, 302)
+        docid = self._extract_docid(r)
+
+        edit_path = '/view/{}/edit'.format(docid)
+        r = self.client.get(edit_path)
+        self.assert200(r)
+        self.assertIn('Delete', r.data)
+
+        delete_path = '/view/{}/delete'.format(docid)
+        r = self.client.post(delete_path)
+        self.assertStatus(r, 302)
+        r = self.client.get(r.location)
+        self.assert200(r)
+
+        view_path = '/view/{}'.format(docid)
+        r = self.client.get(view_path)
+        self.assert404(r)
+
+    def test_upload_title(self):
+        r = self._upload('toto.pdf', title='Batman is great')
+        self.assertStatus(r, 302)
+        r = self.client.get(r.location)
+        self.assert200(r)
+
+        self.assertIn('Batman is great', r.data)
+
+    def test_upload_title_blank(self):
+        self._login('a', 'b', signup=True)
+        r = self._upload('toto.pdf', title='')
+        self.assertStatus(r, 302)
+        docid = self._extract_docid(r)
+        r = self.client.get('/')
+        empty_link = "></a>"
+        self.assertNotIn(empty_link, r.data)
+
+    def test_signup_twice(self):
+        self._signup('a', 'b')
+        r = self._signup('a', 'c')
+        self.assertIn('already taken', r.data)
