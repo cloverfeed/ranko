@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="col-md-4">
+    <form method="post" action="{{action}}" enctype="multipart/form-data" role="form">
+        {{form.hidden_tag()}}
+
+        <div class="form-group">
+            {{form.title.label()}}
+            {{form.title(class_='form-control')}}
+        </div>
+        <p class="help-block">
+            {{form.title.description}}
+        </p>
+
+        <p><input type="submit" value="Submit changes"></p>
+    </form>
+</div>
+{% endblock %}
