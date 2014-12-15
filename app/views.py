@@ -96,7 +96,10 @@ def upload():
         except UploadNotAllowed:
             flash('Unsupported file type')
             return redirect(url_for('.home'))
-        doc = Document(filename, title=form.title.data)
+        title = form.title.data
+        if title == '':
+            title = None
+        doc = Document(filename, title=title)
         db.session.add(doc)
         db.session.commit()
         revises = request.args.get('revises')

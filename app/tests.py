@@ -255,3 +255,12 @@ class TestCase(TestCase):
         self.assert200(r)
 
         self.assertIn('Batman is great', r.data)
+
+    def test_upload_title_blank(self):
+        self._login('a', 'b', signup=True)
+        r = self._upload('toto.pdf', title='')
+        self.assertStatus(r, 302)
+        docid = self._extract_docid(r)
+        r = self.client.get('/')
+        empty_link = "></a>"
+        self.assertNotIn(empty_link, r.data)
