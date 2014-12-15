@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="col-md-4">
-    <form method="post" action="{{action}}" enctype="multipart/form-data" role="form">
+    <form method="post" enctype="multipart/form-data" role="form">
         {{form.hidden_tag()}}
 
         <div class="form-group">
@@ -12,7 +12,19 @@
             {{form.title.description}}
         </p>
 
-        <p><input type="submit" value="Submit changes"></p>
+        <p><button type="submit" class="btn btn-primary">Submit changes</button></p>
+    </form>
+
+    <hr>
+
+    <form method="post" action="{{delete_action}}" enctype="multipart/form-data" role="form">
+        {{delete_form.hidden_tag()}}
+        <p class="help-block">
+        You can also delete this document. This is irreversible.
+        </p>
+        <p>
+        <button type="submit" class="btn btn-danger">Delete this document</button>
+        </p>
     </form>
 </div>
 {% endblock %}

@@ -298,9 +298,32 @@ def edit_doc(id):
     """
     id = kore_id(id)
     form = EditForm()
+    delete_form = DeleteForm()
     if form.validate_on_submit():
         doc = Document.query.get(id)
         doc.title = form.title.data
         db.session.commit()
         return redirect(url_for('.view_doc', id=id))
-    return render_template('edit.html', form=form)
+    delete_action = url_for('.delete_doc', id=id)
+    return render_template('edit.html',
+                           form=form,
+                           delete_form=delete_form,
+                           delete_action=delete_action)
+
+
+class DeleteForm(Form):
+    pass
+
+
+@bp.route('/view/<id>/delete', methods=['POST'])
+def delete_doc(id):
+    """
+    Delete the document.
+    """
+    id = kore_id(id)
+    form = DeleteForm()
+    if form.validate_on_submit():
+        doc = Document.query.get(id)
+        doc.delete()
+        return redirect(url_for('.home'))
+    return redirect(url_for('.view_doc', id=id))

@@ -1,6 +1,7 @@
 """
 SQLAlchemy models
 """
+import os
 import os.path
 import random
 import string
@@ -89,6 +90,17 @@ class Document(db.Model):
         if current_user.is_authenticated():
             user_id = current_user.id
         self.user_id = user_id
+
+    def delete(self):
+        """
+        Remove this document from the DB and filesystem.
+        """
+        db.session.delete(self)
+        db.session.commit()
+        os.unlink(self.full_path())
+
+    def full_path(self):
+        return os.path.join(current_app.instance_path, 'uploads', self.filename)
 
     @staticmethod
     def detect_filetype(filename):

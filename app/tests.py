@@ -223,3 +223,24 @@ class TestCase(TestCase):
         r = self.client.get('/')
         self.assert200(r)
         self.assertIn('New awesome title', r.data)
+
+    def test_delete(self):
+        self._login('a', 'b', signup=True)
+        r = self._upload('toto.pdf')
+        self.assertStatus(r, 302)
+        docid = self._extract_docid(r)
+
+        edit_path = '/view/{}/edit'.format(docid)
+        r = self.client.get(edit_path)
+        self.assert200(r)
+        self.assertIn('Delete', r.data)
+
+        delete_path = '/view/{}/delete'.format(docid)
+        r = self.client.post(delete_path)
+        self.assertStatus(r, 302)
+        r = self.client.get(r.location)
+        self.assert200(r)
+
+        view_path = '/view/{}'.format(docid)
+        r = self.client.get(view_path)
+        self.assert404(r)
