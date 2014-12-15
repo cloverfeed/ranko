@@ -1,9 +1,13 @@
+{% from 'macros.html' import glyphicon %}
 {% from 'macros.html' import js_bool %}
 {% from 'macros.html' import upload_form %}
 {% extends "base.html" %}
 {% block title %}Document{% endblock %}
 {% block content %}
 
+{% if doc.title %}
+<h1>{{doc.title}}</h1>
+{% endif %}
 
 <div id="docview" class="col-md-9"></div>
 
@@ -11,7 +15,7 @@
 <div id="exitfullscreen">
     <div class="list-group">
         <a id="fullscreen_button_exit" href="#" class="list-group-item">
-            <span class="glyphicon glyphicon-resize-small"></span>
+            {{ glyphicon('resize-small') }}
             Exit fullscreen
         </a>
     </div>
@@ -20,15 +24,21 @@
 
     <div class="list-group">
         <a id="fullscreen_button" href="#" class="list-group-item">
-            <span class="glyphicon glyphicon-fullscreen"></span>
+            {{ glyphicon('fullscreen') }}
             Full screen
         </a>
         <a href="{{url_for('.view_list', id=doc.id)}}" class="list-group-item">
-            <span class="glyphicon glyphicon-list"></span>
+            {{ glyphicon('list') }}
             List mode
         </a>
+        <a href="{{url_for('.edit_doc', id=doc.id)}}" class="list-group-item">
+            {{ glyphicon('pencil') }}
+            Edit
+        </a>
+
+
     </div>
-    <h3><span class="glyphicon glyphicon-eye-open"></span> View</h3>
+    <h3>{{ glyphicon('eye-open') }} View</h3>
 
     <div class="btn-group">
         <button class="view-states-btn btn btn-default" data-view="nothing">Nothing</button>
@@ -36,7 +46,7 @@
         <button class="view-states-btn btn btn-default" data-view="everything">Everything</button>
     </div>
 
-    <h3><span class="glyphicon glyphicon-pencil"></span> History</h3>
+    <h3>{{ glyphicon('pencil') }} History</h3>
 
     <p>
     <a href="{{url_for('.view_revisions', id=doc.id)}}">Revisions</a>
@@ -50,7 +60,7 @@
         {{ upload_form (form_up, url_for('.upload', revises=doc.id)) }}
     </div>
 
-    <h3><span class="glyphicon glyphicon-comment"></span> Comments</h3>
+    <h3>{{ glyphicon('comment') }} Comments</h3>
     <form method="POST" action="{{ url_for('.post_comment') }}" id="post_comment_form">
         {{form_comm.hidden_tag()}}
         <p>{{form_comm.comment()}}</p>

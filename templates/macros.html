@@ -20,7 +20,7 @@
 {% endmacro %}
 
 {% macro link_to_doc(doc) %}
-<a href="{{ url_for('bp.view_doc', id=doc.id) }}">{{ doc.title() }}</a>
+<a href="{{ url_for('bp.view_doc', id=doc.id) }}">{{ doc.title_or_id() }}</a>
 {% endmacro %}
 {% macro js_bool(obj) %}
 {% if obj %}
@@ -28,4 +28,8 @@ true
 {% else %}
 false
 {% endif %}
+{% endmacro %}
+
+{% macro glyphicon(name) %}
+<span class="glyphicon glyphicon-{{ name }}"></span>
 {% endmacro %}

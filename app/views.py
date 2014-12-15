@@ -18,6 +18,7 @@ from flask_wtf.file import FileField
 from werkzeug.exceptions import BadRequest
 from wtforms import HiddenField
 from wtforms import TextAreaField
+from wtforms import TextField
 
 from .auth import lm
 from .models import Annotation
@@ -284,3 +285,22 @@ def view_revisions(id):
     history = Revision.history(id)
     revs = ((koremutake.encode(rev.doc), rev.version) for rev in history)
     return render_template('revisions.html', revs=revs)
+
+
+class EditForm(Form):
+    title = TextField('Title', description='The title of your document')
+
+
+@bp.route('/view/<id>/edit', methods=['GET', 'POST'])
+def edit_doc(id):
+    """
+    Edit the document's metadata.
+    """
+    id = kore_id(id)
+    form = EditForm()
+    if form.validate_on_submit():
+        doc = Document.query.get(id)
+        doc.title = form.title.data
+        db.session.commit()
+        return redirect(url_for('.view_doc', id=id))
+    return render_template('edit.html', form=form)
