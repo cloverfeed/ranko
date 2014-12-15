@@ -184,7 +184,6 @@ class TestCase(TestCase):
         self.assertNotIn('Admin panel', r.data)
         r = self._signup('a', 'a')
         self.assertIn('User successfully created', r.data)
-        r = self._login('a', 'a')
         self.assertIn('Signed in as a', r.data)
         self.assertNotIn('Log in', r.data)
         self.assertIn('Log out', r.data)
