@@ -12,6 +12,7 @@ from flask import send_from_directory
 from flask import url_for
 from flask.ext.login import current_user
 from flask.ext.login import login_required
+from flask.ext.uploads import UploadNotAllowed
 from flask.ext.wtf import Form
 from flask_wtf.file import FileField
 from werkzeug.exceptions import BadRequest
@@ -88,7 +89,11 @@ def upload():
     """
     form = UploadForm()
     if form.validate_on_submit():
-        filename = documents.save(form.file.data)
+        try:
+            filename = documents.save(form.file.data)
+        except UploadNotAllowed:
+            flash('Unsupported file type')
+            return redirect(url_for('.home'))
         doc = Document(filename)
         db.session.add(doc)
         db.session.commit()
