@@ -1,4 +1,5 @@
 {% from 'macros.html' import annotation_state %}
+{% from 'macros.html' import glyphicon %}
 {% extends "base.html" %}
 {% block content %}
 
@@ -27,7 +28,7 @@
 
     <div class="list-group">
         <a href="{{url_for('.view_doc', id=doc.id)}}" class="list-group-item">
-            <span class="glyphicon glyphicon-file"></span>
+            {{ glyphicon('file') }}
             Document mode
         </a>
     </div>
