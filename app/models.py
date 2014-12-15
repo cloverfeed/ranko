@@ -101,7 +101,11 @@ class Document(db.Model):
         os.unlink(self.full_path())
 
     def full_path(self):
-        return os.path.join(current_app.instance_path, 'uploads', self.filename)
+        return Document.full_path_to(self.filename)
+
+    @staticmethod
+    def full_path_to(filename):
+        return os.path.join(current_app.instance_path, 'uploads', filename)
 
     @staticmethod
     def detect_filetype(filename):
@@ -124,7 +128,7 @@ class Document(db.Model):
             return base + extension
 
         filename = fake_filename()
-        fullname = os.path.join(current_app.instance_path, 'uploads', filename)
+        fullname = Document.full_path_to(filename)
         with open(fullname, 'w') as file:
             file.write(pdfdata)
         doc = Document(filename)

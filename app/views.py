@@ -27,6 +27,7 @@ from .models import Comment
 from .models import db
 from .models import Document
 from .models import Revision
+from .tasks import extract_title
 from .uploads import documents
 from .uploads import documents_dir
 
@@ -97,6 +98,9 @@ def upload():
             flash('Unsupported file type')
             return redirect(url_for('.home'))
         title = form.title.data
+        if title == '':
+            full_path = Document.full_path_to(filename)
+            title = extract_title(full_path)
         if title == '':
             title = None
         doc = Document(filename, title=title)

@@ -14,3 +14,4 @@ flask-wtf
 koremutake
 nose
 psycopg2
+pypdf2
