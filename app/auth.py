@@ -9,6 +9,7 @@ from flask.ext.login import login_user
 from flask.ext.login import LoginManager
 from flask.ext.login import logout_user
 from flask.ext.wtf import Form
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import PasswordField
 from wtforms import TextField
@@ -52,15 +53,19 @@ def signup():
     Sign up a new user
     """
     form = SignupForm()
-    if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-        user = User(username, password)
-        db.session.add(user)
-        db.session.commit()
-        flash('User successfully created')
-        login_user(user)
-        return redirect(url_for('bp.home'))
+    try:
+        if form.validate_on_submit():
+            username = form.username.data
+            password = form.password.data
+            user = User(username, password)
+            db.session.add(user)
+            db.session.commit()
+            flash('User successfully created')
+            login_user(user)
+            return redirect(url_for('bp.home'))
+    except IntegrityError:
+        db.session.rollback()
+        flash('This username is already taken, sorry.')
     return render_template('signup.html', title='Sign up', form=form)
 
 

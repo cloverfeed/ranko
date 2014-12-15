@@ -263,3 +263,8 @@ class TestCase(TestCase):
         r = self.client.get('/')
         empty_link = "></a>"
         self.assertNotIn(empty_link, r.data)
+
+    def test_signup_twice(self):
+        self._signup('a', 'b')
+        r = self._signup('a', 'c')
+        self.assertIn('already taken', r.data)
