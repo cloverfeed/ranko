@@ -79,6 +79,7 @@ def view_favicon():
 
 class UploadForm(Form):
     file = FileField('The file to review')
+    title = TextField('Title', description='The title of your document (may be blank)')
 
 
 @bp.route('/upload', methods=['POST'])
@@ -95,7 +96,7 @@ def upload():
         except UploadNotAllowed:
             flash('Unsupported file type')
             return redirect(url_for('.home'))
-        doc = Document(filename)
+        doc = Document(filename, title=form.title.data)
         db.session.add(doc)
         db.session.commit()
         revises = request.args.get('revises')

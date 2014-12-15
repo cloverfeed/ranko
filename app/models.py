@@ -82,7 +82,7 @@ class Document(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     title = db.Column(db.String, nullable=True)
 
-    def __init__(self, filename):
+    def __init__(self, filename, title=None):
         self.id = random.randint(0, 0x7fffffff)
         self.filename = filename
         self.filetype = Document.detect_filetype(filename)
@@ -90,6 +90,7 @@ class Document(db.Model):
         if current_user.is_authenticated():
             user_id = current_user.id
         self.user_id = user_id
+        self.title = title
 
     def delete(self):
         """

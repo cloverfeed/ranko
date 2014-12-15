@@ -26,9 +26,12 @@ class TestCase(TestCase):
         r = self.client.get('/')
         self.assertIn('Upload and review', r.data)
 
-    def _upload(self, filename):
+    def _upload(self, filename, title=None):
         storage = FileStorage(filename=filename, stream=BytesIO())
-        r = self.client.post('/upload', data={'file': storage})
+        post_data = {'file': storage}
+        if title is not None:
+            post_data['title'] = title
+        r = self.client.post('/upload', data=post_data)
         return r
 
     def test_upload(self):
@@ -244,3 +247,11 @@ class TestCase(TestCase):
         view_path = '/view/{}'.format(docid)
         r = self.client.get(view_path)
         self.assert404(r)
+
+    def test_upload_title(self):
+        r = self._upload('toto.pdf', title='Batman is great')
+        self.assertStatus(r, 302)
+        r = self.client.get(r.location)
+        self.assert200(r)
+
+        self.assertIn('Batman is great', r.data)

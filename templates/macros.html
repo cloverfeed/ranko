@@ -2,6 +2,7 @@
 <form method="post" action="{{action}}" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
     {{ form_field(form.file) }}
+    {{ form_field(form.title) }}
     <p><input type="submit" value="Upload"></p>
 </form>
 {% endmacro %}
