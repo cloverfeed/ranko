@@ -32,8 +32,7 @@ class User(db.Model):
 
     def __init__(self, login, password, workfactor=12):
         self.name = login
-        salt = bcrypt.gensalt(workfactor)
-        self.password = bcrypt.hashpw(password.encode('utf-8'), salt)
+        self.set_password(password, workfactor=workfactor)
 
     def is_active(self):
         """
@@ -66,6 +65,10 @@ class User(db.Model):
         password = fake.password()
         user = User(username, password, workfactor=4)
         return user
+
+    def set_password(self, clear, workfactor=12):
+        salt = bcrypt.gensalt(workfactor)
+        self.password = bcrypt.hashpw(clear.encode('utf-8'), salt)
 
 
 class Document(db.Model):
