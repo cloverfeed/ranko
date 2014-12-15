@@ -1,12 +1,7 @@
 {% macro upload_form(form, action) %}
 <form method="post" action="{{action}}" enctype="multipart/form-data">
-    {{form.hidden_tag()}}
-    <p>
-        <label>
-            File
-            {{form.file()}}
-        </label>
-    </p>
+    {{ form.hidden_tag() }}
+    {{ form_field(form.file) }}
     <p><input type="submit" value="Upload"></p>
 </form>
 {% endmacro %}
@@ -32,4 +27,14 @@ false
 
 {% macro glyphicon(name) %}
 <span class="glyphicon glyphicon-{{ name }}"></span>
+{% endmacro %}
+
+{% macro form_field(field) %}
+<div class="form-group">
+    {{field.label()}}
+    {{field(class_='form-control')}}
+</div>
+<p class="help-block">
+    {{field.description}}
+</p>
 {% endmacro %}

@@ -1,17 +1,10 @@
+{% from 'macros.html' import form_field %}
 {% extends "base.html" %}
 {% block content %}
 <div class="col-md-4">
     <form method="post" enctype="multipart/form-data" role="form">
-        {{form.hidden_tag()}}
-
-        <div class="form-group">
-            {{form.title.label()}}
-            {{form.title(class_='form-control')}}
-        </div>
-        <p class="help-block">
-            {{form.title.description}}
-        </p>
-
+        {{ form.hidden_tag() }}
+        {{ form_field(form.title) }}
         <p><button type="submit" class="btn btn-primary">Submit changes</button></p>
     </form>
 
