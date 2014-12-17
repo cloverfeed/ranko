@@ -344,10 +344,21 @@ class ShareForm(Form):
     pass
 
 
+def shared_link_serializer():
+    salt = 'shared-link'
+    serializer = URLSafeSerializer(current_app.secret_key, salt=salt)
+    return serializer
+
+
 @bp.route('/view/<id>/share', methods=['POST'])
 def share_doc(id):
-    salt = 'share-link'
-    s = URLSafeSerializer(current_app.secret_key, salt=salt)
     data = {'doc': id}
-    h = s.dumps(data)
+    h = shared_link_serializer().dumps(data)
     return jsonify(data=h)
+
+
+@bp.route('/view/shared/<key>')
+def view_shared_doc(key):
+    data = shared_link_serializer().loads(key)
+    docid = data['doc']
+    return redirect(url_for('.view_doc', id=docid))

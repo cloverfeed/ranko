@@ -68,7 +68,7 @@ view_init_common = (docid) ->
       type: 'POST'
       url: "/view/#{docid}/share"
       success: (data) ->
-        share_url = "#{window.location.origin}/view/#{docid}/shared/#{data['data']}"
+        share_url = "#{window.location.origin}/view/shared/#{data['data']}"
         input = $('<input>').attr('type', 'text').val(share_url)
         $('#share_form > button[type=submit]').replaceWith input
 
