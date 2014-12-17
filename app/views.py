@@ -335,3 +335,8 @@ def delete_doc(id):
         doc.delete()
         return redirect(url_for('.home'))
     return redirect(url_for('.view_doc', id=id))
+
+
+@bp.route('/view/<id>/share')
+def share_doc(id):
+    return render_template('share.html')
