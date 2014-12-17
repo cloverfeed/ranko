@@ -60,6 +60,9 @@ view_init_pdf = (docid, readOnly) ->
     $pv.text "Error loading the document."
 
 view_init_common = ->
+  form_init '#upload_dialog', '#upload_link'
+  form_init '#share_dialog', '#share_link'
+
   $('#post_comment_form').submit (e) ->
     e.preventDefault()
     $.ajax

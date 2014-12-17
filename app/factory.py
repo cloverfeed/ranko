@@ -49,7 +49,7 @@ def create_app(config_file=None):
         'coffee/selection.coffee',
         'coffee/annotation.coffee',
         'coffee/page.coffee',
-        'coffee/upload.coffee',
+        'coffee/form.coffee',
         'coffee/listview.coffee',
         'coffee/audioplayer.coffee',
         'coffee/rest.coffee',

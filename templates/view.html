@@ -89,8 +89,6 @@
 {% block js_end %}
 <script type="text/javascript">
 $( document ).ready(function(){
-    upload_form_init();
-    share_form_init();
     PDFJS.workerSrc = "{{url_for('static', filename='vendor/pdfjs-' + config.X_PDFJS_VERSION + '-dist/build/pdf.worker.js')}}";
     view_init({{doc.id}}, "{{doc.filetype}}", {{js_bool(readOnly)}});
 });
