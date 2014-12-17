@@ -15,6 +15,7 @@ from flask.ext.login import login_required
 from flask.ext.uploads import UploadNotAllowed
 from flask.ext.wtf import Form
 from flask_wtf.file import FileField
+from itsdangerous import URLSafeSerializer
 from werkzeug.exceptions import BadRequest
 from wtforms import HiddenField
 from wtforms import TextAreaField
@@ -133,6 +134,7 @@ def view_doc(id):
     doc = Document.query.get_or_404(id)
     form_comm = CommentForm(docid=id)
     form_up = UploadForm()
+    form_share = ShareForm()
     comments = Comment.query.filter_by(doc=id)
     annotations = Annotation.query.filter_by(doc=id)
     readOnly = not current_user.is_authenticated()
@@ -140,6 +142,7 @@ def view_doc(id):
                            doc=doc,
                            form_comm=form_comm,
                            form_up=form_up,
+                           form_share=form_share,
                            comments=comments,
                            annotations=annotations,
                            readOnly=readOnly,
@@ -337,6 +340,14 @@ def delete_doc(id):
     return redirect(url_for('.view_doc', id=id))
 
 
-@bp.route('/view/<id>/share')
+class ShareForm(Form):
+    pass
+
+
+@bp.route('/view/<id>/share', methods=['POST'])
 def share_doc(id):
-    return render_template('share.html')
+    salt = 'share-link'
+    s = URLSafeSerializer(current_app.secret_key, salt=salt)
+    data = {'doc': id}
+    h = s.dumps(data)
+    return jsonify(data=h)

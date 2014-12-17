@@ -1,7 +1,7 @@
 {% from 'macros.html' import glyphicon %}
 {% from 'macros.html' import js_bool %}
 {% from 'macros.html' import upload_form %}
-{% from 'macros.html' import share_form %}
+{% from 'macros.html' import render_share_form %}
 {% extends "base.html" %}
 {% block title %}Document{% endblock %}
 {% block content %}
@@ -64,7 +64,7 @@
         {{ upload_form (form_up, url_for('.upload', revises=doc.id)) }}
     </div>
     <div id="share_dialog" title="Generate a review link">
-        {{ share_form () }}
+        {{ render_share_form(form_share) }}
     </div>
 
     <h3>{{ glyphicon('comment') }} Comments</h3>

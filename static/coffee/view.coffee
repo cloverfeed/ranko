@@ -24,7 +24,7 @@ view_init = (docid, filetype, readOnly) ->
       view_init_image docid, readOnly
     when "audio"
       view_init_audio docid, readOnly
-  view_init_common()
+  view_init_common docid
 
 view_init_audio = (docid, readOnly) ->
   $pv = $('#docview')
@@ -59,9 +59,18 @@ view_init_pdf = (docid, readOnly) ->
   .then null, ->
     $pv.text "Error loading the document."
 
-view_init_common = ->
+view_init_common = (docid) ->
   form_init '#upload_dialog', '#upload_link'
   form_init '#share_dialog', '#share_link'
+  $('#share_form').submit (e) ->
+    e.preventDefault()
+    $.ajax
+      type: 'POST'
+      url: "/view/#{docid}/share"
+      success: (data) ->
+        share_url = "#{window.location.origin}/view/#{docid}/shared/#{data['data']}"
+        input = $('<input>').attr('type', 'text').val(share_url)
+        $('#share_form > button[type=submit]').replaceWith input
 
   $('#post_comment_form').submit (e) ->
     e.preventDefault()
