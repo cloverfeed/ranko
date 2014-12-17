@@ -67,6 +67,7 @@ view_init_common = (docid) ->
     $.ajax
       type: 'POST'
       url: "/view/#{docid}/share"
+      data: $(this).serialize()
       success: (data) ->
         share_url = "#{window.location.origin}/view/shared/#{data['data']}"
         input = $('<input>').attr('type', 'text').val(share_url)

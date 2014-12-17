@@ -341,7 +341,7 @@ def delete_doc(id):
 
 
 class ShareForm(Form):
-    pass
+    name = TextField('Name', description='The person you are giving this link to')
 
 
 def shared_link_serializer():
@@ -352,13 +352,20 @@ def shared_link_serializer():
 
 @bp.route('/view/<id>/share', methods=['POST'])
 def share_doc(id):
-    data = {'doc': id}
-    h = shared_link_serializer().dumps(data)
-    return jsonify(data=h)
+    form = ShareForm()
+    if form.validate_on_submit():
+        data = {'doc': id,
+                'name': form.name.data,
+                }
+        h = shared_link_serializer().dumps(data)
+        return jsonify(data=h)
+    return BadRequest()
 
 
 @bp.route('/view/shared/<key>')
 def view_shared_doc(key):
     data = shared_link_serializer().loads(key)
     docid = data['doc']
+    name = data['name']
+    flash("Hello, {}!".format(name))
     return redirect(url_for('.view_doc', id=docid))

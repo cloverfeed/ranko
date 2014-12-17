@@ -19,6 +19,7 @@ without having to register.
 
 <form method="post" enctype="multipart/form-data" id="share_form">
     {{ form.hidden_tag() }}
+    {{ form_field(form.name) }}
     <button type="submit" class="btn btn-primary">Generate</button>
 </form>
 {% endmacro %}
