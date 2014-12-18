@@ -33,7 +33,7 @@ class User(db.Model):
     role = db.Column(db.SmallInteger, default=ROLE_USER, nullable=False)
     full_name = db.Column(db.String, unique=True, nullable=True)
 
-    def __init__(self, login, password, workfactor=12):
+    def __init__(self, login, password, workfactor=None):
         if login is None:
             login = 'guest'
         self.name = login
@@ -74,7 +74,9 @@ class User(db.Model):
         user = User(username, password, workfactor=4)
         return user
 
-    def set_password(self, clear, workfactor=12):
+    def set_password(self, clear, workfactor):
+        if workfactor is None:
+            workfactor = current_app.config['BCRYPT_WORKFACTOR']
         salt = bcrypt.gensalt(workfactor)
         self.password = bcrypt.hashpw(clear.encode('utf-8'), salt)
 
