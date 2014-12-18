@@ -72,7 +72,6 @@ def create_app(config_file=None):
         """
         return models.User.query.get(int(userid))
 
-
     @app.before_request
     def set_g_user():
         g.user = current_user

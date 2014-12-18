@@ -85,7 +85,8 @@ def view_favicon():
 
 class UploadForm(Form):
     file = FileField('The file to review')
-    title = TextField('Title', description='The title of your document (may be blank)')
+    title = TextField('Title',
+                      description='The title of your document (may be blank)')
 
 
 @bp.route('/upload', methods=['POST'])
@@ -185,7 +186,9 @@ def post_comment():
     form = CommentForm()
     assert(form.validate_on_submit())
     docid = kore_id(form.docid.data)
-    if not (current_user.is_authenticated() and current_user.can_comment_on(docid)):
+    if not current_user.is_authenticated():
+        return Unauthorized()
+    if not current_user.can_comment_on(docid):
         return Unauthorized()
     comm = Comment(docid, form.comment.data)
     db.session.add(comm)
@@ -350,7 +353,8 @@ def delete_doc(id):
 
 
 class ShareForm(Form):
-    name = TextField('Name', description='The person you are giving this link to')
+    name = TextField('Name',
+                     description='The person you are giving this link to')
 
 
 @bp.route('/view/<id>/share', methods=['POST'])
