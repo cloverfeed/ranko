@@ -18,6 +18,7 @@ from flask.ext.wtf import Form
 from flask_wtf.file import FileField
 from itsdangerous import BadSignature
 from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import Unauthorized
 from wtforms import HiddenField
 from wtforms import TextAreaField
 from wtforms import TextField
@@ -232,6 +233,8 @@ def annotation_new():
     state = Annotation.STATE_OPEN
     if 'state' in request.form:
         state = Annotation.state_decode(request.form['state'])
+    if not current_user.can_annotate(doc):
+        return Unauthorized()
     user = current_user.id
     ann = Annotation(doc, page, posx, posy, width, height, text, user,
                      state=state)

@@ -120,6 +120,7 @@ def pseudo_user(name, docid):
         user = User(None, None)
         user.full_name = name
         user.role = ROLE_GUEST
+        user.only_doc_id = docid
         db.session.add(user)
         db.session.commit()
     return user

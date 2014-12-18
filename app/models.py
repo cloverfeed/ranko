@@ -32,6 +32,7 @@ class User(db.Model):
     password = db.Column(db.String, nullable=False)
     role = db.Column(db.SmallInteger, default=ROLE_USER, nullable=False)
     full_name = db.Column(db.String, unique=True, nullable=True)
+    only_doc_id = db.Column(db.Integer, nullable=True)
 
     def __init__(self, login, password, workfactor=None):
         if login is None:
@@ -91,6 +92,12 @@ class User(db.Model):
         if self.role == ROLE_GUEST:
             pretty += ' (guest)'
         return pretty
+
+    def can_annotate(self, docid):
+        docid = int(docid)
+        if self.role == ROLE_GUEST:
+            return docid == self.only_doc_id
+        return True
 
 
 class Document(db.Model):

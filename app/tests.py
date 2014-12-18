@@ -35,6 +35,11 @@ class TestCase(TestCase):
         r = self.client.post('/upload', data=post_data)
         return r
 
+    def _new_upload_id(self, filename):
+        r = self._upload('toto.pdf', title='')
+        docid = self._extract_docid(r)
+        return koremutake.decode(docid)
+
     def test_upload(self):
         r = self._upload('toto.pdf')
         self.assertStatus(r, 302)
@@ -271,9 +276,7 @@ class TestCase(TestCase):
         self.assertIn('already taken', r.data)
 
     def test_share_link(self):
-        r = self._upload('toto.pdf', title='')
-        docid = self._extract_docid(r)
-        docid = koremutake.decode(docid)
+        docid = self._new_upload_id('toto.pdf')
         data = {'name': 'Bob'}
         r = self.client.post(url_for('bp.share_doc', id=docid), data=data)
         self.assert200(r)
@@ -294,3 +297,20 @@ class TestCase(TestCase):
         self.assertRedirects(r, url_for('bp.view_doc', id=docid))
         r = self.client.get(r.location)
         self.assertIn('Signed in as Bob (guest)', r.data)
+
+        self.assertTrue(self._can_annotate(docid))
+
+        other_docid = self._new_upload_id('blabla.pdf')
+        self.assertFalse(self._can_annotate(other_docid))
+
+    def _can_annotate(self, docid):
+        data = {'doc': docid,
+                'page': 2,
+                'posx': 3,
+                'posy': 4,
+                'width': 5,
+                'height': 6,
+                'value': 'Oh oh',
+                }
+        r = self.client.post('/annotation/new', data=data)
+        return r.status_code == 200
