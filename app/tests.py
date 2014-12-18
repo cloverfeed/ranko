@@ -2,6 +2,7 @@ import os
 import re
 from io import BytesIO
 
+import faker
 import koremutake
 from flask import url_for
 from flask.ext.testing import TestCase
@@ -9,7 +10,11 @@ from werkzeug import FileStorage
 
 from factory import create_app
 from key import get_secret_key
+from models import Annotation
+from models import Comment
 from models import db
+from models import Document
+from models import User
 
 
 class RankoTestCase(TestCase):
@@ -414,3 +419,12 @@ class KeyTestCase(RankoTestCase):
         self.assertEquals(key, key2)
 
         os.unlink(secret_key_file)
+
+
+class FakeTestCase(RankoTestCase):
+    def test_generate_models(self):
+        fake = faker.Faker()
+        user = User.generate(fake)
+        doc = Document.generate('pdfdata')
+        comm = Comment.generate(fake, doc)
+        ann = Annotation.generate(fake, doc, user)
