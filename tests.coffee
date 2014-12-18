@@ -14,7 +14,7 @@ casper.test.begin "Upload a document", (test) ->
   casper.start root, ->
     test.assertTitle 'Ranko - Home'
     @fill 'form',
-      file: 'bitcoin.pdf'
+      file: 'fixtures/bitcoin.pdf'
     , true
 
   casper.run -> test.done()
