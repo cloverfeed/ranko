@@ -346,18 +346,30 @@ class AudioAnnotationTestCase(RankoTestCase):
         d = json.loads(r.data)
         annid = d['id']
 
+
+        d = self._annotations_for_doc(docid)
+        expected_json = {'doc': docid,
+                         'start': 1,
+                         'length': 2,
+                         'text': "Bla",
+                         'id': annid,
+                         'state': 'open',
+                         'user': 1,
+                         }
+        self.assertEqual(d, {'data': [expected_json]})
+
+        url = url_for('audioann.audio_annotation_edit', id=annid)
+        data = {'length': 3}
+        r = self.client.put(url, data=data)
+        self.assert200(r)
+        self.assertEqual(json.loads(r.data), {'status': 'ok'})
+
+        d = self._annotations_for_doc(docid)
+        expected_json['length'] = 3
+        self.assertEqual(d, {'data': [expected_json]})
+
+    def _annotations_for_doc(self, docid):
         url = url_for('audioann.audio_annotations_for_doc', id=docid)
         r = self.client.get(url)
         self.assert200(r)
-        d = json.loads(r.data)
-        expected_json = {'data': [{'doc': docid,
-                                   'start': 1,
-                                   'length': 2,
-                                   'text': "Bla",
-                                   'id': annid,
-                                   'state': 'open',
-                                   'user': 1,
-                                   }
-                                  ]
-                         }
-        self.assertEqual(d, expected_json)
+        return json.loads(r.data)
