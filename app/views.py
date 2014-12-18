@@ -23,6 +23,7 @@ from wtforms import TextAreaField
 from wtforms import TextField
 
 from .auth import lm
+from .auth import login_pseudo
 from .models import Annotation
 from .models import AudioAnnotation
 from .models import Comment
@@ -370,7 +371,9 @@ def view_shared_doc(key):
     except BadSignature:
         flash('This link is invalid.')
         return redirect(url_for('.home'))
-    docid = data['doc']
+    docid = kore_id(data['doc'])
+    doc = Document.query.get(docid)
     name = data['name']
+    login_pseudo(doc, name)
     flash("Hello, {}!".format(name))
-    return redirect(url_for('.view_doc', id=docid))
+    return redirect(url_for('.view_doc', id=doc.id))

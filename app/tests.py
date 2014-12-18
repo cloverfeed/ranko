@@ -273,6 +273,7 @@ class TestCase(TestCase):
     def test_share_link(self):
         r = self._upload('toto.pdf', title='')
         docid = self._extract_docid(r)
+        docid = koremutake.decode(docid)
         r = self.client.post(url_for('bp.share_doc', id=docid))
         self.assert200(r)
         d = json.loads(r.data)

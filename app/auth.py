@@ -103,3 +103,24 @@ def logout():
     """
     logout_user()
     return redirect(url_for('bp.home'))
+
+
+class PseudoUser(object):
+
+    def __init__(self, doc, name):
+        self.doc = doc
+        self.name = name
+
+    def is_active(self):
+        return True
+
+    def get_id(self):
+        return None
+
+
+def login_pseudo(doc, name):
+    """
+    Login a special pseudonymous user that can only edit one document.
+    """
+    user = PseudoUser(doc, name)
+    login_user(user)
