@@ -368,6 +368,14 @@ class AudioAnnotationTestCase(RankoTestCase):
         expected_json['length'] = 3
         self.assertEqual(d, {'data': [expected_json]})
 
+        url = url_for('audioann.annotation_delete', id=annid)
+        r = self.client.delete(url)
+        self.assert200(r)
+        self.assertEqual(json.loads(r.data), {'status': 'ok'})
+
+        d = self._annotations_for_doc(docid)
+        self.assertEqual(d, {'data': []})
+
     def _annotations_for_doc(self, docid):
         url = url_for('audioann.audio_annotations_for_doc', id=docid)
         r = self.client.get(url)
