@@ -12,7 +12,7 @@ from factory import create_app
 from models import db
 
 
-class TestCase(TestCase):
+class RankoTestCase(TestCase):
     def create_app(self):
         return create_app(config_file='conf/testing.py')
 
@@ -23,9 +23,20 @@ class TestCase(TestCase):
         db.session.remove()
         # db.drop_all()
 
-    def test_home(self):
-        r = self.client.get('/')
-        self.assertIn('Upload and review', r.data)
+    def _login(self, username, password, signup=False):
+        if signup:
+            self._signup(username, password)
+        return self.client.post('/login', data=dict(
+            username=username,
+            password=password
+            ), follow_redirects=True)
+
+    def _signup(self, username, password):
+        return self.client.post('/signup', data=dict(
+            username=username,
+            password=password,
+            confirm=password
+            ), follow_redirects=True)
 
     def _upload(self, filename, title=None):
         storage = FileStorage(filename=filename, stream=BytesIO())
@@ -39,6 +50,18 @@ class TestCase(TestCase):
         r = self._upload('toto.pdf', title='')
         docid = self._extract_docid(r)
         return koremutake.decode(docid)
+
+    def _extract_docid(self, r):
+        m = re.search('/view/(\w+)', r.location)
+        self.assertIsNotNone(m)
+        docid = m.group(1)
+        return docid
+
+
+class DocTestCase(RankoTestCase):
+    def test_home(self):
+        r = self.client.get('/')
+        self.assertIn('Upload and review', r.data)
 
     def test_upload(self):
         r = self._login('a', 'a', signup=True)
@@ -139,12 +162,6 @@ class TestCase(TestCase):
         d = json.loads(r.data)
         self.assertNotIn('2', d['data'])
 
-    def _extract_docid(self, r):
-        m = re.search('/view/(\w+)', r.location)
-        self.assertIsNotNone(m)
-        docid = m.group(1)
-        return docid
-
     def test_upload_rev(self):
         r = self._upload('toto.pdf')
         docid = self._extract_docid(r)
@@ -165,21 +182,6 @@ class TestCase(TestCase):
             self.assert200(r)
             for docb in [docid, docid2]:
                 self.assertIn(docb, r.data)
-
-    def _signup(self, username, password):
-        return self.client.post('/signup', data=dict(
-            username=username,
-            password=password,
-            confirm=password
-            ), follow_redirects=True)
-
-    def _login(self, username, password, signup=False):
-        if signup:
-            self._signup(username, password)
-        return self.client.post('/login', data=dict(
-            username=username,
-            password=password
-            ), follow_redirects=True)
 
     def _logout(self):
         return self.client.get('/logout', follow_redirects=True)
@@ -328,3 +330,15 @@ class TestCase(TestCase):
                              follow_redirects=True,
                              )
         return r.status_code == 200
+
+class AudioAnnotationTestCase(RankoTestCase):
+    def test_create_audio_annotation(self):
+        self._login('a', 'a', signup=True)
+        docid = self._new_upload_id('x.mp3')
+        data = {'doc': docid,
+                'start': 1,
+                'length': 2,
+                'text': "Bla",
+                }
+        r = self.client.post(url_for('audioann.audioann_new'), data=data)
+        self.assert200(r)
