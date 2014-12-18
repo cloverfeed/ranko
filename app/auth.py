@@ -1,5 +1,6 @@
 import bcrypt
 from flask import Blueprint
+from flask import current_app
 from flask import flash
 from flask import redirect
 from flask import render_template
@@ -9,6 +10,7 @@ from flask.ext.login import login_user
 from flask.ext.login import LoginManager
 from flask.ext.login import logout_user
 from flask.ext.wtf import Form
+from itsdangerous import URLSafeSerializer
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import PasswordField
@@ -105,22 +107,36 @@ def logout():
     return redirect(url_for('bp.home'))
 
 
+def shared_link_serializer():
+    salt = 'shared-link'
+    serializer = URLSafeSerializer(current_app.secret_key, salt=salt)
+    return serializer
+
+
 class PseudoUser(object):
 
-    def __init__(self, doc, name):
-        self.doc = doc
-        self.name = name
+    def __init__(self, h):
+        self.h = h
+        data = shared_link_serializer().loads(h)
+        self.name = '{} (guest)'.format(data['name'])
 
     def is_active(self):
         return True
 
     def get_id(self):
-        return None
+        return self.h
+
+    def is_authenticated(self):
+        return True
+
+    def is_admin(self):
+        return False
 
 
-def login_pseudo(doc, name):
+def login_pseudo(h):
     """
     Login a special pseudonymous user that can only edit one document.
+    The argument is the HMAC'd fragment of URL that is in the share link.
     """
-    user = PseudoUser(doc, name)
+    user = PseudoUser(h)
     login_user(user)

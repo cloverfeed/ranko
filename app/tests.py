@@ -274,15 +274,19 @@ class TestCase(TestCase):
         r = self._upload('toto.pdf', title='')
         docid = self._extract_docid(r)
         docid = koremutake.decode(docid)
-        r = self.client.post(url_for('bp.share_doc', id=docid))
+        data = {'name': 'Bob'}
+        r = self.client.post(url_for('bp.share_doc', id=docid), data=data)
         self.assert200(r)
         d = json.loads(r.data)
         self.assertIn('data', d)
         h = d['data']
 
-        r = self.client.get(url_for('bp.view_shared_doc', key=h))
-        self.assertRedirects(r, url_for('bp.view_doc', id=docid))
-
         h2 = h + 'x'
         r = self.client.get(url_for('bp.view_shared_doc', key=h2))
         self.assertRedirects(r, url_for('bp.home'))
+
+        r = self.client.get(url_for('bp.view_shared_doc', key=h))
+        self.assertRedirects(r, url_for('bp.view_doc', id=docid))
+
+        r = self.client.get(r.location)
+        self.assertIn('Signed in as Bob (guest)', r.data)

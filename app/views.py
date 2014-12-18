@@ -16,7 +16,6 @@ from flask.ext.uploads import UploadNotAllowed
 from flask.ext.wtf import Form
 from flask_wtf.file import FileField
 from itsdangerous import BadSignature
-from itsdangerous import URLSafeSerializer
 from werkzeug.exceptions import BadRequest
 from wtforms import HiddenField
 from wtforms import TextAreaField
@@ -24,6 +23,7 @@ from wtforms import TextField
 
 from .auth import lm
 from .auth import login_pseudo
+from .auth import shared_link_serializer
 from .models import Annotation
 from .models import AudioAnnotation
 from .models import Comment
@@ -346,12 +346,6 @@ class ShareForm(Form):
     name = TextField('Name', description='The person you are giving this link to')
 
 
-def shared_link_serializer():
-    salt = 'shared-link'
-    serializer = URLSafeSerializer(current_app.secret_key, salt=salt)
-    return serializer
-
-
 @bp.route('/view/<id>/share', methods=['POST'])
 def share_doc(id):
     form = ShareForm()
@@ -374,6 +368,6 @@ def view_shared_doc(key):
     docid = kore_id(data['doc'])
     doc = Document.query.get(docid)
     name = data['name']
-    login_pseudo(doc, name)
+    login_pseudo(key)
     flash("Hello, {}!".format(name))
     return redirect(url_for('.view_doc', id=doc.id))
