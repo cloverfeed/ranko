@@ -8,6 +8,7 @@ from flask.ext.testing import TestCase
 from werkzeug import FileStorage
 
 from factory import create_app
+from key import get_secret_key
 from models import db
 
 
@@ -389,3 +390,17 @@ class AudioAnnotationTestCase(RankoTestCase):
     def _delete(self, annid):
         url = url_for('audioann.annotation_delete', id=annid)
         return self.client.delete(url)
+
+
+class KeyTestCase(RankoTestCase):
+    def test_recreate(self):
+        secret_key_file = 'test.key'
+
+        self.assertFalse(os.path.isfile(secret_key_file))
+        key = get_secret_key(secret_key_file)
+        self.assertTrue(os.path.isfile(secret_key_file))
+
+        key2 = get_secret_key(secret_key_file)
+        self.assertEquals(key, key2)
+
+        os.unlink(secret_key_file)
