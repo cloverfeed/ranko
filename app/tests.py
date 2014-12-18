@@ -38,8 +38,10 @@ class RankoTestCase(TestCase):
             confirm=password
             ), follow_redirects=True)
 
-    def _upload(self, filename, title=None):
-        storage = FileStorage(filename=filename, stream=BytesIO())
+    def _upload(self, filename, title=None, stream=None):
+        if stream is None:
+            stream = BytesIO()
+        storage = FileStorage(filename=filename, stream=stream)
         post_data = {'file': storage}
         if title is not None:
             post_data['title'] = title
@@ -269,6 +271,14 @@ class DocTestCase(RankoTestCase):
         r = self.client.get('/')
         empty_link = "></a>"
         self.assertNotIn(empty_link, r.data)
+
+    def test_upload_title_detect(self):
+        with open('fixtures/manual.pdf') as f:
+            r = self._upload('toto.pdf', title='', stream=f)
+        self.assertStatus(r, 302)
+        r = self.client.get(r.location)
+        title = "Hypertext marks in LaTeX: a manual for hyperref"
+        self.assertIn(title, r.data)
 
     def test_signup_twice(self):
         self._signup('a', 'b')
