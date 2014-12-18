@@ -1,6 +1,7 @@
 {% from 'macros.html' import glyphicon %}
 {% from 'macros.html' import js_bool %}
 {% from 'macros.html' import upload_form %}
+{% from 'macros.html' import render_share_form %}
 {% extends "base.html" %}
 {% block title %}Document{% endblock %}
 {% block content %}
@@ -35,7 +36,10 @@
             {{ glyphicon('pencil') }}
             Edit
         </a>
-
+        <a href="#" class="list-group-item" id="share_link">
+            {{ glyphicon('share') }}
+            Generate a review link
+        </a>
 
     </div>
     <h3>{{ glyphicon('eye-open') }} View</h3>
@@ -58,6 +62,9 @@
 
     <div id="upload_dialog" title="Upload a new version">
         {{ upload_form (form_up, url_for('.upload', revises=doc.id)) }}
+    </div>
+    <div id="share_dialog" title="Generate a review link">
+        {{ render_share_form(form_share) }}
     </div>
 
     <h3>{{ glyphicon('comment') }} Comments</h3>
@@ -82,7 +89,6 @@
 {% block js_end %}
 <script type="text/javascript">
 $( document ).ready(function(){
-    upload_form_init();
     PDFJS.workerSrc = "{{url_for('static', filename='vendor/pdfjs-' + config.X_PDFJS_VERSION + '-dist/build/pdf.worker.js')}}";
     view_init({{doc.id}}, "{{doc.filetype}}", {{js_bool(readOnly)}});
 });

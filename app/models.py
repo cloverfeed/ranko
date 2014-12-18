@@ -20,6 +20,7 @@ db = SQLAlchemy()
 
 ROLE_USER = 0
 ROLE_ADMIN = 1
+ROLE_GUEST = 2
 
 
 class User(db.Model):
@@ -30,10 +31,17 @@ class User(db.Model):
     name = db.Column(db.String, unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
     role = db.Column(db.SmallInteger, default=ROLE_USER, nullable=False)
+    full_name = db.Column(db.String, unique=True, nullable=True)
+    only_doc_id = db.Column(db.Integer, nullable=True)
 
-    def __init__(self, login, password, workfactor=12):
+    def __init__(self, login, password, workfactor=None):
+        if login is None:
+            login = 'guest'
         self.name = login
-        self.set_password(password, workfactor=workfactor)
+        if password is None:
+            self.disable_password()
+        else:
+            self.set_password(password, workfactor=workfactor)
 
     def is_active(self):
         """
@@ -67,9 +75,35 @@ class User(db.Model):
         user = User(username, password, workfactor=4)
         return user
 
-    def set_password(self, clear, workfactor=12):
+    def set_password(self, clear, workfactor):
+        if workfactor is None:
+            workfactor = current_app.config['BCRYPT_WORKFACTOR']
         salt = bcrypt.gensalt(workfactor)
         self.password = bcrypt.hashpw(clear.encode('utf-8'), salt)
+
+    def disable_password(self):
+        self.password = '!'
+
+    def pretty_name(self):
+        if self.full_name is not None:
+            pretty = self.full_name
+        else:
+            pretty = self.name
+        if self.role == ROLE_GUEST:
+            pretty += ' (guest)'
+        return pretty
+
+    def can_act_on(self, docid):
+        docid = int(docid)
+        if self.role == ROLE_GUEST:
+            return docid == self.only_doc_id
+        return True
+
+    def can_annotate(self, docid):
+        return self.can_act_on(docid)
+
+    def can_comment_on(self, docid):
+        return self.can_act_on(docid)
 
 
 class Document(db.Model):

@@ -12,15 +12,20 @@ from flask import send_from_directory
 from flask import url_for
 from flask.ext.login import current_user
 from flask.ext.login import login_required
+from flask.ext.login import login_user
 from flask.ext.uploads import UploadNotAllowed
 from flask.ext.wtf import Form
 from flask_wtf.file import FileField
+from itsdangerous import BadSignature
 from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import Unauthorized
 from wtforms import HiddenField
 from wtforms import TextAreaField
 from wtforms import TextField
 
 from .auth import lm
+from .auth import pseudo_user
+from .auth import shared_link_serializer
 from .models import Annotation
 from .models import AudioAnnotation
 from .models import Comment
@@ -133,6 +138,7 @@ def view_doc(id):
     doc = Document.query.get_or_404(id)
     form_comm = CommentForm(docid=id)
     form_up = UploadForm()
+    form_share = ShareForm()
     comments = Comment.query.filter_by(doc=id)
     annotations = Annotation.query.filter_by(doc=id)
     readOnly = not current_user.is_authenticated()
@@ -140,6 +146,7 @@ def view_doc(id):
                            doc=doc,
                            form_comm=form_comm,
                            form_up=form_up,
+                           form_share=form_share,
                            comments=comments,
                            annotations=annotations,
                            readOnly=readOnly,
@@ -173,10 +180,13 @@ def post_comment():
     Create a new comment.
 
     :status 302: Redirects to the "view document" page.
+    :status 401: Not allowed to comment.
     """
     form = CommentForm()
     assert(form.validate_on_submit())
     docid = kore_id(form.docid.data)
+    if not (current_user.is_authenticated() and current_user.can_comment_on(docid)):
+        return Unauthorized()
     comm = Comment(docid, form.comment.data)
     db.session.add(comm)
     db.session.commit()
@@ -226,6 +236,8 @@ def annotation_new():
     state = Annotation.STATE_OPEN
     if 'state' in request.form:
         state = Annotation.state_decode(request.form['state'])
+    if not current_user.can_annotate(doc):
+        return Unauthorized()
     user = current_user.id
     ann = Annotation(doc, page, posx, posy, width, height, text, user,
                      state=state)
@@ -335,3 +347,35 @@ def delete_doc(id):
         doc.delete()
         return redirect(url_for('.home'))
     return redirect(url_for('.view_doc', id=id))
+
+
+class ShareForm(Form):
+    name = TextField('Name', description='The person you are giving this link to')
+
+
+@bp.route('/view/<id>/share', methods=['POST'])
+def share_doc(id):
+    form = ShareForm()
+    if form.validate_on_submit():
+        data = {'doc': id,
+                'name': form.name.data,
+                }
+        h = shared_link_serializer().dumps(data)
+        return jsonify(data=h)
+    return BadRequest()
+
+
+@bp.route('/view/shared/<key>')
+def view_shared_doc(key):
+    try:
+        data = shared_link_serializer().loads(key)
+    except BadSignature:
+        flash('This link is invalid.')
+        return redirect(url_for('.home'))
+    docid = kore_id(data['doc'])
+    doc = Document.query.get(docid)
+    name = data['name']
+    user = pseudo_user(name, docid)
+    login_user(user)
+    flash("Hello, {}!".format(name))
+    return redirect(url_for('.view_doc', id=doc.id))

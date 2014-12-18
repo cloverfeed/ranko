@@ -81,5 +81,9 @@
 
 {% endblock %}
 {% block js_end %}
-<script>upload_form_init();</script>
+<script type="text/javascript">
+$( document ).ready(function(){
+    form_init('#upload_dialog', '#upload_link');
+});
+</script>
 {% endblock %}

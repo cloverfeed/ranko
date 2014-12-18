@@ -1,5 +1,6 @@
 import bcrypt
 from flask import Blueprint
+from flask import current_app
 from flask import flash
 from flask import redirect
 from flask import render_template
@@ -9,6 +10,7 @@ from flask.ext.login import login_user
 from flask.ext.login import LoginManager
 from flask.ext.login import logout_user
 from flask.ext.wtf import Form
+from itsdangerous import URLSafeSerializer
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import PasswordField
@@ -18,6 +20,7 @@ from wtforms.validators import Required
 
 from models import db
 from models import User
+from models import ROLE_GUEST
 
 lm = LoginManager()
 
@@ -103,3 +106,21 @@ def logout():
     """
     logout_user()
     return redirect(url_for('bp.home'))
+
+
+def shared_link_serializer():
+    salt = 'shared-link'
+    serializer = URLSafeSerializer(current_app.secret_key, salt=salt)
+    return serializer
+
+
+def pseudo_user(name, docid):
+    user = User.query.filter_by(role=ROLE_GUEST, full_name=name).first()
+    if user is None:
+        user = User(None, None)
+        user.full_name = name
+        user.role = ROLE_GUEST
+        user.only_doc_id = docid
+        db.session.add(user)
+        db.session.commit()
+    return user

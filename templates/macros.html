@@ -7,6 +7,23 @@
 </form>
 {% endmacro %}
 
+{% macro render_share_form(form) %}
+<p>
+By clicking on this button you will generate a link to this document.
+</p>
+
+<p>
+The person you will send this link to will be able to make comments on it
+without having to register.
+</p>
+
+<form method="post" enctype="multipart/form-data" id="share_form">
+    {{ form.hidden_tag() }}
+    {{ form_field(form.name) }}
+    <button type="submit" class="btn btn-primary">Generate</button>
+</form>
+{% endmacro %}
+
 {% macro annotation_state(ann) %}
 <input class="ann-state-checkbox"
        data-annid={{ann.id}}

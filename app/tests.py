@@ -4,6 +4,7 @@ import re
 from io import BytesIO
 
 import koremutake
+from flask import url_for
 from flask.ext.testing import TestCase
 from werkzeug import FileStorage
 
@@ -34,7 +35,13 @@ class TestCase(TestCase):
         r = self.client.post('/upload', data=post_data)
         return r
 
+    def _new_upload_id(self, filename):
+        r = self._upload('toto.pdf', title='')
+        docid = self._extract_docid(r)
+        return koremutake.decode(docid)
+
     def test_upload(self):
+        r = self._login('a', 'a', signup=True)
         r = self._upload('toto.pdf')
         self.assertStatus(r, 302)
         m = re.search('/view/(\w+)', r.location)
@@ -268,3 +275,56 @@ class TestCase(TestCase):
         self._signup('a', 'b')
         r = self._signup('a', 'c')
         self.assertIn('already taken', r.data)
+
+    def test_share_link(self):
+        docid = self._new_upload_id('toto.pdf')
+        data = {'name': 'Bob'}
+        r = self.client.post(url_for('bp.share_doc', id=docid), data=data)
+        self.assert200(r)
+        d = json.loads(r.data)
+        self.assertIn('data', d)
+        h = d['data']
+
+        h2 = h + 'x'
+        r = self.client.get(url_for('bp.view_shared_doc', key=h2))
+        self.assertRedirects(r, url_for('bp.home'))
+
+        r = self.client.get(url_for('bp.view_shared_doc', key=h))
+        self.assertRedirects(r, url_for('bp.view_doc', id=docid))
+        r = self.client.get(r.location)
+        self.assertIn('Signed in as Bob (guest)', r.data)
+
+        r = self.client.get(url_for('bp.view_shared_doc', key=h))
+        self.assertRedirects(r, url_for('bp.view_doc', id=docid))
+        r = self.client.get(r.location)
+        self.assertIn('Signed in as Bob (guest)', r.data)
+
+        other_docid = self._new_upload_id('blabla.pdf')
+
+        self.assertTrue(self._can_annotate(docid))
+        self.assertFalse(self._can_annotate(other_docid))
+
+        self.assertTrue(self._can_comment_on(docid))
+        self.assertFalse(self._can_comment_on(other_docid))
+
+    def _can_annotate(self, docid):
+        data = {'doc': docid,
+                'page': 2,
+                'posx': 3,
+                'posy': 4,
+                'width': 5,
+                'height': 6,
+                'value': 'Oh oh',
+                }
+        r = self.client.post('/annotation/new', data=data)
+        return r.status_code == 200
+
+    def _can_comment_on(self, docid):
+        comm = 'bla bla bla'
+        r = self.client.post('/comment/new',
+                             data={'docid': docid,
+                                   'comment': comm
+                                   },
+                             follow_redirects=True,
+                             )
+        return r.status_code == 200
