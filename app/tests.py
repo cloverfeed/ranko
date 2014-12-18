@@ -41,6 +41,7 @@ class TestCase(TestCase):
         return koremutake.decode(docid)
 
     def test_upload(self):
+        r = self._login('a', 'a', signup=True)
         r = self._upload('toto.pdf')
         self.assertStatus(r, 302)
         m = re.search('/view/(\w+)', r.location)
@@ -298,10 +299,13 @@ class TestCase(TestCase):
         r = self.client.get(r.location)
         self.assertIn('Signed in as Bob (guest)', r.data)
 
-        self.assertTrue(self._can_annotate(docid))
-
         other_docid = self._new_upload_id('blabla.pdf')
+
+        self.assertTrue(self._can_annotate(docid))
         self.assertFalse(self._can_annotate(other_docid))
+
+        self.assertTrue(self._can_comment_on(docid))
+        self.assertFalse(self._can_comment_on(other_docid))
 
     def _can_annotate(self, docid):
         data = {'doc': docid,
@@ -313,4 +317,14 @@ class TestCase(TestCase):
                 'value': 'Oh oh',
                 }
         r = self.client.post('/annotation/new', data=data)
+        return r.status_code == 200
+
+    def _can_comment_on(self, docid):
+        comm = 'bla bla bla'
+        r = self.client.post('/comment/new',
+                             data={'docid': docid,
+                                   'comment': comm
+                                   },
+                             follow_redirects=True,
+                             )
         return r.status_code == 200

@@ -93,11 +93,17 @@ class User(db.Model):
             pretty += ' (guest)'
         return pretty
 
-    def can_annotate(self, docid):
+    def can_act_on(self, docid):
         docid = int(docid)
         if self.role == ROLE_GUEST:
             return docid == self.only_doc_id
         return True
+
+    def can_annotate(self, docid):
+        return self.can_act_on(docid)
+
+    def can_comment_on(self, docid):
+        return self.can_act_on(docid)
 
 
 class Document(db.Model):

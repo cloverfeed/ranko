@@ -180,10 +180,13 @@ def post_comment():
     Create a new comment.
 
     :status 302: Redirects to the "view document" page.
+    :status 401: Not allowed to comment.
     """
     form = CommentForm()
     assert(form.validate_on_submit())
     docid = kore_id(form.docid.data)
+    if not (current_user.is_authenticated() and current_user.can_comment_on(docid)):
+        return Unauthorized()
     comm = Comment(docid, form.comment.data)
     db.session.add(comm)
     db.session.commit()
