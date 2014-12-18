@@ -127,8 +127,7 @@ class DocTestCase(RankoTestCase):
             bad_data[key] = ok
 
         r = self.client.get('/view/1/annotations')
-        d = json.loads(r.data)
-        anns = d['data']['2']
+        anns = r.json['data']['2']
         self.assertEqual(len(anns), 1)
         ann = anns[0]
         id_retr = ann['id']
@@ -148,8 +147,7 @@ class DocTestCase(RankoTestCase):
         r = self.client.put('/annotation/{}'.format(id_retr), data=data)
         self.assert200(r)
         r = self.client.get('/view/1/annotations')
-        d = json.loads(r.data)
-        anns = d['data']['2']
+        anns = r.json['data']['2']
         self.assertEqual(len(anns), 1)
         ann = anns[0]
         self.assertEqual(ann['height'], 60)
@@ -158,8 +156,7 @@ class DocTestCase(RankoTestCase):
         r = self.client.delete('/annotation/{}'.format(id_retr))
         self.assert200(r)
         r = self.client.get('/view/1/annotations')
-        d = json.loads(r.data)
-        self.assertNotIn('2', d['data'])
+        self.assertNotIn('2', r.json['data'])
 
     def test_upload_rev(self):
         r = self._upload('toto.pdf')
@@ -282,9 +279,7 @@ class DocTestCase(RankoTestCase):
         data = {'name': 'Bob'}
         r = self.client.post(url_for('bp.share_doc', id=docid), data=data)
         self.assert200(r)
-        d = json.loads(r.data)
-        self.assertIn('data', d)
-        h = d['data']
+        h = r.json['data']
 
         h2 = h + 'x'
         r = self.client.get(url_for('bp.view_shared_doc', key=h2))
