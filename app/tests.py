@@ -342,3 +342,22 @@ class AudioAnnotationTestCase(RankoTestCase):
                 }
         r = self.client.post(url_for('audioann.audioann_new'), data=data)
         self.assert200(r)
+
+        d = json.loads(r.data)
+        annid = d['id']
+
+        url = url_for('audioann.audio_annotations_for_doc', id=docid)
+        r = self.client.get(url)
+        self.assert200(r)
+        d = json.loads(r.data)
+        expected_json = {'data': [{'doc': docid,
+                                   'start': 1,
+                                   'length': 2,
+                                   'text': "Bla",
+                                   'id': annid,
+                                   'state': 'open',
+                                   'user': 1,
+                                   }
+                                  ]
+                         }
+        self.assertEqual(d, expected_json)
