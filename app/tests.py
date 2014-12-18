@@ -326,6 +326,7 @@ class DocTestCase(RankoTestCase):
                              )
         return r.status_code == 200
 
+
 class AudioAnnotationTestCase(RankoTestCase):
     def test_create_audio_annotation(self):
         self._login('a', 'a', signup=True)
@@ -340,7 +341,6 @@ class AudioAnnotationTestCase(RankoTestCase):
 
         d = r.json
         annid = d['id']
-
 
         d = self._annotations_for_doc(docid)
         expected_json = {'doc': docid,
