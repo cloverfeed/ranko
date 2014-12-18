@@ -12,6 +12,7 @@ from flask import send_from_directory
 from flask import url_for
 from flask.ext.login import current_user
 from flask.ext.login import login_required
+from flask.ext.login import login_user
 from flask.ext.uploads import UploadNotAllowed
 from flask.ext.wtf import Form
 from flask_wtf.file import FileField
@@ -21,8 +22,8 @@ from wtforms import HiddenField
 from wtforms import TextAreaField
 from wtforms import TextField
 
+from .auth import create_pseudo_user
 from .auth import lm
-from .auth import login_pseudo
 from .auth import shared_link_serializer
 from .models import Annotation
 from .models import AudioAnnotation
@@ -368,6 +369,7 @@ def view_shared_doc(key):
     docid = kore_id(data['doc'])
     doc = Document.query.get(docid)
     name = data['name']
-    login_pseudo(key)
+    user = create_pseudo_user(name, docid)
+    login_user(user)
     flash("Hello, {}!".format(name))
     return redirect(url_for('.view_doc', id=doc.id))

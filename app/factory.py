@@ -13,7 +13,6 @@ from flask.ext.uploads import configure_uploads
 
 import models
 from auth import lm
-from auth import PseudoUser
 from key import get_secret_key
 from uploads import documents
 
@@ -71,10 +70,7 @@ def create_app(config_file=None):
         """
         Needed for flask-login.
         """
-        try:
-            return models.User.query.get(int(userid))
-        except ValueError:
-            return PseudoUser(userid)
+        return models.User.query.get(int(userid))
 
 
     @app.before_request

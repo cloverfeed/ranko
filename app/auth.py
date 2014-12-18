@@ -20,6 +20,7 @@ from wtforms.validators import Required
 
 from models import db
 from models import User
+from models import ROLE_GUEST
 
 lm = LoginManager()
 
@@ -113,30 +114,10 @@ def shared_link_serializer():
     return serializer
 
 
-class PseudoUser(object):
-
-    def __init__(self, h):
-        self.h = h
-        data = shared_link_serializer().loads(h)
-        self.name = '{} (guest)'.format(data['name'])
-
-    def is_active(self):
-        return True
-
-    def get_id(self):
-        return self.h
-
-    def is_authenticated(self):
-        return True
-
-    def is_admin(self):
-        return False
-
-
-def login_pseudo(h):
-    """
-    Login a special pseudonymous user that can only edit one document.
-    The argument is the HMAC'd fragment of URL that is in the share link.
-    """
-    user = PseudoUser(h)
-    login_user(user)
+def create_pseudo_user(name, docid):
+    user = User(None, None)
+    user.full_name = name
+    user.role = ROLE_GUEST
+    db.session.add(user)
+    db.session.commit()
+    return user

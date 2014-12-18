@@ -20,6 +20,7 @@ db = SQLAlchemy()
 
 ROLE_USER = 0
 ROLE_ADMIN = 1
+ROLE_GUEST = 2
 
 
 class User(db.Model):
@@ -30,10 +31,16 @@ class User(db.Model):
     name = db.Column(db.String, unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
     role = db.Column(db.SmallInteger, default=ROLE_USER, nullable=False)
+    full_name = db.Column(db.String, unique=True, nullable=True)
 
     def __init__(self, login, password, workfactor=12):
+        if login is None:
+            login = 'guest'
         self.name = login
-        self.set_password(password, workfactor=workfactor)
+        if password is None:
+            self.disable_password()
+        else:
+            self.set_password(password, workfactor=workfactor)
 
     def is_active(self):
         """
@@ -70,6 +77,18 @@ class User(db.Model):
     def set_password(self, clear, workfactor=12):
         salt = bcrypt.gensalt(workfactor)
         self.password = bcrypt.hashpw(clear.encode('utf-8'), salt)
+
+    def disable_password(self):
+        self.password = '!'
+
+    def pretty_name(self):
+        if self.full_name is not None:
+            pretty = self.full_name
+        else:
+            pretty = self.name
+        if self.role == ROLE_GUEST:
+            pretty += ' (guest)'
+        return pretty
 
 
 class Document(db.Model):
