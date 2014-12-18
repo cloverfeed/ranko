@@ -4,6 +4,7 @@ import re
 from io import BytesIO
 
 import koremutake
+from flask import url_for
 from flask.ext.testing import TestCase
 from werkzeug import FileStorage
 
@@ -268,3 +269,19 @@ class TestCase(TestCase):
         self._signup('a', 'b')
         r = self._signup('a', 'c')
         self.assertIn('already taken', r.data)
+
+    def test_share_link(self):
+        r = self._upload('toto.pdf', title='')
+        docid = self._extract_docid(r)
+        r = self.client.post(url_for('bp.share_doc', id=docid))
+        self.assert200(r)
+        d = json.loads(r.data)
+        self.assertIn('data', d)
+        h = d['data']
+
+        r = self.client.get(url_for('bp.view_shared_doc', key=h))
+        self.assertRedirects(r, url_for('bp.view_doc', id=docid))
+
+        h2 = h + 'x'
+        r = self.client.get(url_for('bp.view_shared_doc', key=h2))
+        self.assertRedirects(r, url_for('bp.home'))

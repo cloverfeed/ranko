@@ -15,6 +15,7 @@ from flask.ext.login import login_required
 from flask.ext.uploads import UploadNotAllowed
 from flask.ext.wtf import Form
 from flask_wtf.file import FileField
+from itsdangerous import BadSignature
 from itsdangerous import URLSafeSerializer
 from werkzeug.exceptions import BadRequest
 from wtforms import HiddenField
@@ -364,7 +365,11 @@ def share_doc(id):
 
 @bp.route('/view/shared/<key>')
 def view_shared_doc(key):
-    data = shared_link_serializer().loads(key)
+    try:
+        data = shared_link_serializer().loads(key)
+    except BadSignature:
+        flash('This link is invalid.')
+        return redirect(url_for('.home'))
     docid = data['doc']
     name = data['name']
     flash("Hello, {}!".format(name))
