@@ -71,6 +71,10 @@ class DocTestCase(RankoTestCase):
         r = self.client.get('/')
         self.assertIn('Upload and review', r.data)
 
+    def test_favicon(self):
+        r = self.client.get('/favicon.ico', follow_redirects=True)
+        self.assert200(r)
+
     def test_upload(self):
         r = self._login('a', 'a', signup=True)
         r = self._upload('toto.pdf')
