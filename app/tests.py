@@ -352,9 +352,16 @@ class AudioAnnotationTestCase(RankoTestCase):
                          }
         self.assertEqual(d, {'data': [expected_json]})
 
-        url = url_for('audioann.audio_annotation_edit', id=annid)
-        data = {'length': 3}
-        r = self.client.put(url, data=data)
+        self._login('b', 'b', signup=True)
+        r = self._edit(annid, dict(length=3))
+        self.assert401(r)
+
+        r = self._delete(annid)
+        self.assert401(r)
+
+        self._login('a', 'a')
+
+        r = self._edit(annid, dict(length=3))
         self.assert200(r)
         self.assertEqual(r.json, {'status': 'ok'})
 
@@ -362,8 +369,7 @@ class AudioAnnotationTestCase(RankoTestCase):
         expected_json['length'] = 3
         self.assertEqual(d, {'data': [expected_json]})
 
-        url = url_for('audioann.annotation_delete', id=annid)
-        r = self.client.delete(url)
+        r = self._delete(annid)
         self.assert200(r)
         self.assertEqual(r.json, {'status': 'ok'})
 
@@ -375,3 +381,11 @@ class AudioAnnotationTestCase(RankoTestCase):
         r = self.client.get(url)
         self.assert200(r)
         return r.json
+
+    def _edit(self, annid, data):
+        url = url_for('audioann.audio_annotation_edit', id=annid)
+        return self.client.put(url, data=data)
+
+    def _delete(self, annid):
+        url = url_for('audioann.annotation_delete', id=annid)
+        return self.client.delete(url)
