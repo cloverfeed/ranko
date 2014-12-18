@@ -1,4 +1,3 @@
-import json
 import os
 import re
 from io import BytesIO
@@ -108,7 +107,7 @@ class DocTestCase(RankoTestCase):
         self._login('username', 'password', signup=True)
         r = self.client.post('/annotation/new', data=data)
         self.assert200(r)
-        d = json.loads(r.data)
+        d = r.json
         self.assertIn('id', d)
         id_resp = d['id']
 
@@ -343,7 +342,7 @@ class AudioAnnotationTestCase(RankoTestCase):
         r = self.client.post(url_for('audioann.audioann_new'), data=data)
         self.assert200(r)
 
-        d = json.loads(r.data)
+        d = r.json
         annid = d['id']
 
 
@@ -362,7 +361,7 @@ class AudioAnnotationTestCase(RankoTestCase):
         data = {'length': 3}
         r = self.client.put(url, data=data)
         self.assert200(r)
-        self.assertEqual(json.loads(r.data), {'status': 'ok'})
+        self.assertEqual(r.json, {'status': 'ok'})
 
         d = self._annotations_for_doc(docid)
         expected_json['length'] = 3
@@ -371,7 +370,7 @@ class AudioAnnotationTestCase(RankoTestCase):
         url = url_for('audioann.annotation_delete', id=annid)
         r = self.client.delete(url)
         self.assert200(r)
-        self.assertEqual(json.loads(r.data), {'status': 'ok'})
+        self.assertEqual(r.json, {'status': 'ok'})
 
         d = self._annotations_for_doc(docid)
         self.assertEqual(d, {'data': []})
@@ -380,4 +379,4 @@ class AudioAnnotationTestCase(RankoTestCase):
         url = url_for('audioann.audio_annotations_for_doc', id=docid)
         r = self.client.get(url)
         self.assert200(r)
-        return json.loads(r.data)
+        return r.json
