@@ -46,5 +46,6 @@ class Page
         @addAnnotation ann.text, ann.id, ann, ann.state
 
   addAnnotation: (text, id, geom, state) ->
-    ann = new Annotation @$textLayerDiv, @docid, @i, text, id, geom, state, @readOnly
+    ann = new Annotation @$textLayerDiv, @docid, @i, text,
+                         id, geom, state, @readOnly
     @$div.append ann.$div
