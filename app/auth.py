@@ -114,10 +114,12 @@ def shared_link_serializer():
     return serializer
 
 
-def create_pseudo_user(name, docid):
-    user = User(None, None)
-    user.full_name = name
-    user.role = ROLE_GUEST
-    db.session.add(user)
-    db.session.commit()
+def pseudo_user(name, docid):
+    user = User.query.filter_by(role=ROLE_GUEST, full_name=name).first()
+    if user is None:
+        user = User(None, None)
+        user.full_name = name
+        user.role = ROLE_GUEST
+        db.session.add(user)
+        db.session.commit()
     return user

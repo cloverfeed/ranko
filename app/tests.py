@@ -287,6 +287,10 @@ class TestCase(TestCase):
 
         r = self.client.get(url_for('bp.view_shared_doc', key=h))
         self.assertRedirects(r, url_for('bp.view_doc', id=docid))
+        r = self.client.get(r.location)
+        self.assertIn('Signed in as Bob (guest)', r.data)
 
+        r = self.client.get(url_for('bp.view_shared_doc', key=h))
+        self.assertRedirects(r, url_for('bp.view_doc', id=docid))
         r = self.client.get(r.location)
         self.assertIn('Signed in as Bob (guest)', r.data)
