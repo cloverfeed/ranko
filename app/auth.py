@@ -19,8 +19,8 @@ from wtforms.validators import EqualTo
 from wtforms.validators import Required
 
 from models import db
-from models import User
 from models import ROLE_GUEST
+from models import User
 
 lm = LoginManager()
 
