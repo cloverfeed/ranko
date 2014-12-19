@@ -330,6 +330,10 @@ class DocTestCase(RankoTestCase):
         self.assertTrue(self._can_comment_on(docid))
         self.assertFalse(self._can_comment_on(other_docid))
 
+    def test_anon_cant_comment(self):
+        docid = self._new_upload_id('bla.pdf')
+        self.assertFalse(self._can_comment_on(docid))
+
     def _annotate(self, data):
         return self.client.post('/annotation/new', data=data)
 
