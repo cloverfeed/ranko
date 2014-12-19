@@ -55,7 +55,7 @@ class RankoTestCase(TestCase):
         return r
 
     def _new_upload_id(self, filename):
-        r = self._upload('toto.pdf', title='')
+        r = self._upload(filename, title='')
         docid = self._extract_docid(r)
         return koremutake.decode(docid)
 
@@ -382,7 +382,7 @@ class AudioAnnotationTestCase(RankoTestCase):
                 'length': 2,
                 'text': "Bla",
                 }
-        r = self.client.post(url_for('audioann.audioann_new'), data=data)
+        r = self._audio_annotate(data)
         self.assert200(r)
 
         d = r.json
@@ -423,6 +423,9 @@ class AudioAnnotationTestCase(RankoTestCase):
         d = self._annotations_for_doc(docid)
         self.assertEqual(d, {'data': []})
 
+    def _audio_annotate(self, data):
+        return self.client.post(url_for('audioann.audioann_new'), data=data)
+
     def _annotations_for_doc(self, docid):
         url = url_for('audioann.audio_annotations_for_doc', id=docid)
         r = self.client.get(url)
@@ -436,6 +439,20 @@ class AudioAnnotationTestCase(RankoTestCase):
     def _delete(self, annid):
         url = url_for('audioann.annotation_delete', id=annid)
         return self.client.delete(url)
+
+    def test_view_list_audio(self):
+        self._login('a', 'a', signup=True)
+        docid = self._new_upload_id('x.mp3')
+        data = {'doc': docid,
+                'start': 2,
+                'length': 3,
+                'text': 'My annotation',
+                }
+        r = self._audio_annotate(data)
+        self.assert200(r)
+        r = self.client.get(url_for('bp.view_list', id=docid))
+        self.assert200(r)
+        self.assertIn('My annotation', r.data)
 
 
 class KeyTestCase(RankoTestCase):
