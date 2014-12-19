@@ -330,6 +330,9 @@ class DocTestCase(RankoTestCase):
         self.assertTrue(self._can_comment_on(docid))
         self.assertFalse(self._can_comment_on(other_docid))
 
+    def _annotate(self, data):
+        return self.client.post('/annotation/new', data=data)
+
     def _can_annotate(self, docid):
         data = {'doc': docid,
                 'page': 2,
@@ -339,7 +342,7 @@ class DocTestCase(RankoTestCase):
                 'height': 6,
                 'value': 'Oh oh',
                 }
-        r = self.client.post('/annotation/new', data=data)
+        r = self._annotate(data)
         return r.status_code == 200
 
     def _can_comment_on(self, docid):
@@ -351,6 +354,23 @@ class DocTestCase(RankoTestCase):
                              follow_redirects=True,
                              )
         return r.status_code == 200
+
+    def test_view_list(self):
+        self._login('a', 'a', signup=True)
+        docid = self._new_upload_id('x.pdf')
+        data = {'doc': docid,
+                'page': 2,
+                'posx': 3,
+                'posy': 4,
+                'width': 5,
+                'height': 6,
+                'value': 'My annotation',
+                }
+        r = self._annotate(data)
+        self.assert200(r)
+        r = self.client.get(url_for('bp.view_list', id=docid))
+        self.assert200(r)
+        self.assertIn('My annotation', r.data)
 
 
 class AudioAnnotationTestCase(RankoTestCase):
