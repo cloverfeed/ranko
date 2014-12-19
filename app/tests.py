@@ -15,8 +15,8 @@ from models import Annotation
 from models import Comment
 from models import db
 from models import Document
-from models import User
 from models import ROLE_ADMIN
+from models import User
 
 
 class RankoTestCase(TestCase):
