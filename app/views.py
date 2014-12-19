@@ -107,8 +107,6 @@ def upload():
         if title == '':
             full_path = Document.full_path_to(filename)
             title = extract_title(full_path)
-        if title == '':
-            title = None
         doc = Document(filename, title=title)
         db.session.add(doc)
         db.session.commit()
