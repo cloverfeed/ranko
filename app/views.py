@@ -350,7 +350,6 @@ def delete_doc(id):
         doc = Document.query.get(id)
         doc.delete()
         return redirect(url_for('.home'))
-    return redirect(url_for('.view_doc', id=id))
 
 
 class ShareForm(Form):
@@ -367,7 +366,6 @@ def share_doc(id):
                 }
         h = shared_link_serializer().dumps(data)
         return jsonify(data=h)
-    return BadRequest()
 
 
 @bp.route('/view/shared/<key>')
