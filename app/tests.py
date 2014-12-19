@@ -334,6 +334,21 @@ class DocTestCase(RankoTestCase):
         docid = self._new_upload_id('bla.pdf')
         self.assertFalse(self._can_comment_on(docid))
 
+    def test_create_annotation_closed(self):
+        self._login('a', 'a', signup=True)
+        docid = self._new_upload_id('bla.pdf')
+        data = {'doc': docid,
+                'page': 2,
+                'posx': 3,
+                'posy': 4,
+                'width': 5,
+                'height': 6,
+                'value': 'Oh oh',
+                'state': 'closed',
+                }
+        r = self._annotate(data)
+        self.assert200(r)
+
     def _annotate(self, data):
         return self.client.post('/annotation/new', data=data)
 
