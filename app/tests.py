@@ -9,6 +9,7 @@ from flask.ext.testing import TestCase
 from werkzeug import FileStorage
 
 from factory import create_app
+from factory import translate_db_uri
 from key import get_secret_key
 from models import Annotation
 from models import Comment
@@ -503,7 +504,7 @@ class KeyTestCase(RankoTestCase):
         self.assertTrue(os.path.isfile(secret_key_file))
 
         key2 = get_secret_key(secret_key_file)
-        self.assertEquals(key, key2)
+        self.assertEqual(key, key2)
 
         os.unlink(secret_key_file)
 
@@ -535,3 +536,11 @@ class AdminTestCase(RankoTestCase):
         r = self.client.get('/admin/')
         self.assert200(r)
         return 'Document' in r.data
+
+
+class FactoryTestCase(RankoTestCase):
+    def test_translate_db_uri(self):
+        self.assertEqual(translate_db_uri(self.app, 'sqlite://'), 'sqlite://')
+        db_uri = translate_db_uri(self.app, '@sql_file')
+        self.assertIn(self.app.instance_path, db_uri)
+        self.assertIn('app.db', db_uri)

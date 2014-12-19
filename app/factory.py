@@ -17,6 +17,13 @@ from key import get_secret_key
 from uploads import documents
 
 
+def translate_db_uri(app, db_uri):
+    if db_uri == '@sql_file':
+        here_db = 'sqlite:///' + os.path.join(app.instance_path, 'app.db')
+        return here_db
+    return db_uri
+
+
 def create_app(config_file=None):
 
     this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -37,9 +44,8 @@ def create_app(config_file=None):
     configure_uploads(app, [documents])
 
     # flask-sqlalchemy
-    if app.config.get('SQLALCHEMY_DATABASE_URI') == '@sql_file':
-        here_db = 'sqlite:///' + os.path.join(app.instance_path, 'app.db')
-        app.config['SQLALCHEMY_DATABASE_URI'] = here_db
+    db_uri = app.config.get('SQLALCHEMY_DATABASE_URI')
+    app.config['SQLALCHEMY_DATABASE_URI'] = translate_db_uri(app, db_uri)
     models.db.init_app(app)
 
     # flask-assets
