@@ -412,6 +412,11 @@ class DocTestCase(RankoTestCase):
         self.assert200(r)
         self.assertIn('My annotation', r.data)
 
+    def test_upload_image(self):
+        self._login('a', 'a', signup=True)
+        docid = self._new_upload_id('x.png')
+        r = self.client.get(url_for('bp.home'))
+        self.assertIn('glyphicon-picture', r.data)
 
 class AudioAnnotationTestCase(RankoTestCase):
     def test_create_audio_annotation(self):
