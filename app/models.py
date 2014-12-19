@@ -285,12 +285,14 @@ class Annotation(db.Model):
         posy = fake.random_int(0, 600)
         width = fake.random_int(50, 300)
         height = fake.random_int(50, 300)
-        if fake.boolean():
-            state = Annotation.STATE_OPEN
-        else:
-            state = Annotation.STATE_CLOSED
+        annotations_states = {True: Annotation.STATE_OPEN,
+                              False: Annotation.STATE_CLOSED,
+                              }
+        state = annotations_states[fake.boolean()]
         text = fake.text()
-        ann = Annotation(doc, page, posx, posy, width, height, text, user, state)
+        ann = Annotation(doc, page, posx, posy,
+                         width, height,
+                         text, user, state)
         return ann
 
     def is_closed(self):
@@ -352,7 +354,8 @@ class AudioAnnotation(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
-    doc_id = db.Column(db.Integer, db.ForeignKey('document.id'), nullable=False)
+    doc_id = db.Column(db.Integer, db.ForeignKey('document.id'),
+                       nullable=False)
     start = db.Column(db.Integer, nullable=False)
     length = db.Column(db.Integer, nullable=False)
     text = db.Column(db.String, nullable=False)

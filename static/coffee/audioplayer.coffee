@@ -43,7 +43,8 @@ class AudioPlayer
     $.getJSON ann_url, (annotations) =>
       for ann in annotations.data
         annotation = new AudioAnnotation this, ann.id, ann.start,
-                                         ann.length, ann.state, ann.text, @readOnly
+                                         ann.length, ann.state,
+                                         ann.text, @readOnly
         @$div.append annotation.$div
         @annotations.push annotation
         @update()
@@ -87,7 +88,8 @@ class AudioPlayer
       else
         # New one
         @selection = new AudioSelection time, (start, length) =>
-          annotation = new AudioAnnotation this, null, start, length, 'open', "", @readOnly
+          annotation = new AudioAnnotation this, null, start, length,
+                                           'open', "", @readOnly
           @$div.append annotation.$div
           @annotations.push annotation
           @update()

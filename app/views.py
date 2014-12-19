@@ -85,7 +85,8 @@ def view_favicon():
 
 class UploadForm(Form):
     file = FileField('The file to review')
-    title = TextField('Title', description='The title of your document (may be blank)')
+    title = TextField('Title',
+                      description='The title of your document (may be blank)')
 
 
 @bp.route('/upload', methods=['POST'])
@@ -106,8 +107,6 @@ def upload():
         if title == '':
             full_path = Document.full_path_to(filename)
             title = extract_title(full_path)
-        if title == '':
-            title = None
         doc = Document(filename, title=title)
         db.session.add(doc)
         db.session.commit()
@@ -166,8 +165,6 @@ def view_list(id):
     elif doc.filetype == 'audio':
         annotations = AudioAnnotation.query.filter_by(doc_id=id)
         template = 'list_audio.html'
-    else:
-        assert False, 'Unknown filetype: {}'.format(doc.filetype)
     return render_template(template,
                            doc=doc,
                            annotations=annotations,
@@ -185,7 +182,9 @@ def post_comment():
     form = CommentForm()
     assert(form.validate_on_submit())
     docid = kore_id(form.docid.data)
-    if not (current_user.is_authenticated() and current_user.can_comment_on(docid)):
+    if not current_user.is_authenticated():
+        return Unauthorized()
+    if not current_user.can_comment_on(docid):
         return Unauthorized()
     comm = Comment(docid, form.comment.data)
     db.session.add(comm)
@@ -225,6 +224,8 @@ def annotation_new():
     :<json string state: Optional state: "open" (default), "closed"
 
     :>json int id: The new ID.
+
+    :status 400: Document ID does not exist.
     """
     doc = coerce_to(int, request.form['doc'])
     page = coerce_to(int, request.form['page'])
@@ -236,6 +237,9 @@ def annotation_new():
     state = Annotation.STATE_OPEN
     if 'state' in request.form:
         state = Annotation.state_decode(request.form['state'])
+    doc_obj = Document.query.get(doc)
+    if doc_obj is None:
+        return BadRequest()
     if not current_user.can_annotate(doc):
         return Unauthorized()
     user = current_user.id
@@ -346,11 +350,11 @@ def delete_doc(id):
         doc = Document.query.get(id)
         doc.delete()
         return redirect(url_for('.home'))
-    return redirect(url_for('.view_doc', id=id))
 
 
 class ShareForm(Form):
-    name = TextField('Name', description='The person you are giving this link to')
+    name = TextField('Name',
+                     description='The person you are giving this link to')
 
 
 @bp.route('/view/<id>/share', methods=['POST'])
@@ -362,7 +366,6 @@ def share_doc(id):
                 }
         h = shared_link_serializer().dumps(data)
         return jsonify(data=h)
-    return BadRequest()
 
 
 @bp.route('/view/shared/<key>')

@@ -9,6 +9,7 @@ from models import db
 
 audioann = Blueprint('audioann', __name__)
 
+
 @audioann.route('/audioannotation/new', methods=['POST'])
 def audioann_new():
     """

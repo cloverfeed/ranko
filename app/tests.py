@@ -1,18 +1,25 @@
-import json
 import os
 import re
 from io import BytesIO
 
+import faker
 import koremutake
 from flask import url_for
 from flask.ext.testing import TestCase
 from werkzeug import FileStorage
 
 from factory import create_app
+from factory import translate_db_uri
+from key import get_secret_key
+from models import Annotation
+from models import Comment
 from models import db
+from models import Document
+from models import ROLE_ADMIN
+from models import User
 
 
-class TestCase(TestCase):
+class RankoTestCase(TestCase):
     def create_app(self):
         return create_app(config_file='conf/testing.py')
 
@@ -23,12 +30,25 @@ class TestCase(TestCase):
         db.session.remove()
         # db.drop_all()
 
-    def test_home(self):
-        r = self.client.get('/')
-        self.assertIn('Upload and review', r.data)
+    def _login(self, username, password, signup=False):
+        if signup:
+            self._signup(username, password)
+        return self.client.post('/login', data=dict(
+            username=username,
+            password=password
+            ), follow_redirects=True)
 
-    def _upload(self, filename, title=None):
-        storage = FileStorage(filename=filename, stream=BytesIO())
+    def _signup(self, username, password):
+        return self.client.post('/signup', data=dict(
+            username=username,
+            password=password,
+            confirm=password
+            ), follow_redirects=True)
+
+    def _upload(self, filename, title=None, stream=None):
+        if stream is None:
+            stream = BytesIO()
+        storage = FileStorage(filename=filename, stream=stream)
         post_data = {'file': storage}
         if title is not None:
             post_data['title'] = title
@@ -36,9 +56,25 @@ class TestCase(TestCase):
         return r
 
     def _new_upload_id(self, filename):
-        r = self._upload('toto.pdf', title='')
+        r = self._upload(filename, title='')
         docid = self._extract_docid(r)
         return koremutake.decode(docid)
+
+    def _extract_docid(self, r):
+        m = re.search('/view/(\w+)', r.location)
+        self.assertIsNotNone(m)
+        docid = m.group(1)
+        return docid
+
+
+class DocTestCase(RankoTestCase):
+    def test_home(self):
+        r = self.client.get('/')
+        self.assertIn('Upload and review', r.data)
+
+    def test_favicon(self):
+        r = self.client.get('/favicon.ico', follow_redirects=True)
+        self.assert200(r)
 
     def test_upload(self):
         r = self._login('a', 'a', signup=True)
@@ -65,6 +101,12 @@ class TestCase(TestCase):
         r = self.client.get('/view/' + unkore_docid)
         self.assert200(r)
 
+    def test_upload_bad_ext(self):
+        r = self._upload('toto.txt')
+        self.assertRedirects(r, url_for('bp.home'))
+        r = self.client.get(r.location)
+        self.assertIn('Unsupported', r.data)
+
     def test_no_doc(self):
         r = self.client.get('/view/0')
         self.assert404(r)
@@ -72,7 +114,8 @@ class TestCase(TestCase):
         self.assert404(r)
 
     def test_annotation(self):
-        data = {'doc': 1,
+        docid = 1
+        data = {'doc': docid,
                 'page': 2,
                 'posx': 3,
                 'posy': 4,
@@ -84,12 +127,17 @@ class TestCase(TestCase):
         self.assert401(r)
         self._login('username', 'password', signup=True)
         r = self.client.post('/annotation/new', data=data)
+        self.assert400(r)
+
+        docid = self._new_upload_id('blabla.pdf')
+        data['doc'] = docid
+        r = self.client.post('/annotation/new', data=data)
         self.assert200(r)
-        d = json.loads(r.data)
+        d = r.json
         self.assertIn('id', d)
         id_resp = d['id']
 
-        bad_data = {'doc': 1,
+        bad_data = {'doc': docid,
                     'page': 2,
                     'posx': 3,
                     'posy': 4,
@@ -104,9 +152,8 @@ class TestCase(TestCase):
             self.assert400(r)
             bad_data[key] = ok
 
-        r = self.client.get('/view/1/annotations')
-        d = json.loads(r.data)
-        anns = d['data']['2']
+        r = self.client.get('/view/{}/annotations'.format(docid))
+        anns = r.json['data']['2']
         self.assertEqual(len(anns), 1)
         ann = anns[0]
         id_retr = ann['id']
@@ -114,7 +161,7 @@ class TestCase(TestCase):
         self.assertEqual(ann['state'], 'open')
         self.assertEqual(id_retr, id_resp)
 
-        data = {'doc': 1,
+        data = {'doc': docid,
                 'page': 2,
                 'posx': 3,
                 'posy': 4,
@@ -123,27 +170,33 @@ class TestCase(TestCase):
                 'value': 'Oh oh',
                 'state': 'closed',
                 }
+        self._login('c', 'c', signup=True)
+        r = self.client.put('/annotation/{}'.format(id_retr), data=data)
+        self.assert401(r)
+
+        self._login('username', 'password')
         r = self.client.put('/annotation/{}'.format(id_retr), data=data)
         self.assert200(r)
-        r = self.client.get('/view/1/annotations')
-        d = json.loads(r.data)
-        anns = d['data']['2']
+
+        r = self.client.get('/view/{}/annotations'.format(docid))
+        anns = r.json['data']['2']
         self.assertEqual(len(anns), 1)
         ann = anns[0]
         self.assertEqual(ann['height'], 60)
         self.assertEqual(ann['state'], 'closed')
 
-        r = self.client.delete('/annotation/{}'.format(id_retr))
+        self._login('c', 'c')
+        r = self._delete(id_retr)
+        self.assert401(r)
+
+        self._login('username', 'password')
+        r = self._delete(id_retr)
         self.assert200(r)
         r = self.client.get('/view/1/annotations')
-        d = json.loads(r.data)
-        self.assertNotIn('2', d['data'])
+        self.assertNotIn('2', r.json['data'])
 
-    def _extract_docid(self, r):
-        m = re.search('/view/(\w+)', r.location)
-        self.assertIsNotNone(m)
-        docid = m.group(1)
-        return docid
+    def _delete(self, docid):
+        return self.client.delete('/annotation/{}'.format(docid))
 
     def test_upload_rev(self):
         r = self._upload('toto.pdf')
@@ -165,21 +218,6 @@ class TestCase(TestCase):
             self.assert200(r)
             for docb in [docid, docid2]:
                 self.assertIn(docb, r.data)
-
-    def _signup(self, username, password):
-        return self.client.post('/signup', data=dict(
-            username=username,
-            password=password,
-            confirm=password
-            ), follow_redirects=True)
-
-    def _login(self, username, password, signup=False):
-        if signup:
-            self._signup(username, password)
-        return self.client.post('/login', data=dict(
-            username=username,
-            password=password
-            ), follow_redirects=True)
 
     def _logout(self):
         return self.client.get('/logout', follow_redirects=True)
@@ -271,6 +309,14 @@ class TestCase(TestCase):
         empty_link = "></a>"
         self.assertNotIn(empty_link, r.data)
 
+    def test_upload_title_detect(self):
+        with open('fixtures/manual.pdf') as f:
+            r = self._upload('toto.pdf', title='', stream=f)
+        self.assertStatus(r, 302)
+        r = self.client.get(r.location)
+        title = "Hypertext marks in LaTeX: a manual for hyperref"
+        self.assertIn(title, r.data)
+
     def test_signup_twice(self):
         self._signup('a', 'b')
         r = self._signup('a', 'c')
@@ -281,9 +327,7 @@ class TestCase(TestCase):
         data = {'name': 'Bob'}
         r = self.client.post(url_for('bp.share_doc', id=docid), data=data)
         self.assert200(r)
-        d = json.loads(r.data)
-        self.assertIn('data', d)
-        h = d['data']
+        h = r.json['data']
 
         h2 = h + 'x'
         r = self.client.get(url_for('bp.view_shared_doc', key=h2))
@@ -307,6 +351,28 @@ class TestCase(TestCase):
         self.assertTrue(self._can_comment_on(docid))
         self.assertFalse(self._can_comment_on(other_docid))
 
+    def test_anon_cant_comment(self):
+        docid = self._new_upload_id('bla.pdf')
+        self.assertFalse(self._can_comment_on(docid))
+
+    def test_create_annotation_closed(self):
+        self._login('a', 'a', signup=True)
+        docid = self._new_upload_id('bla.pdf')
+        data = {'doc': docid,
+                'page': 2,
+                'posx': 3,
+                'posy': 4,
+                'width': 5,
+                'height': 6,
+                'value': 'Oh oh',
+                'state': 'closed',
+                }
+        r = self._annotate(data)
+        self.assert200(r)
+
+    def _annotate(self, data):
+        return self.client.post('/annotation/new', data=data)
+
     def _can_annotate(self, docid):
         data = {'doc': docid,
                 'page': 2,
@@ -316,7 +382,7 @@ class TestCase(TestCase):
                 'height': 6,
                 'value': 'Oh oh',
                 }
-        r = self.client.post('/annotation/new', data=data)
+        r = self._annotate(data)
         return r.status_code == 200
 
     def _can_comment_on(self, docid):
@@ -328,3 +394,169 @@ class TestCase(TestCase):
                              follow_redirects=True,
                              )
         return r.status_code == 200
+
+    def test_view_list(self):
+        self._login('a', 'a', signup=True)
+        docid = self._new_upload_id('x.pdf')
+        data = {'doc': docid,
+                'page': 2,
+                'posx': 3,
+                'posy': 4,
+                'width': 5,
+                'height': 6,
+                'value': 'My annotation',
+                }
+        r = self._annotate(data)
+        self.assert200(r)
+        r = self.client.get(url_for('bp.view_list', id=docid))
+        self.assert200(r)
+        self.assertIn('My annotation', r.data)
+
+    def test_upload_image(self):
+        self._login('a', 'a', signup=True)
+        docid = self._new_upload_id('x.png')
+        r = self.client.get(url_for('bp.home'))
+        self.assertIn('glyphicon-picture', r.data)
+
+    def test_detect_unknown(self):
+        self.assertRaises(AssertionError, Document.detect_filetype, 'x.txt')
+
+class AudioAnnotationTestCase(RankoTestCase):
+    def test_create_audio_annotation(self):
+        self._login('a', 'a', signup=True)
+        docid = self._new_upload_id('x.mp3')
+        data = {'doc': docid,
+                'start': 1,
+                'length': 2,
+                'text': "Bla",
+                }
+        r = self._audio_annotate(data)
+        self.assert200(r)
+
+        d = r.json
+        annid = d['id']
+
+        d = self._annotations_for_doc(docid)
+        expected_json = {'doc': docid,
+                         'start': 1,
+                         'length': 2,
+                         'text': "Bla",
+                         'id': annid,
+                         'state': 'open',
+                         'user': 1,
+                         }
+        self.assertEqual(d, {'data': [expected_json]})
+
+        self._login('b', 'b', signup=True)
+        data = {'start': 2,
+                'length': 3,
+                'text': 'toto',
+                'state': 'closed',
+                }
+        r = self._edit(annid, data)
+        self.assert401(r)
+
+        r = self._delete(annid)
+        self.assert401(r)
+
+        self._login('a', 'a')
+
+        r = self._edit(annid, data)
+        self.assert200(r)
+        self.assertEqual(r.json, {'status': 'ok'})
+
+        d = self._annotations_for_doc(docid)
+        expected_json['start'] = 2
+        expected_json['length'] = 3
+        expected_json['text'] = 'toto'
+        expected_json['state'] = 'closed'
+        self.assertEqual(d, {'data': [expected_json]})
+
+        r = self._delete(annid)
+        self.assert200(r)
+        self.assertEqual(r.json, {'status': 'ok'})
+
+        d = self._annotations_for_doc(docid)
+        self.assertEqual(d, {'data': []})
+
+    def _audio_annotate(self, data):
+        return self.client.post(url_for('audioann.audioann_new'), data=data)
+
+    def _annotations_for_doc(self, docid):
+        url = url_for('audioann.audio_annotations_for_doc', id=docid)
+        r = self.client.get(url)
+        self.assert200(r)
+        return r.json
+
+    def _edit(self, annid, data):
+        url = url_for('audioann.audio_annotation_edit', id=annid)
+        return self.client.put(url, data=data)
+
+    def _delete(self, annid):
+        url = url_for('audioann.annotation_delete', id=annid)
+        return self.client.delete(url)
+
+    def test_view_list_audio(self):
+        self._login('a', 'a', signup=True)
+        docid = self._new_upload_id('x.mp3')
+        data = {'doc': docid,
+                'start': 2,
+                'length': 3,
+                'text': 'My annotation',
+                }
+        r = self._audio_annotate(data)
+        self.assert200(r)
+        r = self.client.get(url_for('bp.view_list', id=docid))
+        self.assert200(r)
+        self.assertIn('My annotation', r.data)
+
+
+class KeyTestCase(RankoTestCase):
+    def test_recreate(self):
+        secret_key_file = 'test.key'
+
+        self.assertFalse(os.path.isfile(secret_key_file))
+        key = get_secret_key(secret_key_file)
+        self.assertTrue(os.path.isfile(secret_key_file))
+
+        key2 = get_secret_key(secret_key_file)
+        self.assertEqual(key, key2)
+
+        os.unlink(secret_key_file)
+
+
+class FakeTestCase(RankoTestCase):
+    def test_generate_models(self):
+        fake = faker.Faker()
+        user = User.generate(fake)
+        doc = Document.generate('pdfdata')
+        comm = Comment.generate(fake, doc)
+        ann = Annotation.generate(fake, doc, user)
+
+
+class AdminTestCase(RankoTestCase):
+    def test_admin_unauthorized_guest(self):
+        self.assertFalse(self._can_see_admin_panel())
+
+    def test_admin_unauthorized_user(self):
+        self._login('a', 'a', signup=True)
+        self.assertFalse(self._can_see_admin_panel())
+
+    def test_admin_authorized_admin(self):
+        self._login('a', 'a', signup=True)
+        user = User.query.one()
+        user.role = ROLE_ADMIN
+        self.assertTrue(self._can_see_admin_panel())
+
+    def _can_see_admin_panel(self):
+        r = self.client.get('/admin/')
+        self.assert200(r)
+        return 'Document' in r.data
+
+
+class FactoryTestCase(RankoTestCase):
+    def test_translate_db_uri(self):
+        self.assertEqual(translate_db_uri(self.app, 'sqlite://'), 'sqlite://')
+        db_uri = translate_db_uri(self.app, '@sql_file')
+        self.assertIn(self.app.instance_path, db_uri)
+        self.assertIn('app.db', db_uri)
