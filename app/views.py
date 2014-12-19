@@ -165,8 +165,6 @@ def view_list(id):
     elif doc.filetype == 'audio':
         annotations = AudioAnnotation.query.filter_by(doc_id=id)
         template = 'list_audio.html'
-    else:
-        assert False, 'Unknown filetype: {}'.format(doc.filetype)
     return render_template(template,
                            doc=doc,
                            annotations=annotations,
