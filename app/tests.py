@@ -440,7 +440,12 @@ class AudioAnnotationTestCase(RankoTestCase):
         self.assertEqual(d, {'data': [expected_json]})
 
         self._login('b', 'b', signup=True)
-        r = self._edit(annid, dict(length=3))
+        data = {'start': 2,
+                'length': 3,
+                'text': 'toto',
+                'state': 'closed',
+                }
+        r = self._edit(annid, data)
         self.assert401(r)
 
         r = self._delete(annid)
@@ -448,12 +453,15 @@ class AudioAnnotationTestCase(RankoTestCase):
 
         self._login('a', 'a')
 
-        r = self._edit(annid, dict(length=3))
+        r = self._edit(annid, data)
         self.assert200(r)
         self.assertEqual(r.json, {'status': 'ok'})
 
         d = self._annotations_for_doc(docid)
+        expected_json['start'] = 2
         expected_json['length'] = 3
+        expected_json['text'] = 'toto'
+        expected_json['state'] = 'closed'
         self.assertEqual(d, {'data': [expected_json]})
 
         r = self._delete(annid)
