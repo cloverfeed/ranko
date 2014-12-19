@@ -100,6 +100,12 @@ class DocTestCase(RankoTestCase):
         r = self.client.get('/view/' + unkore_docid)
         self.assert200(r)
 
+    def test_upload_bad_ext(self):
+        r = self._upload('toto.txt')
+        self.assertRedirects(r, url_for('bp.home'))
+        r = self.client.get(r.location)
+        self.assertIn('Unsupported', r.data)
+
     def test_no_doc(self):
         r = self.client.get('/view/0')
         self.assert404(r)
