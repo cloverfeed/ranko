@@ -224,6 +224,8 @@ def annotation_new():
     :<json string state: Optional state: "open" (default), "closed"
 
     :>json int id: The new ID.
+
+    :status 400: Document ID does not exist.
     """
     doc = coerce_to(int, request.form['doc'])
     page = coerce_to(int, request.form['page'])
@@ -235,6 +237,9 @@ def annotation_new():
     state = Annotation.STATE_OPEN
     if 'state' in request.form:
         state = Annotation.state_decode(request.form['state'])
+    doc_obj = Document.query.get(doc)
+    if doc_obj is None:
+        return BadRequest()
     if not current_user.can_annotate(doc):
         return Unauthorized()
     user = current_user.id

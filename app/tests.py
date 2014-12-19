@@ -113,7 +113,8 @@ class DocTestCase(RankoTestCase):
         self.assert404(r)
 
     def test_annotation(self):
-        data = {'doc': 1,
+        docid = 1
+        data = {'doc': docid,
                 'page': 2,
                 'posx': 3,
                 'posy': 4,
@@ -125,12 +126,17 @@ class DocTestCase(RankoTestCase):
         self.assert401(r)
         self._login('username', 'password', signup=True)
         r = self.client.post('/annotation/new', data=data)
+        self.assert400(r)
+
+        docid = self._new_upload_id('blabla.pdf')
+        data['doc'] = docid
+        r = self.client.post('/annotation/new', data=data)
         self.assert200(r)
         d = r.json
         self.assertIn('id', d)
         id_resp = d['id']
 
-        bad_data = {'doc': 1,
+        bad_data = {'doc': docid,
                     'page': 2,
                     'posx': 3,
                     'posy': 4,
@@ -145,7 +151,7 @@ class DocTestCase(RankoTestCase):
             self.assert400(r)
             bad_data[key] = ok
 
-        r = self.client.get('/view/1/annotations')
+        r = self.client.get('/view/{}/annotations'.format(docid))
         anns = r.json['data']['2']
         self.assertEqual(len(anns), 1)
         ann = anns[0]
@@ -154,7 +160,7 @@ class DocTestCase(RankoTestCase):
         self.assertEqual(ann['state'], 'open')
         self.assertEqual(id_retr, id_resp)
 
-        data = {'doc': 1,
+        data = {'doc': docid,
                 'page': 2,
                 'posx': 3,
                 'posy': 4,
@@ -165,17 +171,25 @@ class DocTestCase(RankoTestCase):
                 }
         r = self.client.put('/annotation/{}'.format(id_retr), data=data)
         self.assert200(r)
-        r = self.client.get('/view/1/annotations')
+        r = self.client.get('/view/{}/annotations'.format(docid))
         anns = r.json['data']['2']
         self.assertEqual(len(anns), 1)
         ann = anns[0]
         self.assertEqual(ann['height'], 60)
         self.assertEqual(ann['state'], 'closed')
 
-        r = self.client.delete('/annotation/{}'.format(id_retr))
+        self._login('c', 'c', signup=True)
+        r = self._delete(id_retr)
+        self.assert401(r)
+
+        self._login('username', 'password')
+        r = self._delete(id_retr)
         self.assert200(r)
         r = self.client.get('/view/1/annotations')
         self.assertNotIn('2', r.json['data'])
+
+    def _delete(self, docid):
+        return self.client.delete('/annotation/{}'.format(docid))
 
     def test_upload_rev(self):
         r = self._upload('toto.pdf')
