@@ -169,8 +169,14 @@ class DocTestCase(RankoTestCase):
                 'value': 'Oh oh',
                 'state': 'closed',
                 }
+        self._login('c', 'c', signup=True)
+        r = self.client.put('/annotation/{}'.format(id_retr), data=data)
+        self.assert401(r)
+
+        self._login('username', 'password')
         r = self.client.put('/annotation/{}'.format(id_retr), data=data)
         self.assert200(r)
+
         r = self.client.get('/view/{}/annotations'.format(docid))
         anns = r.json['data']['2']
         self.assertEqual(len(anns), 1)
@@ -178,7 +184,7 @@ class DocTestCase(RankoTestCase):
         self.assertEqual(ann['height'], 60)
         self.assertEqual(ann['state'], 'closed')
 
-        self._login('c', 'c', signup=True)
+        self._login('c', 'c')
         r = self._delete(id_retr)
         self.assert401(r)
 
