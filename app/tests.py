@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import re
 from io import BytesIO
@@ -322,10 +323,14 @@ class DocTestCase(RankoTestCase):
         r = self._signup('a', 'c')
         self.assertIn('already taken', r.data)
 
+    def _share_link(self, docid, name):
+        data = {'name': name}
+        r = self.client.post(url_for('bp.share_doc', id=docid), data=data)
+        return r
+
     def test_share_link(self):
         docid = self._new_upload_id('toto.pdf')
-        data = {'name': 'Bob'}
-        r = self.client.post(url_for('bp.share_doc', id=docid), data=data)
+        r = self._share_link(docid, 'Bob')
         self.assert200(r)
         h = r.json['data']
 
@@ -350,6 +355,14 @@ class DocTestCase(RankoTestCase):
 
         self.assertTrue(self._can_comment_on(docid))
         self.assertFalse(self._can_comment_on(other_docid))
+
+    def test_share_link_unicode(self):
+        docid = self._new_upload_id('toto.pdf')
+        r = self._share_link(docid, 'Ohé')
+        self.assert200(r)
+        h = r.json['data']
+        r = self.client.get(url_for('bp.view_shared_doc', key=h), follow_redirects=True)
+        self.assert200(r)
 
     def test_anon_cant_comment(self):
         docid = self._new_upload_id('bla.pdf')
@@ -420,6 +433,7 @@ class DocTestCase(RankoTestCase):
 
     def test_detect_unknown(self):
         self.assertRaises(AssertionError, Document.detect_filetype, 'x.txt')
+
 
 class AudioAnnotationTestCase(RankoTestCase):
     def test_create_audio_annotation(self):

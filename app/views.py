@@ -380,5 +380,5 @@ def view_shared_doc(key):
     name = data['name']
     user = pseudo_user(name, docid)
     login_user(user)
-    flash("Hello, {}!".format(name))
+    flash(u"Hello, {}!".format(name, 'utf-8'))
     return redirect(url_for('.view_doc', id=doc.id))
