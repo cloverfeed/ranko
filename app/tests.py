@@ -421,6 +421,7 @@ class DocTestCase(RankoTestCase):
     def test_detect_unknown(self):
         self.assertRaises(AssertionError, Document.detect_filetype, 'x.txt')
 
+
 class AudioAnnotationTestCase(RankoTestCase):
     def test_create_audio_annotation(self):
         self._login('a', 'a', signup=True)
