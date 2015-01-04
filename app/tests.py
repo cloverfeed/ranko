@@ -322,10 +322,14 @@ class DocTestCase(RankoTestCase):
         r = self._signup('a', 'c')
         self.assertIn('already taken', r.data)
 
+    def _share_link(self, docid, name):
+        data = {'name': name}
+        r = self.client.post(url_for('bp.share_doc', id=docid), data=data)
+        return r
+
     def test_share_link(self):
         docid = self._new_upload_id('toto.pdf')
-        data = {'name': 'Bob'}
-        r = self.client.post(url_for('bp.share_doc', id=docid), data=data)
+        r = self._share_link(docid, 'Bob')
         self.assert200(r)
         h = r.json['data']
 
