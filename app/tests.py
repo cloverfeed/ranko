@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import re
 from io import BytesIO
@@ -354,6 +355,14 @@ class DocTestCase(RankoTestCase):
 
         self.assertTrue(self._can_comment_on(docid))
         self.assertFalse(self._can_comment_on(other_docid))
+
+    def test_share_link_unicode(self):
+        docid = self._new_upload_id('toto.pdf')
+        r = self._share_link(docid, 'Ohé')
+        self.assert200(r)
+        h = r.json['data']
+        r = self.client.get(url_for('bp.view_shared_doc', key=h), follow_redirects=True)
+        self.assert200(r)
 
     def test_anon_cant_comment(self):
         docid = self._new_upload_id('bla.pdf')
