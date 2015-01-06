@@ -32,5 +32,5 @@ def home():
 
 
 @bp.route('/favicon.ico')
-def view_favicon():
+def favicon():
     return redirect(url_for('static', filename='favicon.ico'))
