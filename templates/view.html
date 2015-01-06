@@ -32,7 +32,7 @@
             {{ glyphicon('list') }}
             List mode
         </a>
-        <a href="{{url_for('.edit_doc', id=doc.id)}}" class="list-group-item">
+        <a href="{{url_for('document.edit', id=doc.id)}}" class="list-group-item">
             {{ glyphicon('pencil') }}
             Edit
         </a>
@@ -68,7 +68,7 @@
     </div>
 
     <h3>{{ glyphicon('comment') }} Comments</h3>
-    <form method="POST" action="{{ url_for('.post_comment') }}" id="post_comment_form">
+    <form method="POST" action="{{ url_for('comment.new') }}" id="post_comment_form">
         {{form_comm.hidden_tag()}}
         <p>{{form_comm.comment()}}</p>
         {{form_comm.docid()}}

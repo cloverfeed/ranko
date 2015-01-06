@@ -9,7 +9,7 @@
       {{ glyphicon('upload') }} Upload a file
 </button>
 <div id="upload_dialog" title="Upload a file">
-    {{ upload_form (form, url_for('.upload')) }}
+    {{ upload_form (form, url_for('document.upload')) }}
 </div>
 <div class="row">
     <div class="col-md-6">
@@ -49,7 +49,7 @@
 </div>
 
 <div id="upload_dialog" title="Upload a file">
-    {{ upload_form (form, url_for('.upload')) }}
+    {{ upload_form (form, url_for('document.upload')) }}
 </div>
 
 <div class="row">

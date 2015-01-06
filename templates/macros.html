@@ -33,7 +33,7 @@ without having to register.
 {% endmacro %}
 
 {% macro link_to_doc(doc) %}
-<a href="{{ url_for('bp.view_doc', id=doc.id) }}">{{ doc.title_or_id() }}</a>
+<a href="{{ url_for('document.view', id=doc.id) }}">{{ doc.title_or_id() }}</a>
 {% endmacro %}
 {% macro js_bool(obj) %}
 {% if obj %}
