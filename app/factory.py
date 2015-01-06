@@ -99,6 +99,10 @@ def create_app(config_file=None):
 
     from views import bp
     app.register_blueprint(bp)
+    from document import document
+    app.register_blueprint(document)
+    from comment import comment
+    app.register_blueprint(comment)
     from auth import auth
     app.register_blueprint(auth)
     from audio_annotation import audioann

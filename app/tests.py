@@ -325,7 +325,8 @@ class DocTestCase(RankoTestCase):
 
     def _share_link(self, docid, name):
         data = {'name': name}
-        r = self.client.post(url_for('bp.share_doc', id=docid), data=data)
+        url = url_for('document.share_doc', id=docid)
+        r = self.client.post(url, data=data)
         return r
 
     def test_share_link(self):
@@ -335,16 +336,16 @@ class DocTestCase(RankoTestCase):
         h = r.json['data']
 
         h2 = h + 'x'
-        r = self.client.get(url_for('bp.view_shared_doc', key=h2))
+        r = self.client.get(url_for('document.view_shared_doc', key=h2))
         self.assertRedirects(r, url_for('bp.home'))
 
-        r = self.client.get(url_for('bp.view_shared_doc', key=h))
-        self.assertRedirects(r, url_for('bp.view_doc', id=docid))
+        r = self.client.get(url_for('document.view_shared_doc', key=h))
+        self.assertRedirects(r, url_for('document.view_doc', id=docid))
         r = self.client.get(r.location)
         self.assertIn('Signed in as Bob (guest)', r.data)
 
-        r = self.client.get(url_for('bp.view_shared_doc', key=h))
-        self.assertRedirects(r, url_for('bp.view_doc', id=docid))
+        r = self.client.get(url_for('document.view_shared_doc', key=h))
+        self.assertRedirects(r, url_for('document.view_doc', id=docid))
         r = self.client.get(r.location)
         self.assertIn('Signed in as Bob (guest)', r.data)
 
@@ -361,7 +362,8 @@ class DocTestCase(RankoTestCase):
         r = self._share_link(docid, 'Ohé')
         self.assert200(r)
         h = r.json['data']
-        r = self.client.get(url_for('bp.view_shared_doc', key=h), follow_redirects=True)
+        url = url_for('document.view_shared_doc', key=h)
+        r = self.client.get(url, follow_redirects=True)
         self.assert200(r)
 
     def test_anon_cant_comment(self):
@@ -421,7 +423,7 @@ class DocTestCase(RankoTestCase):
                 }
         r = self._annotate(data)
         self.assert200(r)
-        r = self.client.get(url_for('bp.view_list', id=docid))
+        r = self.client.get(url_for('document.view_list', id=docid))
         self.assert200(r)
         self.assertIn('My annotation', r.data)
 
@@ -520,7 +522,7 @@ class AudioAnnotationTestCase(RankoTestCase):
                 }
         r = self._audio_annotate(data)
         self.assert200(r)
-        r = self.client.get(url_for('bp.view_list', id=docid))
+        r = self.client.get(url_for('document.view_list', id=docid))
         self.assert200(r)
         self.assertIn('My annotation', r.data)
 
