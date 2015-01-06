@@ -103,6 +103,8 @@ def create_app(config_file=None):
     app.register_blueprint(document)
     from comment import comment
     app.register_blueprint(comment)
+    from annotation import annotation
+    app.register_blueprint(annotation)
     from auth import auth
     app.register_blueprint(auth)
     from audio_annotation import audioann
