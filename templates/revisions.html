@@ -6,7 +6,7 @@ Revisions:
 <ul>
     {% for (k_id, version) in revs %} 
     <li>
-        <a href="{{url_for('.view_doc', id=k_id)}}">
+        <a href="{{url_for('document.view', id=k_id)}}">
             {{k_id}}
             (v{{version}})
         </a>

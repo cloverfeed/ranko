@@ -68,11 +68,11 @@ def upload():
             db.session.add(revision)
             db.session.commit()
         flash('Uploaded')
-        return redirect(url_for('.view_doc', id=koremutake.encode(doc.id)))
+        return redirect(url_for('.view', id=koremutake.encode(doc.id)))
 
 
 @document.route('/view/<id>')
-def view_doc(id):
+def view(id):
     """
     View a Document.
 
@@ -98,7 +98,7 @@ def view_doc(id):
 
 
 @document.route('/raw/<id>')
-def rawdoc(id):
+def raw(id):
     """
     Get the file associated to a Document.
 
@@ -144,7 +144,7 @@ class EditForm(Form):
 
 
 @document.route('/view/<id>/edit', methods=['GET', 'POST'])
-def edit_doc(id):
+def edit(id):
     """
     Edit the document's metadata.
     """
@@ -155,8 +155,8 @@ def edit_doc(id):
         doc = Document.query.get(id)
         doc.title = form.title.data
         db.session.commit()
-        return redirect(url_for('.view_doc', id=id))
-    delete_action = url_for('.delete_doc', id=id)
+        return redirect(url_for('.view', id=id))
+    delete_action = url_for('.delete', id=id)
     return render_template('edit.html',
                            form=form,
                            delete_form=delete_form,
@@ -168,7 +168,7 @@ class DeleteForm(Form):
 
 
 @document.route('/view/<id>/delete', methods=['POST'])
-def delete_doc(id):
+def delete(id):
     """
     Delete the document.
     """
@@ -186,7 +186,7 @@ class ShareForm(Form):
 
 
 @document.route('/view/<id>/share', methods=['POST'])
-def share_doc(id):
+def share(id):
     form = ShareForm()
     if form.validate_on_submit():
         data = {'doc': id,
@@ -197,7 +197,7 @@ def share_doc(id):
 
 
 @document.route('/view/shared/<key>')
-def view_shared_doc(key):
+def view_shared(key):
     try:
         data = shared_link_serializer().loads(key)
     except BadSignature:
@@ -209,4 +209,4 @@ def view_shared_doc(key):
     user = pseudo_user(name, docid)
     login_user(user)
     flash(u"Hello, {}!".format(name, 'utf-8'))
-    return redirect(url_for('.view_doc', id=doc.id))
+    return redirect(url_for('.view', id=doc.id))

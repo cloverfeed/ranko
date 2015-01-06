@@ -325,7 +325,7 @@ class DocTestCase(RankoTestCase):
 
     def _share_link(self, docid, name):
         data = {'name': name}
-        url = url_for('document.share_doc', id=docid)
+        url = url_for('document.share', id=docid)
         r = self.client.post(url, data=data)
         return r
 
@@ -336,16 +336,16 @@ class DocTestCase(RankoTestCase):
         h = r.json['data']
 
         h2 = h + 'x'
-        r = self.client.get(url_for('document.view_shared_doc', key=h2))
+        r = self.client.get(url_for('document.view_shared', key=h2))
         self.assertRedirects(r, url_for('bp.home'))
 
-        r = self.client.get(url_for('document.view_shared_doc', key=h))
-        self.assertRedirects(r, url_for('document.view_doc', id=docid))
+        r = self.client.get(url_for('document.view_shared', key=h))
+        self.assertRedirects(r, url_for('document.view', id=docid))
         r = self.client.get(r.location)
         self.assertIn('Signed in as Bob (guest)', r.data)
 
-        r = self.client.get(url_for('document.view_shared_doc', key=h))
-        self.assertRedirects(r, url_for('document.view_doc', id=docid))
+        r = self.client.get(url_for('document.view_shared', key=h))
+        self.assertRedirects(r, url_for('document.view', id=docid))
         r = self.client.get(r.location)
         self.assertIn('Signed in as Bob (guest)', r.data)
 
@@ -362,7 +362,7 @@ class DocTestCase(RankoTestCase):
         r = self._share_link(docid, 'Ohé')
         self.assert200(r)
         h = r.json['data']
-        url = url_for('document.view_shared_doc', key=h)
+        url = url_for('document.view_shared', key=h)
         r = self.client.get(url, follow_redirects=True)
         self.assert200(r)
 

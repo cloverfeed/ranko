@@ -39,4 +39,4 @@ def new():
     db.session.add(comm)
     db.session.commit()
     flash("Comment saved")
-    return redirect(url_for('document.view_doc', id=form.docid.data))
+    return redirect(url_for('document.view', id=form.docid.data))
