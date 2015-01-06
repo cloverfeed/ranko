@@ -68,7 +68,7 @@
     </div>
 
     <h3>{{ glyphicon('comment') }} Comments</h3>
-    <form method="POST" action="{{ url_for('comment.post_comment') }}" id="post_comment_form">
+    <form method="POST" action="{{ url_for('comment.new') }}" id="post_comment_form">
         {{form_comm.hidden_tag()}}
         <p>{{form_comm.comment()}}</p>
         {{form_comm.docid()}}

@@ -21,7 +21,7 @@ class CommentForm(Form):
 
 
 @comment.route('/comment/new', methods=['POST'])
-def post_comment():
+def new():
     """
     Create a new comment.
 
