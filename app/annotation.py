@@ -17,7 +17,7 @@ annotation = Blueprint('annotation', __name__)
 
 @annotation.route('/annotation/new', methods=['POST'])
 @login_required
-def annotation_new():
+def new():
     """
     Create a new annotation.
 
@@ -61,7 +61,7 @@ def annotation_new():
 
 
 @annotation.route('/view/<id>/annotations')
-def annotations_for_doc(id):
+def for_doc(id):
     """
     Get the annotations associated to a Document.
 
@@ -78,7 +78,7 @@ def annotations_for_doc(id):
 
 
 @annotation.route('/annotation/<id>', methods=['DELETE'])
-def annotation_delete(id):
+def delete(id):
     """
     Delete an annotation.
 
@@ -94,7 +94,7 @@ def annotation_delete(id):
 
 
 @annotation.route('/annotation/<id>', methods=['PUT'])
-def annotation_edit(id):
+def edit(id):
     """
     Edit an Annotation.
 
