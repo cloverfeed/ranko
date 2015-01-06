@@ -1,10 +1,12 @@
 import koremutake
 from flask import Blueprint
+from flask import current_app
 from flask import flash
 from flask import jsonify
 from flask import redirect
 from flask import render_template
 from flask import request
+from flask import send_from_directory
 from flask import url_for
 from flask.ext.login import current_user
 from flask.ext.login import login_user
@@ -26,6 +28,7 @@ from .models import Revision
 from .tasks import extract_title
 from .tools import kore_id
 from .uploads import documents
+from .uploads import documents_dir
 
 document = Blueprint('document', __name__)
 
@@ -92,6 +95,18 @@ def view_doc(id):
                            annotations=annotations,
                            readOnly=readOnly,
                            )
+
+
+@document.route('/raw/<id>')
+def rawdoc(id):
+    """
+    Get the file associated to a Document.
+
+    :param id: A numeric (or koremutake) id.
+    """
+    id = kore_id(id)
+    doc = Document.query.get_or_404(id)
+    return send_from_directory(documents_dir(current_app), doc.filename)
 
 
 @document.route('/view/<id>/list')
