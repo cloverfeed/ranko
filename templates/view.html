@@ -32,6 +32,7 @@
             {{ glyphicon('list') }}
             List mode
         </a>
+{% if can_edit %}
         <a href="{{url_for('document.edit', id=doc.id)}}" class="list-group-item">
             {{ glyphicon('pencil') }}
             Edit
@@ -40,6 +41,7 @@
             {{ glyphicon('share') }}
             Generate a review link
         </a>
+{% endif %}
 
     </div>
     <h3>{{ glyphicon('eye-open') }} View</h3>
@@ -63,9 +65,11 @@
     <div id="upload_dialog" title="Upload a new version">
         {{ upload_form (form_up, url_for('.upload', revises=doc.id)) }}
     </div>
+{% if can_edit %}
     <div id="share_dialog" title="Generate a review link">
         {{ render_share_form(form_share) }}
     </div>
+{% endif %}
 
     <h3>{{ glyphicon('comment') }} Comments</h3>
     <form method="POST" action="{{ url_for('comment.new') }}" id="post_comment_form">

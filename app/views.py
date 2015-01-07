@@ -36,8 +36,10 @@ def home():
 def favicon():
     return redirect(url_for('static', filename='favicon.ico'))
 
+
 def page_not_found():
     return (render_template('404.html'), 404)
+
 
 @bp.route('/502')
 def internal_server_error():

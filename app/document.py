@@ -16,6 +16,7 @@ from flask_wtf.file import FileField
 from itsdangerous import BadSignature
 from wtforms import TextField
 
+from .auth import lm
 from .auth import pseudo_user
 from .auth import shared_link_serializer
 from .comment import CommentForm
@@ -86,6 +87,7 @@ def view(id):
     comments = Comment.query.filter_by(doc=id)
     annotations = Annotation.query.filter_by(doc=id)
     readOnly = not current_user.is_authenticated()
+    can_edit = doc.editable_by(current_user)
     return render_template('view.html',
                            doc=doc,
                            form_comm=form_comm,
@@ -94,6 +96,7 @@ def view(id):
                            comments=comments,
                            annotations=annotations,
                            readOnly=readOnly,
+                           can_edit=can_edit,
                            )
 
 
@@ -153,6 +156,8 @@ def edit(id):
     delete_form = DeleteForm()
     if form.validate_on_submit():
         doc = Document.query.get(id)
+        if not doc.editable_by(current_user):
+            return lm.unauthorized()
         doc.title = form.title.data
         db.session.commit()
         return redirect(url_for('.view', id=id))
@@ -176,6 +181,8 @@ def delete(id):
     form = DeleteForm()
     if form.validate_on_submit():
         doc = Document.query.get(id)
+        if not doc.editable_by(current_user):
+            return lm.unauthorized()
         doc.delete()
         return redirect(url_for('bp.home'))
 
@@ -189,6 +196,9 @@ class ShareForm(Form):
 def share(id):
     form = ShareForm()
     if form.validate_on_submit():
+        doc = Document.query.get(id)
+        if not doc.shareable_by(current_user):
+            return lm.unauthorized()
         data = {'doc': id,
                 'name': form.name.data,
                 }

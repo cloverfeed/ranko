@@ -1,5 +1,5 @@
 #!/bin/bash
-src_py="*.py scripts/*.py conf/*.py app/*.py"
+src_py="*.py scripts/*.py conf/*.py app/*.py tests/*.py"
 src_coffee="static/coffee/*"
 
 isort -c -sl $src_py
@@ -9,7 +9,7 @@ coffee_npm_path=node_modules/coffeelint/bin
 PATH="$coffee_npm_path:$PATH"
 
 if coffeelint -v > /dev/null 2>&1 ; then
-    coffeelint $src_coffee
+    coffeelint -q $src_coffee
 else
     echo "Cannot find coffeelint, skipping it."
 fi

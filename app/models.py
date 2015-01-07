@@ -187,6 +187,12 @@ class Document(db.Model):
         if self.filetype == 'audio':
             return 'glyphicon glyphicon-music'
 
+    def editable_by(self, user):
+        return user.is_authenticated() and user.id == self.user_id
+
+    def shareable_by(self, user):
+        return self.editable_by(user)
+
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)

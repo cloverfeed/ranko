@@ -1,71 +1,13 @@
 # -*- coding: utf-8 -*-
-import os
 import re
 from io import BytesIO
 
-import faker
 import koremutake
 from flask import url_for
-from flask.ext.testing import TestCase
 from werkzeug import FileStorage
 
-from factory import create_app
-from factory import translate_db_uri
-from key import get_secret_key
-from models import Annotation
-from models import Comment
-from models import db
-from models import Document
-from models import ROLE_ADMIN
-from models import User
-
-
-class RankoTestCase(TestCase):
-    def create_app(self):
-        return create_app(config_file='conf/testing.py')
-
-    def setUp(self):
-        db.create_all()
-
-    def tearDown(self):
-        db.session.remove()
-        # db.drop_all()
-
-    def _login(self, username, password, signup=False):
-        if signup:
-            self._signup(username, password)
-        return self.client.post('/login', data=dict(
-            username=username,
-            password=password
-            ), follow_redirects=True)
-
-    def _signup(self, username, password):
-        return self.client.post('/signup', data=dict(
-            username=username,
-            password=password,
-            confirm=password
-            ), follow_redirects=True)
-
-    def _upload(self, filename, title=None, stream=None):
-        if stream is None:
-            stream = BytesIO()
-        storage = FileStorage(filename=filename, stream=stream)
-        post_data = {'file': storage}
-        if title is not None:
-            post_data['title'] = title
-        r = self.client.post('/upload', data=post_data)
-        return r
-
-    def _new_upload_id(self, filename):
-        r = self._upload(filename, title='')
-        docid = self._extract_docid(r)
-        return koremutake.decode(docid)
-
-    def _extract_docid(self, r):
-        m = re.search('/view/(\w+)', r.location)
-        self.assertIsNotNone(m)
-        docid = m.group(1)
-        return docid
+from app.models import Document
+from common import RankoTestCase
 
 
 class DocTestCase(RankoTestCase):
@@ -187,16 +129,16 @@ class DocTestCase(RankoTestCase):
         self.assertEqual(ann['state'], 'closed')
 
         self._login('c', 'c')
-        r = self._delete(id_retr)
+        r = self._delete_annotation(id_retr)
         self.assert401(r)
 
         self._login('username', 'password')
-        r = self._delete(id_retr)
+        r = self._delete_annotation(id_retr)
         self.assert200(r)
         r = self.client.get('/view/1/annotations')
         self.assertNotIn('2', r.json['data'])
 
-    def _delete(self, docid):
+    def _delete_annotation(self, docid):
         return self.client.delete('/annotation/{}'.format(docid))
 
     def test_upload_rev(self):
@@ -262,7 +204,7 @@ class DocTestCase(RankoTestCase):
         r = self.client.get(edit_path)
         self.assert200(r)
 
-        r = self.client.post(edit_path, data={'title': 'New awesome title'})
+        r = self._edit(docid, {'title': 'New awesome title'})
         self.assertStatus(r, 302)
         r = self.client.get(r.location)
         self.assert200(r)
@@ -271,6 +213,10 @@ class DocTestCase(RankoTestCase):
         r = self.client.get('/')
         self.assert200(r)
         self.assertIn('New awesome title', r.data)
+
+    def _edit(self, docid, data):
+        edit_path = '/view/{}/edit'.format(docid)
+        return self.client.post(edit_path, data=data)
 
     def test_delete(self):
         self._login('a', 'b', signup=True)
@@ -283,8 +229,7 @@ class DocTestCase(RankoTestCase):
         self.assert200(r)
         self.assertIn('Delete', r.data)
 
-        delete_path = '/view/{}/delete'.format(docid)
-        r = self.client.post(delete_path)
+        r = self._delete(docid)
         self.assertStatus(r, 302)
         r = self.client.get(r.location)
         self.assert200(r)
@@ -292,6 +237,10 @@ class DocTestCase(RankoTestCase):
         view_path = '/view/{}'.format(docid)
         r = self.client.get(view_path)
         self.assert404(r)
+
+    def _delete(self, docid):
+        delete_path = '/view/{}/delete'.format(docid)
+        return self.client.post(delete_path)
 
     def test_upload_title(self):
         r = self._upload('toto.pdf', title='Batman is great')
@@ -330,10 +279,12 @@ class DocTestCase(RankoTestCase):
         return r
 
     def test_share_link(self):
+        self._login('a', 'b', signup=True)
         docid = self._new_upload_id('toto.pdf')
         r = self._share_link(docid, 'Bob')
         self.assert200(r)
         h = r.json['data']
+        self._logout()
 
         h2 = h + 'x'
         r = self.client.get(url_for('document.view_shared', key=h2))
@@ -358,9 +309,11 @@ class DocTestCase(RankoTestCase):
         self.assertFalse(self._can_comment_on(other_docid))
 
     def test_share_link_unicode(self):
+        self._login('a', 'a', signup=True)
         docid = self._new_upload_id('toto.pdf')
         r = self._share_link(docid, 'Ohé')
         self.assert200(r)
+        self._logout()
         h = r.json['data']
         url = url_for('document.view_shared', key=h)
         r = self.client.get(url, follow_redirects=True)
@@ -436,155 +389,28 @@ class DocTestCase(RankoTestCase):
     def test_detect_unknown(self):
         self.assertRaises(AssertionError, Document.detect_filetype, 'x.txt')
 
-
-class AudioAnnotationTestCase(RankoTestCase):
-    def test_create_audio_annotation(self):
+    def test_edit_delete_only_uploader(self):
         self._login('a', 'a', signup=True)
-        docid = self._new_upload_id('x.mp3')
-        data = {'doc': docid,
-                'start': 1,
-                'length': 2,
-                'text': "Bla",
-                }
-        r = self._audio_annotate(data)
-        self.assert200(r)
-
-        d = r.json
-        annid = d['id']
-
-        d = self._annotations_for_doc(docid)
-        expected_json = {'doc': docid,
-                         'start': 1,
-                         'length': 2,
-                         'text': "Bla",
-                         'id': annid,
-                         'state': 'open',
-                         'user': 1,
-                         }
-        self.assertEqual(d, {'data': [expected_json]})
-
-        self._login('b', 'b', signup=True)
-        data = {'start': 2,
-                'length': 3,
-                'text': 'toto',
-                'state': 'closed',
-                }
-        r = self._edit(annid, data)
+        docid = self._new_upload_id('toto.pdf')
+        self._logout()
+        r = self._delete(docid)
+        self.assert401(r)
+        r = self._edit(docid, data={"title": "My title"})
         self.assert401(r)
 
-        r = self._delete(annid)
+        view_path = '/view/{}'.format(docid)
+        r = self.client.get(view_path)
+        self.assert200(r)
+        self.assertNotIn('Edit', r.data)
+
+    def test_share_only_uploader(self):
+        self._login('a', 'a', signup=True)
+        docid = self._new_upload_id('toto.pdf')
+        self._logout()
+        r = self._share_link(docid, 'Bob')
         self.assert401(r)
 
-        self._login('a', 'a')
-
-        r = self._edit(annid, data)
+        view_path = '/view/{}'.format(docid)
+        r = self.client.get(view_path)
         self.assert200(r)
-        self.assertEqual(r.json, {'status': 'ok'})
-
-        d = self._annotations_for_doc(docid)
-        expected_json['start'] = 2
-        expected_json['length'] = 3
-        expected_json['text'] = 'toto'
-        expected_json['state'] = 'closed'
-        self.assertEqual(d, {'data': [expected_json]})
-
-        r = self._delete(annid)
-        self.assert200(r)
-        self.assertEqual(r.json, {'status': 'ok'})
-
-        d = self._annotations_for_doc(docid)
-        self.assertEqual(d, {'data': []})
-
-    def _audio_annotate(self, data):
-        return self.client.post(url_for('audioann.audioann_new'), data=data)
-
-    def _annotations_for_doc(self, docid):
-        url = url_for('audioann.audio_annotations_for_doc', id=docid)
-        r = self.client.get(url)
-        self.assert200(r)
-        return r.json
-
-    def _edit(self, annid, data):
-        url = url_for('audioann.audio_annotation_edit', id=annid)
-        return self.client.put(url, data=data)
-
-    def _delete(self, annid):
-        url = url_for('audioann.annotation_delete', id=annid)
-        return self.client.delete(url)
-
-    def test_view_list_audio(self):
-        self._login('a', 'a', signup=True)
-        docid = self._new_upload_id('x.mp3')
-        data = {'doc': docid,
-                'start': 2,
-                'length': 3,
-                'text': 'My annotation',
-                }
-        r = self._audio_annotate(data)
-        self.assert200(r)
-        r = self.client.get(url_for('document.view_list', id=docid))
-        self.assert200(r)
-        self.assertIn('My annotation', r.data)
-
-
-class KeyTestCase(RankoTestCase):
-    def test_recreate(self):
-        secret_key_file = 'test.key'
-
-        self.assertFalse(os.path.isfile(secret_key_file))
-        key = get_secret_key(secret_key_file)
-        self.assertTrue(os.path.isfile(secret_key_file))
-
-        key2 = get_secret_key(secret_key_file)
-        self.assertEqual(key, key2)
-
-        os.unlink(secret_key_file)
-
-
-class FakeTestCase(RankoTestCase):
-    def test_generate_models(self):
-        fake = faker.Faker()
-        user = User.generate(fake)
-        doc = Document.generate('pdfdata')
-        comm = Comment.generate(fake, doc)
-        ann = Annotation.generate(fake, doc, user)
-
-
-class AdminTestCase(RankoTestCase):
-    def test_admin_unauthorized_guest(self):
-        self.assertFalse(self._can_see_admin_panel())
-
-    def test_admin_unauthorized_user(self):
-        self._login('a', 'a', signup=True)
-        self.assertFalse(self._can_see_admin_panel())
-
-    def test_admin_authorized_admin(self):
-        self._login('a', 'a', signup=True)
-        user = User.query.one()
-        user.role = ROLE_ADMIN
-        self.assertTrue(self._can_see_admin_panel())
-
-    def _can_see_admin_panel(self):
-        r = self.client.get('/admin/')
-        self.assert200(r)
-        return 'Document' in r.data
-
-
-class FactoryTestCase(RankoTestCase):
-    def test_translate_db_uri(self):
-        self.assertEqual(translate_db_uri(self.app, 'sqlite://'), 'sqlite://')
-        db_uri = translate_db_uri(self.app, '@sql_file')
-        self.assertIn(self.app.instance_path, db_uri)
-        self.assertIn('app.db', db_uri)
-
-
-class ErrorPagesTestCase(RankoTestCase):
-    def test_404(self):
-        r = self.client.get('/nonexistent')
-        self.assertIn('does not exist', r.data)
-
-    def test_502(self):
-        #  This error page cannot be tested with an exception so we rely on the
-        #  exposed endpoint that is used by nginx.
-        r = self.client.get('/502')
-        self.assertIn('Sorry for the inconvenience', r.data)
+        self.assertNotIn('review link', r.data)
