@@ -16,6 +16,7 @@ from flask_wtf.file import FileField
 from itsdangerous import BadSignature
 from wtforms import TextField
 
+from .auth import lm
 from .auth import pseudo_user
 from .auth import shared_link_serializer
 from .comment import CommentForm
@@ -176,6 +177,8 @@ def delete(id):
     form = DeleteForm()
     if form.validate_on_submit():
         doc = Document.query.get(id)
+        if not doc.editable_by(current_user):
+            return lm.unauthorized()
         doc.delete()
         return redirect(url_for('bp.home'))
 

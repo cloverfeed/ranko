@@ -187,16 +187,16 @@ class DocTestCase(RankoTestCase):
         self.assertEqual(ann['state'], 'closed')
 
         self._login('c', 'c')
-        r = self._delete(id_retr)
+        r = self._delete_annotation(id_retr)
         self.assert401(r)
 
         self._login('username', 'password')
-        r = self._delete(id_retr)
+        r = self._delete_annotation(id_retr)
         self.assert200(r)
         r = self.client.get('/view/1/annotations')
         self.assertNotIn('2', r.json['data'])
 
-    def _delete(self, docid):
+    def _delete_annotation(self, docid):
         return self.client.delete('/annotation/{}'.format(docid))
 
     def test_upload_rev(self):
@@ -283,8 +283,7 @@ class DocTestCase(RankoTestCase):
         self.assert200(r)
         self.assertIn('Delete', r.data)
 
-        delete_path = '/view/{}/delete'.format(docid)
-        r = self.client.post(delete_path)
+        r = self._delete(docid)
         self.assertStatus(r, 302)
         r = self.client.get(r.location)
         self.assert200(r)
@@ -292,6 +291,10 @@ class DocTestCase(RankoTestCase):
         view_path = '/view/{}'.format(docid)
         r = self.client.get(view_path)
         self.assert404(r)
+
+    def _delete(self, docid):
+        delete_path = '/view/{}/delete'.format(docid)
+        return self.client.post(delete_path)
 
     def test_upload_title(self):
         r = self._upload('toto.pdf', title='Batman is great')
@@ -435,6 +438,13 @@ class DocTestCase(RankoTestCase):
 
     def test_detect_unknown(self):
         self.assertRaises(AssertionError, Document.detect_filetype, 'x.txt')
+
+    def test_delete_only_uploader(self):
+        self._login('a', 'a', signup=True)
+        docid = self._new_upload_id('toto.pdf')
+        self._logout()
+        r = self._delete(docid)
+        self.assert401(r)
 
 
 class AudioAnnotationTestCase(RankoTestCase):
