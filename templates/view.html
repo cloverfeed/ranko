@@ -32,10 +32,12 @@
             {{ glyphicon('list') }}
             List mode
         </a>
+{% if can_edit %}
         <a href="{{url_for('document.edit', id=doc.id)}}" class="list-group-item">
             {{ glyphicon('pencil') }}
             Edit
         </a>
+{% endif %}
         <a href="#" class="list-group-item" id="share_link">
             {{ glyphicon('share') }}
             Generate a review link

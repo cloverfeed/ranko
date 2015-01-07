@@ -452,6 +452,11 @@ class DocTestCase(RankoTestCase):
         r = self._edit(docid, data={"title": "My title"})
         self.assert401(r)
 
+        view_path = '/view/{}'.format(docid)
+        r = self.client.get(view_path)
+        self.assert200(r)
+        self.assertNotIn('Edit', r.data)
+
 
 class AudioAnnotationTestCase(RankoTestCase):
     def test_create_audio_annotation(self):

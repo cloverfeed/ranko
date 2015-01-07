@@ -87,6 +87,7 @@ def view(id):
     comments = Comment.query.filter_by(doc=id)
     annotations = Annotation.query.filter_by(doc=id)
     readOnly = not current_user.is_authenticated()
+    can_edit = doc.editable_by(current_user)
     return render_template('view.html',
                            doc=doc,
                            form_comm=form_comm,
@@ -95,6 +96,7 @@ def view(id):
                            comments=comments,
                            annotations=annotations,
                            readOnly=readOnly,
+                           can_edit=can_edit,
                            )
 
 
