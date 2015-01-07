@@ -196,6 +196,9 @@ class ShareForm(Form):
 def share(id):
     form = ShareForm()
     if form.validate_on_submit():
+        doc = Document.query.get(id)
+        if not doc.shareable_by(current_user):
+            return lm.unauthorized()
         data = {'doc': id,
                 'name': form.name.data,
                 }

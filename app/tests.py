@@ -337,10 +337,12 @@ class DocTestCase(RankoTestCase):
         return r
 
     def test_share_link(self):
+        self._login('a', 'b', signup=True)
         docid = self._new_upload_id('toto.pdf')
         r = self._share_link(docid, 'Bob')
         self.assert200(r)
         h = r.json['data']
+        self._logout()
 
         h2 = h + 'x'
         r = self.client.get(url_for('document.view_shared', key=h2))
@@ -365,9 +367,11 @@ class DocTestCase(RankoTestCase):
         self.assertFalse(self._can_comment_on(other_docid))
 
     def test_share_link_unicode(self):
+        self._login('a', 'a', signup=True)
         docid = self._new_upload_id('toto.pdf')
         r = self._share_link(docid, 'Ohé')
         self.assert200(r)
+        self._logout()
         h = r.json['data']
         url = url_for('document.view_shared', key=h)
         r = self.client.get(url, follow_redirects=True)
@@ -456,6 +460,18 @@ class DocTestCase(RankoTestCase):
         r = self.client.get(view_path)
         self.assert200(r)
         self.assertNotIn('Edit', r.data)
+
+    def test_share_only_uploader(self):
+        self._login('a', 'a', signup=True)
+        docid = self._new_upload_id('toto.pdf')
+        self._logout()
+        r = self._share_link(docid, 'Bob')
+        self.assert401(r)
+
+        view_path = '/view/{}'.format(docid)
+        r = self.client.get(view_path)
+        self.assert200(r)
+        self.assertNotIn('review link', r.data)
 
 
 class AudioAnnotationTestCase(RankoTestCase):
