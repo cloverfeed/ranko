@@ -154,6 +154,8 @@ def edit(id):
     delete_form = DeleteForm()
     if form.validate_on_submit():
         doc = Document.query.get(id)
+        if not doc.editable_by(current_user):
+            return lm.unauthorized()
         doc.title = form.title.data
         db.session.commit()
         return redirect(url_for('.view', id=id))

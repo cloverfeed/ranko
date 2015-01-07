@@ -262,7 +262,7 @@ class DocTestCase(RankoTestCase):
         r = self.client.get(edit_path)
         self.assert200(r)
 
-        r = self.client.post(edit_path, data={'title': 'New awesome title'})
+        r = self._edit(docid, {'title': 'New awesome title'})
         self.assertStatus(r, 302)
         r = self.client.get(r.location)
         self.assert200(r)
@@ -271,6 +271,10 @@ class DocTestCase(RankoTestCase):
         r = self.client.get('/')
         self.assert200(r)
         self.assertIn('New awesome title', r.data)
+
+    def _edit(self, docid, data):
+        edit_path = '/view/{}/edit'.format(docid)
+        return self.client.post(edit_path, data=data)
 
     def test_delete(self):
         self._login('a', 'b', signup=True)
@@ -439,11 +443,13 @@ class DocTestCase(RankoTestCase):
     def test_detect_unknown(self):
         self.assertRaises(AssertionError, Document.detect_filetype, 'x.txt')
 
-    def test_delete_only_uploader(self):
+    def test_edit_delete_only_uploader(self):
         self._login('a', 'a', signup=True)
         docid = self._new_upload_id('toto.pdf')
         self._logout()
         r = self._delete(docid)
+        self.assert401(r)
+        r = self._edit(docid, data={"title": "My title"})
         self.assert401(r)
 
 
