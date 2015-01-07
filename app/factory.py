@@ -110,4 +110,10 @@ def create_app(config_file=None):
     from audio_annotation import audioann
     app.register_blueprint(audioann)
 
+    from views import page_not_found
+
+    @app.errorhandler(404)
+    def handle_404(self):
+        return page_not_found()
+
     return app

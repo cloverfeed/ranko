@@ -576,3 +576,9 @@ class FactoryTestCase(RankoTestCase):
         db_uri = translate_db_uri(self.app, '@sql_file')
         self.assertIn(self.app.instance_path, db_uri)
         self.assertIn('app.db', db_uri)
+
+
+class ErrorPagesTestCase(RankoTestCase):
+    def test_404(self):
+        r = self.client.get('/nonexistent')
+        self.assertIn('does not exist', r.data)
