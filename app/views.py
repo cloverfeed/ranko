@@ -2,6 +2,7 @@ import os.path
 
 import koremutake
 from flask import Blueprint
+from flask import current_app
 from flask import redirect
 from flask import render_template
 from flask import url_for
@@ -34,3 +35,10 @@ def home():
 @bp.route('/favicon.ico')
 def favicon():
     return redirect(url_for('static', filename='favicon.ico'))
+
+def page_not_found():
+    return (render_template('404.html'), 404)
+
+@bp.route('/502')
+def internal_server_error():
+    return (render_template('502.html'), 502)

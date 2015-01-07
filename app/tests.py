@@ -576,3 +576,15 @@ class FactoryTestCase(RankoTestCase):
         db_uri = translate_db_uri(self.app, '@sql_file')
         self.assertIn(self.app.instance_path, db_uri)
         self.assertIn('app.db', db_uri)
+
+
+class ErrorPagesTestCase(RankoTestCase):
+    def test_404(self):
+        r = self.client.get('/nonexistent')
+        self.assertIn('does not exist', r.data)
+
+    def test_502(self):
+        #  This error page cannot be tested with an exception so we rely on the
+        #  exposed endpoint that is used by nginx.
+        r = self.client.get('/502')
+        self.assertIn('Sorry for the inconvenience', r.data)
