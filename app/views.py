@@ -38,3 +38,7 @@ def favicon():
 
 def page_not_found():
     return (render_template('404.html'), 404)
+
+@bp.route('/502')
+def internal_server_error():
+    return (render_template('502.html'), 502)
