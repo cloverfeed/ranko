@@ -12,9 +12,16 @@ from flask.ext.migrate import MigrateCommand
 from flask.ext.uploads import configure_uploads
 
 import models
+from annotation import annotation
+from audio_annotation import audioann
+from auth import auth
 from auth import lm
+from comment import comment
+from document import document
 from key import get_secret_key
 from uploads import documents
+from views import bp
+from views import page_not_found
 
 
 def translate_db_uri(app, db_uri):
@@ -100,20 +107,16 @@ def create_app(config_file=None):
     for model in admin_models:
         admin.add_view(RestrictedModelView(model, models.db.session))
 
-    from views import bp
-    app.register_blueprint(bp)
-    from document import document
-    app.register_blueprint(document)
-    from comment import comment
-    app.register_blueprint(comment)
-    from annotation import annotation
-    app.register_blueprint(annotation)
-    from auth import auth
-    app.register_blueprint(auth)
-    from audio_annotation import audioann
-    app.register_blueprint(audioann)
-
-    from views import page_not_found
+    blueprints = [
+        bp,
+        document,
+        comment,
+        annotation,
+        auth,
+        audioann,
+        ]
+    for blueprint in blueprints:
+        app.register_blueprint(blueprint)
 
     @app.errorhandler(404)
     def handle_404(self):
