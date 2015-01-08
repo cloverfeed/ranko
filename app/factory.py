@@ -104,6 +104,7 @@ def create_app(config_file=None):
     scss_bundle = Bundle(
         'scss/bootstrap_custom.scss',
         'scss/view.scss',
+        'scss/shame.scss',
         depends='**/*.scss',
         filters='pyscss',
         output='gen/app.css'
