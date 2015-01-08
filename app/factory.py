@@ -12,6 +12,7 @@ from flask.ext.migrate import Migrate
 from flask.ext.migrate import MigrateCommand
 from flask.ext.uploads import configure_uploads
 from xstatic.main import XStatic
+import scss.config
 
 import models
 from annotation import annotation
@@ -57,28 +58,9 @@ def create_app(config_file=None):
     app.config['SQLALCHEMY_DATABASE_URI'] = translate_db_uri(app, db_uri)
     models.db.init_app(app)
 
-    # flask-assets
-    assets = Environment(app)
-    coffee = Bundle(
-        'coffee/view.coffee',
-        'coffee/selection.coffee',
-        'coffee/annotation.coffee',
-        'coffee/page.coffee',
-        'coffee/form.coffee',
-        'coffee/listview.coffee',
-        'coffee/audioplayer.coffee',
-        'coffee/rest.coffee',
-        'coffee/flash.coffee',
-        filters='coffeescript',
-        output='gen/app.js'
-        )
-    assets.register('coffee_app', coffee)
-
-    scss = Bundle('scss/view.scss', filters='pyscss', output='gen/app.css')
-    assets.register('scss_all', scss)
-
     # XStatic
     mod_names = [
+        'bootstrap_scss',
         'jquery',
     ]
     pkg = __import__('xstatic.pkg', fromlist=mod_names)
@@ -96,6 +78,36 @@ def create_app(config_file=None):
     def xstatic(xs_package, filename):
         base_dir = serve_files[xs_package]
         return send_from_directory(base_dir, filename)
+
+    # flask-assets
+    assets = Environment(app)
+    coffee = Bundle(
+        'coffee/view.coffee',
+        'coffee/selection.coffee',
+        'coffee/annotation.coffee',
+        'coffee/page.coffee',
+        'coffee/form.coffee',
+        'coffee/listview.coffee',
+        'coffee/audioplayer.coffee',
+        'coffee/rest.coffee',
+        'coffee/flash.coffee',
+        filters='coffeescript',
+        output='gen/app.js'
+        )
+    assets.register('coffee_app', coffee)
+
+    scss.config.LOAD_PATHS = [
+        os.path.join(serve_files['bootstrap_scss'], 'scss'),
+    ]
+
+    scss_bundle = Bundle(
+        'scss/bootstrap_custom.scss',
+        'scss/view.scss',
+        depends='**/*.scss',
+        filters='pyscss',
+        output='gen/app.css'
+        )
+    assets.register('scss_all', scss_bundle)
 
     # flask-migrate
     migrate = Migrate(app, models.db)
