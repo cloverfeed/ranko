@@ -8,19 +8,19 @@
     position: relative;
     overflow: visible;
     border: 1px solid #000000;
-}
 
-.docPage > canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-}
+    & > canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
 
-.docPage > img {
-    position: absolute;
-    z-index: -1;
-    top: 0;
-    left: 0;
+    & > img {
+        position: absolute;
+        z-index: -1;
+        top: 0;
+        left: 0;
+    }
 }
 
 /* This stuff is important! Otherwise when you select the text, the text in the divs will show up! */
@@ -36,14 +36,14 @@
     color: #000;
     font-family: sans-serif;
     overflow: hidden;
-}
 
-.textLayer > div {
-    color: transparent;
-    position: absolute;
-    line-height: 1;
-    white-space: pre;
-    cursor: text;
+    & > div {
+        color: transparent;
+        position: absolute;
+        line-height: 1;
+        white-space: pre;
+        cursor: text;
+    }
 }
 
 #exitfullscreen {
@@ -54,10 +54,6 @@
     border: 2px dotted orange;
     display: none;
     position: absolute;
-}
-
-.annotation {
-    position: absolute !important; /* important is needed for http://bugs.jqueryui.com/ticket/6939 */
 }
 
 .annotation-open {

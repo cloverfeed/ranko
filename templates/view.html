@@ -12,7 +12,7 @@
 
 <div id="docview" class="col-md-9"></div>
 
-<div class="col-md-3">
+<div class="col-md-1 col-md-offset-1">
 <div id="exitfullscreen">
     <div class="list-group">
         <a id="fullscreen_button_exit" href="#" class="list-group-item">
@@ -23,30 +23,30 @@
 </div>
 <div id="subnav" data-spy="affix">
 
-    <div class="list-group">
-        <a id="fullscreen_button" href="#" class="list-group-item">
+    <div class="btn-group-vertical" role="group">
+        <button id="fullscreen_button" class="btn btn-default" style="text-align: left">
             {{ glyphicon('fullscreen') }}
             Full screen
-        </a>
-        <a href="{{url_for('.view_list', id=doc.id)}}" class="list-group-item">
+        </button>
+        <a href="{{url_for('.view_list', id=doc.id)}}" class="btn btn-default" style="text-align: left">
             {{ glyphicon('list') }}
             List mode
         </a>
 {% if can_edit %}
-        <a href="{{url_for('document.edit', id=doc.id)}}" class="list-group-item">
+        <a href="{{url_for('document.edit', id=doc.id)}}" class="btn btn-default" style="text-align: left">
             {{ glyphicon('pencil') }}
             Edit
         </a>
-        <a href="#" class="list-group-item" id="share_link">
+        <button id="share_link" class="btn btn-default" style="text-align: left">
             {{ glyphicon('share') }}
             Generate a review link
-        </a>
+        </button>
 {% endif %}
-
     </div>
+
     <h3>{{ glyphicon('eye-open') }} View</h3>
 
-    <div class="btn-group">
+    <div class="btn-group-vertical">
         <button class="view-states-btn btn btn-default" data-view="nothing">Nothing</button>
         <button class="view-states-btn btn btn-default" data-view="only-open">Only open</button>
         <button class="view-states-btn btn btn-default" data-view="everything">Everything</button>

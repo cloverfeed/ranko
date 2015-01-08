@@ -1,7 +1,9 @@
 import os
 
+import scss.config
 from flask import Flask
 from flask import g
+from flask import send_from_directory
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib.sqla import ModelView
 from flask.ext.assets import Bundle
@@ -10,11 +12,19 @@ from flask.ext.login import current_user
 from flask.ext.migrate import Migrate
 from flask.ext.migrate import MigrateCommand
 from flask.ext.uploads import configure_uploads
+from xstatic.main import XStatic
 
 import models
+from annotation import annotation
+from audio_annotation import audioann
+from auth import auth
 from auth import lm
+from comment import comment
+from document import document
 from key import get_secret_key
 from uploads import documents
+from views import bp
+from views import page_not_found
 
 
 def translate_db_uri(app, db_uri):
@@ -48,6 +58,27 @@ def create_app(config_file=None):
     app.config['SQLALCHEMY_DATABASE_URI'] = translate_db_uri(app, db_uri)
     models.db.init_app(app)
 
+    # XStatic
+    mod_names = [
+        'bootstrap_scss',
+        'jquery',
+    ]
+    pkg = __import__('xstatic.pkg', fromlist=mod_names)
+    serve_files = {}
+    for mod_name in mod_names:
+        mod = getattr(pkg, mod_name)
+        xs = XStatic(mod,
+                     root_url='/xstatic',
+                     provider='local',
+                     protocol='http',
+                     )
+        serve_files[xs.name] = xs.base_dir
+
+    @app.route('/xstatic/<xs_package>/<path:filename>')
+    def xstatic(xs_package, filename):
+        base_dir = serve_files[xs_package]
+        return send_from_directory(base_dir, filename)
+
     # flask-assets
     assets = Environment(app)
     coffee = Bundle(
@@ -64,6 +95,21 @@ def create_app(config_file=None):
         output='gen/app.js'
         )
     assets.register('coffee_app', coffee)
+
+    scss.config.LOAD_PATHS = [
+        os.path.join(serve_files['bootstrap_scss'], 'scss'),
+        os.path.join(this_dir, '../static/vendor/bootswatch-darkly'),
+    ]
+
+    scss_bundle = Bundle(
+        'scss/bootstrap_custom.scss',
+        'scss/view.scss',
+        'scss/shame.scss',
+        depends='**/*.scss',
+        filters='pyscss',
+        output='gen/app.css'
+        )
+    assets.register('scss_all', scss_bundle)
 
     # flask-migrate
     migrate = Migrate(app, models.db)
@@ -97,20 +143,16 @@ def create_app(config_file=None):
     for model in admin_models:
         admin.add_view(RestrictedModelView(model, models.db.session))
 
-    from views import bp
-    app.register_blueprint(bp)
-    from document import document
-    app.register_blueprint(document)
-    from comment import comment
-    app.register_blueprint(comment)
-    from annotation import annotation
-    app.register_blueprint(annotation)
-    from auth import auth
-    app.register_blueprint(auth)
-    from audio_annotation import audioann
-    app.register_blueprint(audioann)
-
-    from views import page_not_found
+    blueprints = [
+        bp,
+        document,
+        comment,
+        annotation,
+        auth,
+        audioann,
+        ]
+    for blueprint in blueprints:
+        app.register_blueprint(blueprint)
 
     @app.errorhandler(404)
     def handle_404(self):
