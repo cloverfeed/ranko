@@ -65,6 +65,9 @@ def create_app(config_file=None):
         )
     assets.register('coffee_app', coffee)
 
+    scss = Bundle('scss/view.scss', filters='pyscss', output='gen/app.css')
+    assets.register('scss_all', scss)
+
     # flask-migrate
     migrate = Migrate(app, models.db)
 
