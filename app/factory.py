@@ -1,5 +1,6 @@
 import os
 
+import scss.config
 from flask import Flask
 from flask import g
 from flask import send_from_directory
@@ -12,7 +13,6 @@ from flask.ext.migrate import Migrate
 from flask.ext.migrate import MigrateCommand
 from flask.ext.uploads import configure_uploads
 from xstatic.main import XStatic
-import scss.config
 
 import models
 from annotation import annotation
@@ -98,6 +98,7 @@ def create_app(config_file=None):
 
     scss.config.LOAD_PATHS = [
         os.path.join(serve_files['bootstrap_scss'], 'scss'),
+        os.path.join(this_dir, '../static/vendor/bootswatch-darkly'),
     ]
 
     scss_bundle = Bundle(

@@ -1,4 +1,5 @@
 // Core variables and mixins
+@import "darkly_variables";
 @import "bootstrap/variables";
 
 @import "bootstrap_variables_override";
@@ -51,3 +52,5 @@
 // Utility classes
 @import "bootstrap/utilities";
 @import "bootstrap/responsive-utilities";
+
+@import "darkly_bootswatch";
