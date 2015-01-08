@@ -2,6 +2,7 @@ import os
 
 from flask import Flask
 from flask import g
+from flask import send_from_directory
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib.sqla import ModelView
 from flask.ext.assets import Bundle
@@ -10,6 +11,7 @@ from flask.ext.login import current_user
 from flask.ext.migrate import Migrate
 from flask.ext.migrate import MigrateCommand
 from flask.ext.uploads import configure_uploads
+from xstatic.main import XStatic
 
 import models
 from annotation import annotation
@@ -74,6 +76,26 @@ def create_app(config_file=None):
 
     scss = Bundle('scss/view.scss', filters='pyscss', output='gen/app.css')
     assets.register('scss_all', scss)
+
+    # XStatic
+    mod_names = [
+        'jquery',
+    ]
+    pkg = __import__('xstatic.pkg', fromlist=mod_names)
+    serve_files = {}
+    for mod_name in mod_names:
+        mod = getattr(pkg, mod_name)
+        xs = XStatic(mod,
+                     root_url='/xstatic',
+                     provider='local',
+                     protocol='http',
+                     )
+        serve_files[xs.name] = xs.base_dir
+
+    @app.route('/xstatic/<xs_package>/<path:filename>')
+    def xstatic(xs_package, filename):
+        base_dir = serve_files[xs_package]
+        return send_from_directory(base_dir, filename)
 
     # flask-migrate
     migrate = Migrate(app, models.db)
