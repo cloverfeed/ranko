@@ -34,31 +34,34 @@ def translate_db_uri(app, db_uri):
     return db_uri
 
 
-def create_app(config_file=None):
-
-    this_dir = os.path.dirname(os.path.abspath(__file__))
-    instance_path = os.path.join(this_dir, '..', 'instance')
-
-    app = Flask('Review', instance_path=instance_path)
-
-    app.config.from_pyfile(os.path.join(this_dir, '..', 'conf/common.py'))
-
-    if config_file:
-        app.config.from_pyfile(config_file)
-
-    # CSRF & WTForms
+def configure_secret_key(app):
+    """
+    For CSRF & WTForms.
+    """
     key_file = os.path.join(app.instance_path, 'secret.key')
     app.config['SECRET_KEY'] = get_secret_key(key_file)
 
-    # flask-uploads
+
+def configure_ext_uploads(app):
+    """
+    Configure the flask-uploads extension.
+    """
     configure_uploads(app, [documents])
 
-    # flask-sqlalchemy
+
+def configure_ext_sqlalchemy(app):
+    """
+    Configure the flask-sqlalchemy extension.
+    """
     db_uri = app.config.get('SQLALCHEMY_DATABASE_URI')
     app.config['SQLALCHEMY_DATABASE_URI'] = translate_db_uri(app, db_uri)
     models.db.init_app(app)
 
-    # XStatic
+
+def configure_xstatic(app):
+    """
+    Configure XStatic assets.
+    """
     mod_names = [
         'bootstrap_scss',
         'jquery',
@@ -79,7 +82,13 @@ def create_app(config_file=None):
         base_dir = serve_files[xs_package]
         return send_from_directory(base_dir, filename)
 
-    # flask-assets
+    return serve_files
+
+
+def configure_ext_assets(app, serve_files):
+    """
+    Configure the flask-assets extension.
+    """
     assets = Environment(app)
     coffee = Bundle(
         'coffee/view.coffee',
@@ -96,11 +105,6 @@ def create_app(config_file=None):
         )
     assets.register('coffee_app', coffee)
 
-    scss.config.LOAD_PATHS = [
-        os.path.join(serve_files['bootstrap_scss'], 'scss'),
-        os.path.join(this_dir, '../static/vendor/bootswatch-darkly'),
-    ]
-
     scss_bundle = Bundle(
         'scss/bootstrap_custom.scss',
         'scss/view.scss',
@@ -111,10 +115,24 @@ def create_app(config_file=None):
         )
     assets.register('scss_all', scss_bundle)
 
-    # flask-migrate
+    this_dir = os.path.dirname(os.path.abspath(__file__))
+    scss.config.LOAD_PATHS = [
+        os.path.join(serve_files['bootstrap_scss'], 'scss'),
+        os.path.join(this_dir, '../static/vendor/bootswatch-darkly'),
+    ]
+
+
+def configure_ext_migrate(app):
+    """
+    Configure the flask-migrate extension.
+    """
     migrate = Migrate(app, models.db)
 
-    # auth
+
+def configure_ext_login(app):
+    """
+    Configure the flask-login extension.
+    """
     lm.init_app(app)
 
     @lm.user_loader
@@ -128,7 +146,11 @@ def create_app(config_file=None):
     def set_g_user():
         g.user = current_user
 
-    # flask-admin
+
+def configure_ext_admin(app):
+    """
+    Configure the flask-admin extension.
+    """
     admin = Admin(app, name=app.name + ' Admin')
     admin_models = [models.User,
                     models.Document,
@@ -143,6 +165,8 @@ def create_app(config_file=None):
     for model in admin_models:
         admin.add_view(RestrictedModelView(model, models.db.session))
 
+
+def register_blueprints(app):
     blueprints = [
         bp,
         document,
@@ -153,6 +177,28 @@ def create_app(config_file=None):
         ]
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
+
+
+def create_app(config_file=None):
+    this_dir = os.path.dirname(os.path.abspath(__file__))
+    instance_path = os.path.join(this_dir, '..', 'instance')
+
+    app = Flask('Review', instance_path=instance_path)
+    app.config.from_pyfile(os.path.join(this_dir, '..', 'conf/common.py'))
+
+    if config_file:
+        app.config.from_pyfile(config_file)
+
+    configure_secret_key(app)
+    configure_ext_uploads(app)
+    configure_ext_sqlalchemy(app)
+    serve_files = configure_xstatic(app)
+    configure_ext_assets(app, serve_files)
+    configure_ext_migrate(app)
+    configure_ext_login(app)
+    configure_ext_admin(app)
+
+    register_blueprints(app)
 
     @app.errorhandler(404)
     def handle_404(self):
