@@ -15,6 +15,7 @@
     dbname: ranko
     dbuser: ranko
     app_config_file: conf/production.py
+    secret_environment: ""
 
   roles:
     - role: appserver
