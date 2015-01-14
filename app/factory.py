@@ -3,6 +3,7 @@ import os
 import scss.config
 from flask import Flask
 from flask import g
+from flask import render_template
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib.sqla import ModelView
 from flask.ext.assets import Bundle
@@ -22,6 +23,7 @@ from document import document
 from ext_xstatic import FlaskXStatic
 from key import get_secret_key
 from uploads import documents
+from vendor.slack_log_handler import SlackLogHandler
 from views import bp
 from views import page_not_found
 
@@ -39,6 +41,17 @@ def configure_secret_key(app):
     """
     key_file = os.path.join(app.instance_path, 'secret.key')
     app.config['SECRET_KEY'] = get_secret_key(key_file)
+
+
+def configure_logging(app):
+    if app.config.get('SLACK_API_TOKEN') is not None:
+        slack_handler = SlackLogHandler(app.config['SLACK_API_TOKEN'],
+                                        app.config['SLACK_CHANNEL'],
+                                        username=app.config['SLACK_USERNAME'],
+                                        icon_url=app.config['SLACK_ICON_URL'],
+                                        stack_trace=True,
+                                        )
+        app.logger.addHandler(slack_handler)
 
 
 def configure_ext_uploads(app):
@@ -176,6 +189,7 @@ def create_app(config_file=None):
         app.config.from_pyfile(config_file)
 
     configure_secret_key(app)
+    configure_logging(app)
     configure_ext_uploads(app)
     configure_ext_sqlalchemy(app)
     xstatic = configure_xstatic(app)
@@ -189,5 +203,12 @@ def create_app(config_file=None):
     @app.errorhandler(404)
     def handle_404(self):
         return page_not_found()
+
+    @app.errorhandler(Exception)
+    def handle_exception(exn):
+        if app.config.get('LOG_EXCEPTIONS') is None:
+            raise
+        app.logger.exception(exn)
+        return (render_template('502.html'), 502)
 
     return app

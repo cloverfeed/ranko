@@ -1,6 +1,6 @@
 # ⠋ Ranko ⣠ [![Build Status](https://img.shields.io/travis/cloverfeed/ranko.svg)](http://travis-ci.org/cloverfeed/ranko) [![Coverage Status](https://img.shields.io/coveralls/cloverfeed/ranko.svg)](https://coveralls.io/r/cloverfeed/ranko) [![Dependency Status](https://img.shields.io/gemnasium/cloverfeed/ranko.svg)](https://gemnasium.com/cloverfeed/ranko)
 
-![Ranko](http://us.tintin.com/wp-content/uploads/2011/09/characters-ranko-the-gorilla-sm.jpg)
+![Ranko](https://i.imgur.com/QxAyIvW.jpg)
 
 A tool to upload and review documents.
 
