@@ -22,10 +22,10 @@ from comment import comment
 from document import document
 from ext_xstatic import FlaskXStatic
 from key import get_secret_key
+from slack_log_handler import SlackLogHandler
 from uploads import documents
 from views import bp
 from views import page_not_found
-from slack_log_handler import SlackLogHandler
 
 
 def translate_db_uri(app, db_uri):
@@ -206,7 +206,7 @@ def create_app(config_file=None):
 
     @app.errorhandler(Exception)
     def handle_exception(exn):
-        if app.debug:
+        if app.config.get('LOG_EXCEPTIONS') is None:
             raise
         app.logger.exception(exn)
         return (render_template('502.html'), 502)

@@ -11,3 +11,12 @@ class ErrorPagesTestCase(RankoTestCase):
         #  exposed endpoint that is used by nginx.
         r = self.client.get('/502')
         self.assertIn('Sorry for the inconvenience', r.data)
+
+    def test_exception_logged(self):
+        self.app.config['LOG_EXCEPTIONS'] = True
+        r = self.client.get('/exception')
+        self.assertEqual(r.status_code, 502)
+
+    def test_exception_raised(self):
+        with self.assertRaises(Exception):
+            self.client.get('/exception')
