@@ -22,8 +22,8 @@ from comment import comment
 from document import document
 from ext_xstatic import FlaskXStatic
 from key import get_secret_key
-from slack_log_handler import SlackLogHandler
 from uploads import documents
+from vendor.slack_log_handler import SlackLogHandler
 from views import bp
 from views import page_not_found
 
