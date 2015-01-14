@@ -68,6 +68,16 @@
   notify:
     - restart nginx
 
+- name: create SSL directory
+  action: file dest=/etc/nginx/ssl state=directory
+
+- name: create self-signed SSL cert
+  action: command openssl req -new -nodes -x509 -subj /C=FR/S=Ile-de-France/L=Paris/OU=IT/O=Cloverfeed/CN={{server_name}} -days 730 -keyout /etc/nginx/ssl/{{app_name}}.key -out /etc/nginx/ssl/{{app_name}}.crt -extensions v3_ca
+  args:
+      creates: /etc/nginx/ssl/{{app_name}}.crt
+  notify:
+    - restart nginx
+
 - name: link nginx config
   action: file
   args:

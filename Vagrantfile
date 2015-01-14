@@ -10,4 +10,5 @@ Vagrant.configure("2") do |config|
         ansible.tags = "provision"
     end
     config.vm.network "forwarded_port", guest: 80, host: 8080
+    config.vm.network "forwarded_port", guest: 443, host: 4343
 end
