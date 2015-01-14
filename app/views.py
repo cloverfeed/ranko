@@ -44,3 +44,8 @@ def page_not_found():
 @bp.route('/502')
 def internal_server_error():
     return (render_template('502.html'), 502)
+
+
+@bp.route('/exception')
+def trigger_exception():
+    raise Exception()
