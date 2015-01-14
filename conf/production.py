@@ -1,3 +1,5 @@
+import os
+
 SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://ranko:@/ranko'
 SLACK_API_TOKEN = os.getenv('SLACK_API_TOKEN')
 SLACK_CHANNEL = '#general'
