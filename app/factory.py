@@ -44,7 +44,7 @@ def configure_secret_key(app):
 
 
 def configure_logging(app):
-    if 'SLACK_API_TOKEN' in app.config:
+    if app.config.get('SLACK_API_TOKEN') is not None:
         slack_handler = SlackLogHandler(app.config['SLACK_API_TOKEN'],
                                         app.config['SLACK_CHANNEL'],
                                         username=app.config['SLACK_USERNAME'],
