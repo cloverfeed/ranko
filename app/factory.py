@@ -3,7 +3,6 @@ import os
 import scss.config
 from flask import Flask
 from flask import g
-from flask import send_from_directory
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib.sqla import ModelView
 from flask.ext.assets import Bundle
@@ -12,7 +11,6 @@ from flask.ext.login import current_user
 from flask.ext.migrate import Migrate
 from flask.ext.migrate import MigrateCommand
 from flask.ext.uploads import configure_uploads
-from xstatic.main import XStatic
 
 import models
 from annotation import annotation
@@ -21,6 +19,7 @@ from auth import auth
 from auth import lm
 from comment import comment
 from document import document
+from ext_xstatic import FlaskXStatic
 from key import get_secret_key
 from uploads import documents
 from views import bp
@@ -62,30 +61,17 @@ def configure_xstatic(app):
     """
     Configure XStatic assets.
     """
-    mod_names = [
+    modules = [
         'bootstrap_scss',
         'jquery',
     ]
-    pkg = __import__('xstatic.pkg', fromlist=mod_names)
-    serve_files = {}
-    for mod_name in mod_names:
-        mod = getattr(pkg, mod_name)
-        xs = XStatic(mod,
-                     root_url='/xstatic',
-                     provider='local',
-                     protocol='http',
-                     )
-        serve_files[xs.name] = xs.base_dir
-
-    @app.route('/xstatic/<xs_package>/<path:filename>')
-    def xstatic(xs_package, filename):
-        base_dir = serve_files[xs_package]
-        return send_from_directory(base_dir, filename)
-
-    return serve_files
+    xstatic = FlaskXStatic(app)
+    for module in modules:
+        xstatic.add_module(module)
+    return xstatic
 
 
-def configure_ext_assets(app, serve_files):
+def configure_ext_assets(app, xstatic):
     """
     Configure the flask-assets extension.
     """
@@ -117,7 +103,7 @@ def configure_ext_assets(app, serve_files):
 
     this_dir = os.path.dirname(os.path.abspath(__file__))
     scss.config.LOAD_PATHS = [
-        os.path.join(serve_files['bootstrap_scss'], 'scss'),
+        os.path.join(xstatic.path_for('bootstrap_scss'), 'scss'),
         os.path.join(this_dir, '../static/vendor/bootswatch-darkly'),
     ]
 
@@ -192,8 +178,8 @@ def create_app(config_file=None):
     configure_secret_key(app)
     configure_ext_uploads(app)
     configure_ext_sqlalchemy(app)
-    serve_files = configure_xstatic(app)
-    configure_ext_assets(app, serve_files)
+    xstatic = configure_xstatic(app)
+    configure_ext_assets(app, xstatic)
     configure_ext_migrate(app)
     configure_ext_login(app)
     configure_ext_admin(app)
