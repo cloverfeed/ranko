@@ -1,7 +1,8 @@
+{% from 'macros.html' import annotation_state %}
 {% from 'macros.html' import glyphicon %}
 {% from 'macros.html' import js_bool %}
-{% from 'macros.html' import upload_form %}
 {% from 'macros.html' import render_share_form %}
+{% from 'macros.html' import upload_form %}
 {% extends "base.html" %}
 {% block title %}Document{% endblock %}
 {% block content %}
@@ -11,6 +12,26 @@
 {% endif %}
 
 <div id="docview" class="col-md-9"></div>
+<div id="listview" class="col-md-9">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Page</th>
+                <th>Text</th>
+                <th>Done?</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ann in annotations %}
+            <tr>
+                <td>{{ann.page}}</td>
+                <td>{{ann.text}}</td>
+                <td>{{annotation_state(ann)}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 <div class="col-md-1 col-md-offset-1">
 <div id="exitfullscreen">
@@ -28,10 +49,14 @@
             {{ glyphicon('fullscreen') }}
             Full screen
         </button>
-        <a href="{{url_for('.view_list', id=doc.id)}}" class="btn btn-default" style="text-align: left">
+        <button id="listmode_button" class="btn btn-default" style="text-align: left">
             {{ glyphicon('list') }}
             List mode
-        </a>
+        </button>
+        <button id="docmode_button" class="btn btn-default" style="text-align: left">
+            {{ glyphicon('file') }}
+            Document mode
+        </button>
 {% if can_edit %}
         <a href="{{url_for('document.edit', id=doc.id)}}" class="btn btn-default" style="text-align: left">
             {{ glyphicon('pencil') }}

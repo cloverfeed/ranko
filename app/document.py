@@ -108,25 +108,6 @@ def raw(id):
     return send_from_directory(documents_dir(current_app), doc.filename)
 
 
-@document.route('/view/<id>/list')
-def view_list(id):
-    """
-    View the set of annotations on a document.
-    """
-    id = kore_id(id)
-    doc = Document.query.get_or_404(id)
-    if doc.filetype == 'pdf' or doc.filetype == 'image':
-        annotations = Annotation.query.filter_by(doc=id)
-        template = 'list.html'
-    elif doc.filetype == 'audio':
-        annotations = AudioAnnotation.query.filter_by(doc_id=id)
-        template = 'list_audio.html'
-    return render_template(template,
-                           doc=doc,
-                           annotations=annotations,
-                           )
-
-
 @document.route('/view/<id>/revisions')
 def view_revisions(id):
     """

@@ -84,6 +84,14 @@ view_init_common = (docid) ->
         $li = $('<li>').text(comm)
         $('#comments').append $li
 
+  list_view_init('/annotation/')
+  $('#listview').hide()
+  $('#docmode_button').hide()
+  $('#listmode_button').click (e) ->
+    list_mode()
+  $('#docmode_button').click (e) ->
+    doc_mode()
+
   $('#fullscreen_button').click (e) ->
     e.preventDefault()
     $('#subnav').hide()
@@ -105,3 +113,15 @@ view_init_common = (docid) ->
       when 'nothing'
         $('.annotation-open').hide()
         $('.annotation-closed').hide()
+
+list_mode = ->
+  $('#docview').hide()
+  $('#listview').show()
+  $('#listmode_button').hide()
+  $('#docmode_button').show()
+
+doc_mode = ->
+  $('#docview').show()
+  $('#listview').hide()
+  $('#docmode_button').hide()
+  $('#listmode_button').show()

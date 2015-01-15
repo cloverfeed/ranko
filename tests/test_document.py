@@ -363,6 +363,7 @@ class DocTestCase(RankoTestCase):
                              )
         return r.status_code == 200
 
+
     def test_view_list(self):
         self._login('a', 'a', signup=True)
         docid = self._new_upload_id('x.pdf')
@@ -376,9 +377,10 @@ class DocTestCase(RankoTestCase):
                 }
         r = self._annotate(data)
         self.assert200(r)
-        r = self.client.get(url_for('document.view_list', id=docid))
+        r = self.client.get(url_for('document.view', id=docid))
         self.assert200(r)
         self.assertIn('My annotation', r.data)
+
 
     def test_upload_image(self):
         self._login('a', 'a', signup=True)
