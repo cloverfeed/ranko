@@ -38,6 +38,7 @@ def main():
     elif where == 'prod':
         cmd = ['ansible-playbook',
                '-i', 'devops/hosts',
+               '--vault-password-file', '.vault-password',
                ]
         cmd += provision_args
         cmd += ['devops/site.yml',
