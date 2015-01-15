@@ -68,8 +68,6 @@ class ViewPage
           $('.annotation-closed').hide()
 
   init_list_view: ->
-    list_view_init @get_annotations_route
-
     $('#listview').hide()
     $('#listaudioview').hide()
     $('#docmode_button').hide()
@@ -109,6 +107,7 @@ class PdfViewPage extends ViewPage
       page: page
       annotations: annotations
       readOnly: @readOnly
+      $table: $('#listview tbody')
     @$pv.append pp.$div
 
     if (i + 1 <= pdf.numPages)
@@ -148,6 +147,7 @@ class AudioViewPage extends ViewPage
     $pv = $('#docview')
     audioPlayer = new AudioPlayer @docid,
       readOnly: @readOnly
+      $table: $('#listaudioview tbody')
     $pv.append audioPlayer.$div
 
   get_annotations_route: '/audioannotation/'

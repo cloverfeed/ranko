@@ -1,4 +1,5 @@
 class Page
+  # params.$table is the tbody in list view
   constructor: (@docid, @i, params) ->
     annotations = params.annotations or []
     if params.page?
@@ -34,6 +35,7 @@ class Page
         height: height + "px"
         width: width + "px"
     @$div.append @$textLayerDiv
+    @$table = params.$table
 
     if !@readOnly
       selection = new Selection @$textLayerDiv, (geom) =>
@@ -48,4 +50,23 @@ class Page
   addAnnotation: (text, id, geom, state) ->
     ann = new Annotation @$textLayerDiv, @docid, @i, text,
                          id, geom, state, @readOnly
+    $row = $('<tr>')
+    $row.append($('<td>').text(@i))
+    $row.append($('<td>').text(text))
+
+    annotation_state = (st) ->
+      st == 'closed'
+
+    $checkbox = $ '<input>',
+      type: 'checkbox'
+    $checkbox.prop 'checked', annotation_state(state)
+
+    $checkbox.click ->
+      state = if @checked then 'closed' else 'open'
+      ann.state = state
+      ann.update()
+      ann.submitChanges()
+
+    $row.append($('<td>').append($checkbox))
+    @$table.append $row
     @$div.append ann.$div

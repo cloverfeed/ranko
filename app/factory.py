@@ -95,7 +95,6 @@ def configure_ext_assets(app, xstatic):
         'coffee/annotation.coffee',
         'coffee/page.coffee',
         'coffee/form.coffee',
-        'coffee/listview.coffee',
         'coffee/audioplayer.coffee',
         'coffee/rest.coffee',
         'coffee/flash.coffee',
