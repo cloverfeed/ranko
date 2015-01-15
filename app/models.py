@@ -180,9 +180,7 @@ class Document(db.Model):
         return Document.query.filter_by(user_id=uid)
 
     def title_or_id(self):
-        if self.title is None:
-            return koremutake.encode(self.id)
-        return self.title
+        return self.title or koremutake.encode(self.id)
 
     def icon_class_filetype(self):
         if self.filetype == 'pdf':
