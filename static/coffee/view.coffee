@@ -16,7 +16,7 @@ view_init = (docid, filetype, readOnly) ->
   p.init()
 
 class ViewPage
-  constructor: (@docid, @filetype, readOnly) ->
+  constructor: (@docid, @filetype, @readOnly) ->
 
   init: ->
     form_init '#upload_dialog', '#upload_link'
@@ -68,29 +68,19 @@ class ViewPage
           $('.annotation-closed').hide()
 
   init_list_view: ->
-    switch @filetype
-      when "pdf", "image"
-        list_view_init('/annotation/')
-      when "audio"
-        list_view_init('/audioannotation/')
-
-    listview = switch @filetype
-      when "pdf", "image"
-        '#listview'
-      when "audio"
-        '#listaudioview'
+    list_view_init @get_annotations_route
 
     $('#listview').hide()
     $('#listaudioview').hide()
     $('#docmode_button').hide()
     $('#listmode_button').click (e) =>
-      @list_mode listview
+      @list_mode
     $('#docmode_button').click (e) =>
       @doc_mode()
 
-  list_mode: (listview) ->
+  list_mode: ->
     $('#docview').hide()
-    $(listview).show()
+    $(@list_view_selector).show()
     $('#listmode_button').hide()
     $('#docmode_button').show()
 
@@ -125,6 +115,9 @@ class PdfViewPage extends ViewPage
       pdf.getPage(i + 1).then (page) =>
         @render_page pdf, i + 1, page, annotations
 
+  get_annotations_route: '/annotation/'
+  list_view_selector: '#listview'
+
 
 class ImageViewPage extends ViewPage
   init: ->
@@ -145,6 +138,9 @@ class ImageViewPage extends ViewPage
         $pv.append page.$div
     $img.attr('src', '/raw/' + @docid)
 
+  get_annotations_route: '/annotation/'
+  list_view_selector: '#listview'
+
 
 class AudioViewPage extends ViewPage
   init: ->
@@ -153,3 +149,6 @@ class AudioViewPage extends ViewPage
     audioPlayer = new AudioPlayer @docid,
       readOnly: @readOnly
     $pv.append audioPlayer.$div
+
+  get_annotations_route: '/audioannotation/'
+  list_view_selector: '#listaudioview'
