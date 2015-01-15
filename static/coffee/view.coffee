@@ -24,7 +24,7 @@ view_init = (docid, filetype, readOnly) ->
       view_init_image docid, readOnly
     when "audio"
       view_init_audio docid, readOnly
-  view_init_common docid
+  view_init_common docid, filetype
 
 view_init_audio = (docid, readOnly) ->
   $pv = $('#docview')
@@ -59,7 +59,7 @@ view_init_pdf = (docid, readOnly) ->
   .then null, ->
     $pv.text "Error loading the document."
 
-view_init_common = (docid) ->
+view_init_common = (docid, filetype) ->
   form_init '#upload_dialog', '#upload_link'
   form_init '#share_dialog', '#share_link'
   $('#share_form').submit (e) ->
@@ -84,13 +84,7 @@ view_init_common = (docid) ->
         $li = $('<li>').text(comm)
         $('#comments').append $li
 
-  list_view_init('/annotation/')
-  $('#listview').hide()
-  $('#docmode_button').hide()
-  $('#listmode_button').click (e) ->
-    list_mode()
-  $('#docmode_button').click (e) ->
-    doc_mode()
+  init_list_view filetype
 
   $('#fullscreen_button').click (e) ->
     e.preventDefault()
@@ -114,14 +108,36 @@ view_init_common = (docid) ->
         $('.annotation-open').hide()
         $('.annotation-closed').hide()
 
-list_mode = ->
+init_list_view = (filetype) ->
+  switch filetype
+    when "pdf", "image"
+      list_view_init('/annotation/')
+    when "audio"
+      list_view_init('/audioannotation/')
+
+  listview = switch filetype
+    when "pdf", "image"
+      '#listview'
+    when "audio"
+      '#listaudioview'
+
+  $('#listview').hide()
+  $('#listaudioview').hide()
+  $('#docmode_button').hide()
+  $('#listmode_button').click (e) ->
+    list_mode listview
+  $('#docmode_button').click (e) ->
+    doc_mode()
+
+list_mode = (listview) ->
   $('#docview').hide()
-  $('#listview').show()
+  $(listview).show()
   $('#listmode_button').hide()
   $('#docmode_button').show()
 
 doc_mode = ->
   $('#docview').show()
   $('#listview').hide()
+  $('#listaudioview').hide()
   $('#docmode_button').hide()
   $('#listmode_button').show()

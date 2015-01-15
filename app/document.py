@@ -82,6 +82,7 @@ def view(id):
     form_share = ShareForm()
     comments = Comment.query.filter_by(doc=id)
     annotations = Annotation.query.filter_by(doc=id)
+    audioannotations = AudioAnnotation.query.filter_by(doc_id=id)
     readOnly = not current_user.is_authenticated()
     can_edit = doc.editable_by(current_user)
     return render_template('view.html',
@@ -91,6 +92,7 @@ def view(id):
                            form_share=form_share,
                            comments=comments,
                            annotations=annotations,
+                           audioannotations=audioannotations,
                            readOnly=readOnly,
                            can_edit=can_edit,
                            )

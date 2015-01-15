@@ -88,6 +88,6 @@ class AudioAnnotationTestCase(RankoTestCase):
                 }
         r = self._audio_annotate(data)
         self.assert200(r)
-        r = self.client.get(url_for('document.view_list', id=docid))
+        r = self.client.get(url_for('document.view', id=docid))
         self.assert200(r)
         self.assertIn('My annotation', r.data)

@@ -32,6 +32,26 @@
         </tbody>
     </table>
 </div>
+<div id="listaudioview" class="col-md-9">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Text</th>
+                <th>Done?</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ann in audioannotations %}
+            <tr>
+                <td>{{ann.start|round(1)}} s</td>
+                <td>{{ann.text}}</td>
+                <td>{{annotation_state(ann)}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 <div class="col-md-1 col-md-offset-1">
 <div id="exitfullscreen">
