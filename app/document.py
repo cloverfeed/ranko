@@ -26,7 +26,6 @@ from .models import Comment
 from .models import db
 from .models import Document
 from .models import Revision
-from .tasks import extract_title
 from .tools import kore_id
 from .uploads import documents
 from .uploads import documents_dir
@@ -55,9 +54,6 @@ def upload():
             flash('Unsupported file type')
             return redirect(url_for('bp.home'))
         title = form.title.data
-        if title == '':
-            full_path = Document.full_path_to(filename)
-            title = extract_title(full_path)
         doc = Document(filename, title=title)
         db.session.add(doc)
         db.session.commit()
@@ -85,7 +81,6 @@ def view(id):
     form_up = UploadForm()
     form_share = ShareForm()
     comments = Comment.query.filter_by(doc=id)
-    annotations = Annotation.query.filter_by(doc=id)
     readOnly = not current_user.is_authenticated()
     can_edit = doc.editable_by(current_user)
     return render_template('view.html',
@@ -94,7 +89,6 @@ def view(id):
                            form_up=form_up,
                            form_share=form_share,
                            comments=comments,
-                           annotations=annotations,
                            readOnly=readOnly,
                            can_edit=can_edit,
                            )
@@ -110,25 +104,6 @@ def raw(id):
     id = kore_id(id)
     doc = Document.query.get_or_404(id)
     return send_from_directory(documents_dir(current_app), doc.filename)
-
-
-@document.route('/view/<id>/list')
-def view_list(id):
-    """
-    View the set of annotations on a document.
-    """
-    id = kore_id(id)
-    doc = Document.query.get_or_404(id)
-    if doc.filetype == 'pdf' or doc.filetype == 'image':
-        annotations = Annotation.query.filter_by(doc=id)
-        template = 'list.html'
-    elif doc.filetype == 'audio':
-        annotations = AudioAnnotation.query.filter_by(doc_id=id)
-        template = 'list_audio.html'
-    return render_template(template,
-                           doc=doc,
-                           annotations=annotations,
-                           )
 
 
 @document.route('/view/<id>/revisions')

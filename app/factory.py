@@ -90,15 +90,7 @@ def configure_ext_assets(app, xstatic):
     """
     assets = Environment(app)
     coffee = Bundle(
-        'coffee/view.coffee',
-        'coffee/selection.coffee',
-        'coffee/annotation.coffee',
-        'coffee/page.coffee',
-        'coffee/form.coffee',
-        'coffee/listview.coffee',
-        'coffee/audioplayer.coffee',
-        'coffee/rest.coffee',
-        'coffee/flash.coffee',
+        'coffee/*.coffee',
         filters='coffeescript',
         output='gen/app.js'
         )

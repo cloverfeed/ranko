@@ -1,7 +1,7 @@
 class Annotation
   constructor: (@$tld, @docid, @page, @text, @id, @geom, @state, readOnly) ->
     @$div = jQuery('<div>').addClass 'annotation'
-    @$div = jQuery('<div>').addClass ('annotation-' + @state)
+    @addStateClass()
     setGeom @$div, @geom
 
     @rest = new RestClient '/annotation/',
@@ -35,6 +35,9 @@ class Annotation
         @updateGeom(ev, ui)
         @submitChanges()
 
+  addStateClass: ->
+    @$div.addClass ('annotation-' + @state)
+
   updateGeom: (e, ui) ->
     tldOffset = @$tld.offset()
     if e.type == 'dragstop'
@@ -43,6 +46,11 @@ class Annotation
     else if e.type == 'resizestop'
       @geom.width = ui.size.width
       @geom.height = ui.size.height
+
+  update: ->
+    @$div.removeClass 'annotation-open'
+    @$div.removeClass 'annotation-closed'
+    @addStateClass()
 
   submitChanges: ->
     @rest.post_or_put this,
@@ -53,3 +61,4 @@ class Annotation
       doc: @docid
       page: @page
       value: @text
+      state: @state

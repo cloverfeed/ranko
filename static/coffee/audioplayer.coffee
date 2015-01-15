@@ -1,9 +1,11 @@
 class AudioPlayer
+  # params.$table is the table in list view
   constructor: (@docid, params) ->
     @readOnly = false
     if params? and params.readOnly?
       @readOnly = params.readOnly
 
+    @$table = params.$table
     @$div = $ '<div>'
 
     url = '/raw/' + @docid
@@ -42,18 +44,40 @@ class AudioPlayer
     ann_url = '/view/' + docid + '/audioannotations'
     $.getJSON ann_url, (annotations) =>
       for ann in annotations.data
-        annotation = new AudioAnnotation this, ann.id, ann.start,
-                                         ann.length, ann.state,
-                                         ann.text, @readOnly
-        @$div.append annotation.$div
-        @annotations.push annotation
-        @update()
+        @addAudioAnnotation ann
 
     @audio.addEventListener 'timeupdate', @update, false
     @update()
 
     @$canvas.mousedown @mousedown
     @$canvas.mouseup @mouseup
+
+  addAudioAnnotation: (ann) ->
+    annotation = new AudioAnnotation this, ann.id, ann.start,
+                                     ann.length, ann.state,
+                                     ann.text, @readOnly
+    @$div.append annotation.$div
+
+    annotation_state = (st) ->
+      st == 'closed'
+
+    $checkbox = $ '<input>',
+      type: 'checkbox'
+    $checkbox.prop 'checked', annotation_state(ann.state)
+    $checkbox.click ->
+      state = if @checked then 'closed' else 'open'
+      annotation.state = state
+      annotation.update()
+      annotation.submitChanges()
+
+    $row = $('<tr>')
+    $row.append($('<td>').text(ann.start.toFixed(1)))
+    $row.append($('<td>').text(ann.text))
+    $row.append($('<td>').append($checkbox))
+    @$table.append $row
+
+    @annotations.push annotation
+    @update()
 
   annotationAt: (time) ->
     ok = (ann) ->
@@ -242,7 +266,7 @@ class AudioAnnotation
   constructor: (@player, @id, @start, @length, @state, @text, readOnly) ->
     @$div = $('<div>')
     @$div.addClass 'audioAnnotation'
-    @$div.addClass ('annotation-' + @state)
+    @addStateClass()
     x = @player.width + 50
     @$div.css
       height: 50
@@ -272,10 +296,16 @@ class AudioAnnotation
       ,
         onblur: 'submit'
 
+  addStateClass: ->
+    @$div.addClass ('annotation-' + @state)
+
   update: ->
     y = @player.secondsToPixels (@start + @length / 2)
     @$div.css
       top: y + "px"
+    @$div.removeClass 'annotation-open'
+    @$div.removeClass 'annotation-closed'
+    @addStateClass()
 
   submitChanges: ->
     @rest.post_or_put this,
@@ -283,3 +313,4 @@ class AudioAnnotation
       start: @start
       length: @length
       text: @text
+      state: @state

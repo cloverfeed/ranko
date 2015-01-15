@@ -12,6 +12,8 @@ from flask import current_app
 from flask.ext.login import current_user
 from flask.ext.sqlalchemy import SQLAlchemy
 
+from .tasks import extract_title_pdf
+
 """
 The main DB object. It gets initialized in create_app.
 """
@@ -124,6 +126,9 @@ class Document(db.Model):
         if current_user.is_authenticated():
             user_id = current_user.id
         self.user_id = user_id
+        if title == '' and self.filetype == 'pdf':
+            full_path = Document.full_path_to(filename)
+            title = extract_title_pdf(full_path)
         self.title = title
 
     def delete(self):
@@ -175,9 +180,7 @@ class Document(db.Model):
         return Document.query.filter_by(user_id=uid)
 
     def title_or_id(self):
-        if self.title is None:
-            return koremutake.encode(self.id)
-        return self.title
+        return self.title or koremutake.encode(self.id)
 
     def icon_class_filetype(self):
         if self.filetype == 'pdf':
@@ -301,9 +304,6 @@ class Annotation(db.Model):
                          text, user, state)
         return ann
 
-    def is_closed(self):
-        return self.state == Annotation.STATE_CLOSED
-
     @staticmethod
     def mine():
         assert(current_user.is_authenticated())
@@ -397,6 +397,3 @@ class AudioAnnotation(db.Model):
 
     def editable_by(self, user):
         return user.is_authenticated() and user.id == self.user_id
-
-    def is_closed(self):
-        return self.state == Annotation.STATE_CLOSED
