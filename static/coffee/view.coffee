@@ -74,7 +74,7 @@ class ViewPage
     $('#listaudioview').hide()
     $('#docmode_button').hide()
     $('#listmode_button').click (e) =>
-      @list_mode
+      @list_mode()
     $('#docmode_button').click (e) =>
       @doc_mode()
 
