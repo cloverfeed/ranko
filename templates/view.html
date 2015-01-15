@@ -1,4 +1,3 @@
-{% from 'macros.html' import annotation_state %}
 {% from 'macros.html' import glyphicon %}
 {% from 'macros.html' import js_bool %}
 {% from 'macros.html' import render_share_form %}
@@ -22,13 +21,6 @@
             </tr>
         </thead>
         <tbody>
-            {% for ann in annotations %}
-            <tr>
-                <td>{{ann.page}}</td>
-                <td>{{ann.text}}</td>
-                <td>{{annotation_state(ann)}}</td>
-            </tr>
-            {% endfor %}
         </tbody>
     </table>
 </div>
@@ -42,13 +34,6 @@
             </tr>
         </thead>
         <tbody>
-            {% for ann in audioannotations %}
-            <tr>
-                <td>{{ann.start|round(1)}} s</td>
-                <td>{{ann.text}}</td>
-                <td>{{annotation_state(ann)}}</td>
-            </tr>
-            {% endfor %}
         </tbody>
     </table>
 </div>

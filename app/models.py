@@ -304,9 +304,6 @@ class Annotation(db.Model):
                          text, user, state)
         return ann
 
-    def is_closed(self):
-        return self.state == Annotation.STATE_CLOSED
-
     @staticmethod
     def mine():
         assert(current_user.is_authenticated())
@@ -400,6 +397,3 @@ class AudioAnnotation(db.Model):
 
     def editable_by(self, user):
         return user.is_authenticated() and user.id == self.user_id
-
-    def is_closed(self):
-        return self.state == Annotation.STATE_CLOSED

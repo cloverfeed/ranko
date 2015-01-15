@@ -24,14 +24,6 @@ without having to register.
 </form>
 {% endmacro %}
 
-{% macro annotation_state(ann) %}
-<input class="ann-state-checkbox"
-       data-annid={{ann.id}}
-       type="checkbox"
-       {% if ann.is_closed() %} checked{% endif %}
-       >
-{% endmacro %}
-
 {% macro link_to_doc(doc) %}
 <a href="{{ url_for('document.view', id=doc.id) }}">{{ doc.title_or_id() }}</a>
 {% endmacro %}

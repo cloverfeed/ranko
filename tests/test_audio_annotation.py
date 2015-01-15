@@ -77,17 +77,3 @@ class AudioAnnotationTestCase(RankoTestCase):
     def _delete(self, annid):
         url = url_for('audioann.annotation_delete', id=annid)
         return self.client.delete(url)
-
-    def test_view_list_audio(self):
-        self._login('a', 'a', signup=True)
-        docid = self._new_upload_id('x.mp3')
-        data = {'doc': docid,
-                'start': 2,
-                'length': 3,
-                'text': 'My annotation',
-                }
-        r = self._audio_annotate(data)
-        self.assert200(r)
-        r = self.client.get(url_for('document.view', id=docid))
-        self.assert200(r)
-        self.assertIn('My annotation', r.data)
