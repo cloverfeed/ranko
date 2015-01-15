@@ -12,6 +12,8 @@ from flask import current_app
 from flask.ext.login import current_user
 from flask.ext.sqlalchemy import SQLAlchemy
 
+from .tasks import extract_title_pdf
+
 """
 The main DB object. It gets initialized in create_app.
 """
@@ -124,6 +126,9 @@ class Document(db.Model):
         if current_user.is_authenticated():
             user_id = current_user.id
         self.user_id = user_id
+        if title == '' and self.filetype == 'pdf':
+            full_path = Document.full_path_to(filename)
+            title = extract_title_pdf(full_path)
         self.title = title
 
     def delete(self):
