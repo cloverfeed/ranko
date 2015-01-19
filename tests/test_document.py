@@ -267,6 +267,10 @@ class DocTestCase(RankoTestCase):
         title = "Hypertext marks in LaTeX: a manual for hyperref"
         self.assertIn(title, r.data)
 
+    def test_signup_empty(self):
+        r = self._signup('', '')
+        self.assertIn('This field is required', r.data)
+
     def test_signup_twice(self):
         self._signup('a', 'b')
         r = self._signup('a', 'c')
