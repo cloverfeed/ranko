@@ -56,19 +56,18 @@ def signup():
     Sign up a new user
     """
     form = SignupForm()
-    try:
-        if form.validate_on_submit():
-            username = form.username.data
-            password = form.password.data
-            user = User(username, password)
-            db.session.add(user)
-            db.session.commit()
-            flash('User successfully created')
-            login_user(user)
-            return redirect(url_for('bp.home'))
-    except IntegrityError:
-        db.session.rollback()
-        flash('This username is already taken, sorry.')
+    if form.validate_on_submit():
+        username = form.username.data
+        if User.query.filter_by(name=username).first() is not None:
+            flash('This username is already taken, sorry.')
+            return render_template('signup.html', title='Sign up', form=form)
+        password = form.password.data
+        user = User(username, password)
+        db.session.add(user)
+        db.session.commit()
+        flash('User successfully created')
+        login_user(user)
+        return redirect(url_for('bp.home'))
     return render_template('signup.html', title='Sign up', form=form)
 
 
