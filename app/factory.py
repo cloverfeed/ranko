@@ -76,6 +76,7 @@ def configure_xstatic(app):
     """
     modules = [
         'bootstrap_scss',
+        'jasmine',
         'jquery',
     ]
     xstatic = FlaskXStatic(app)
@@ -95,6 +96,13 @@ def configure_ext_assets(app, xstatic):
         output='gen/app.js'
         )
     assets.register('coffee_app', coffee)
+
+    coffee_spec = Bundle(
+        'coffee_spec/*.coffee',
+        filters='coffeescript',
+        output='gen/coffee_spec.js'
+        )
+    assets.register('coffee_spec', coffee_spec)
 
     scss_bundle = Bundle(
         'scss/bootstrap_custom.scss',

@@ -49,3 +49,8 @@ def internal_server_error():
 @bp.route('/exception')
 def trigger_exception():
     raise Exception()
+
+
+@bp.route('/jasmine')
+def jasmine_tests():
+    return render_template('SpecRunner.html')
