@@ -22,11 +22,12 @@ class ViewPage
   init: ->
     form_init '#upload_dialog', '#upload_link'
     form_init '#share_dialog', '#share_link'
+    docid = @docid
     $('#share_form').submit (e) ->
       e.preventDefault()
       $.ajax
         type: 'POST'
-        url: "/view/#{@docid}/share"
+        url: "/view/#{docid}/share"
         data: $(this).serialize()
         success: (data) ->
           share_url = "#{window.location.origin}/view/shared/#{data['data']}"
