@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Jasmine Spec Runner</title>
+
+  <link rel="stylesheet" type="text/css" href="{{url_for('xstatic', xs_package='jasmine', filename='jasmine.css')}}">
+
+  <script src="{{url_for('xstatic', xs_package='jquery', filename='jquery.min.js')}}"></script>
+  <script src="{{url_for('static', filename='vendor/pdfjs-' + config.X_PDFJS_VERSION + '-dist/build/pdf.js')}}"></script>
+  <script src="{{url_for('static', filename='vendor/jquery.jeditable.mini.js')}}"></script>
+  <script src="{{url_for('static', filename='vendor/jquery-ui-1.11.2/jquery-ui.min.js')}}"></script>
+
+  <script src="{{url_for('xstatic', xs_package='jquery', filename='jquery.min.js')}}"></script>
+  <script src="{{url_for('static', filename='vendor/jquery-ui-1.11.2/jquery-ui.min.js')}}"></script>
+
+  <script src="{{url_for('xstatic', xs_package='jasmine', filename='jasmine.js')}}"></script>
+  <script src="{{url_for('xstatic', xs_package='jasmine', filename='jasmine-html.js')}}"></script>
+  <script src="{{url_for('xstatic', xs_package='jasmine', filename='boot.js')}}"></script>
+  <script src="{{url_for('static', filename='vendor/jasmine-jquery.js')}}"></script>
+
+  <!-- include source files here... -->
+  {% assets "coffee_app" %}
+  <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+
+  <!-- include spec files here... -->
+  {% assets "coffee_spec" %}
+  <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+
+</head>
+
+<body>
+</body>
+</html>

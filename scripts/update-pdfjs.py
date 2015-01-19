@@ -6,8 +6,9 @@ import os
 import tempfile
 import zipfile
 
-import bs4
 import requests
+
+import bs4
 
 
 def latest_pdfjs_url():
