@@ -30,7 +30,7 @@ class User(db.Model):
     Application user. Someone that can log in.
     """
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True, nullable=False)
+    name = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
     role = db.Column(db.SmallInteger, default=ROLE_USER, nullable=False)
     full_name = db.Column(db.String, unique=True, nullable=True)
