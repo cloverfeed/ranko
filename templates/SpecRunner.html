@@ -5,9 +5,11 @@
   <title>Jasmine Spec Runner</title>
 
   <link rel="stylesheet" type="text/css" href="{{url_for('xstatic', xs_package='jasmine', filename='jasmine.css')}}">
+  <script src="{{url_for('xstatic', xs_package='jquery', filename='jquery.min.js')}}"></script>
   <script src="{{url_for('xstatic', xs_package='jasmine', filename='jasmine.js')}}"></script>
   <script src="{{url_for('xstatic', xs_package='jasmine', filename='jasmine-html.js')}}"></script>
   <script src="{{url_for('xstatic', xs_package='jasmine', filename='boot.js')}}"></script>
+  <script src="{{url_for('static', filename='vendor/jasmine-jquery.js')}}"></script>
 
   <!-- include source files here... -->
   {% assets "coffee_app" %}
