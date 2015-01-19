@@ -10,6 +10,10 @@ before_install:
     - npm install coffee-script
 before_script:
     - npm install casperjs
+    - npm install grunt-cli
+    - npm install grunt
+    - npm install grunt-contrib-jasmine
+    - npm install grunt-template-jasmine-istanbul
     - export PATH=node_modules/phantomjs/bin:node_modules/casperjs/bin:$PATH
     - python manage.py -c conf/development.py create
     - python run.py &
