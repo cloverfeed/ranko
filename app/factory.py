@@ -104,6 +104,15 @@ def configure_ext_assets(app, xstatic):
         )
     assets.register('coffee_spec', coffee_spec)
 
+    vendor_js = Bundle(
+        os.path.join(xstatic.path_for('jquery'), 'jquery.min.js'),
+        'vendor/pdfjs-' + app.config['X_PDFJS_VERSION'] + '-dist/build/pdf.js',
+        'vendor/jquery.jeditable.mini.js',
+        'vendor/jquery-ui-1.11.2/jquery-ui.min.js',
+        output='gen/vendor_js.js',
+        )
+    assets.register('vendor_js', vendor_js)
+
     scss_bundle = Bundle(
         'scss/bootstrap_custom.scss',
         'scss/view.scss',
