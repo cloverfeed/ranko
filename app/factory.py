@@ -10,7 +10,6 @@ from flask.ext.assets import Bundle
 from flask.ext.assets import Environment
 from flask.ext.login import current_user
 from flask.ext.migrate import Migrate
-from flask.ext.migrate import MigrateCommand
 from flask.ext.uploads import configure_uploads
 
 import models
