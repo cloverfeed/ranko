@@ -16,6 +16,7 @@ view_init = (docid, filetype, readOnly) ->
   p.init()
 
 class ViewPage
+  #  TODO: refactor @filetype out
   constructor: (@docid, @filetype, @readOnly) ->
 
   init: ->
