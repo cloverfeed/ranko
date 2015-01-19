@@ -16,9 +16,7 @@ import sqlalchemy as sa
 
 def upgrade():
     op.drop_constraint("user_name_key", "user")
-    op.drop_constraint("user_full_name_key", "user")
 
 
 def downgrade():
     op.create_unique_constraint("user_name_key", "user", ["name"])
-    op.create_unique_constraint("user_full_name_key", "user", ["full_name"])
