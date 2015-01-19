@@ -15,6 +15,7 @@ before_script:
     - python run.py &
 script:
     - nosetests --with-coverage --cover-package=app
+    - grunt
     - casperjs test tests.coffee
     - make -C docs html
 notifications:
