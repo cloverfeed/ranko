@@ -22,20 +22,18 @@ class Annotation
         onblur: 'submit'
 
       @$div.draggable
-        stop: @drag
+        stop: @updateOnEvent
 
     # necessary to keep out of the if because of bug #44
     @$div.resizable
-      stop: (ev, ui) =>
-        @updateGeom(ev, ui)
-        @submitChanges()
+      stop: @updateOnEvent
 
   edit: (value, settings) =>
     @text = value
     @submitChanges()
     return value
 
-  drag: (ev, ui) =>
+  updateOnEvent: (ev, ui) =>
     @updateGeom(ev, ui)
     @submitChanges()
 

@@ -58,7 +58,7 @@ describe 'Annotation', ->
       offset:
         left: newx + offset.left
         top: newy + offset.top
-    ann.drag ev, ui
+    ann.updateOnEvent ev, ui
     expect(ann.geom).toEqual jasmine.objectContaining
       posx: newx
       posy: newy
@@ -68,3 +68,25 @@ describe 'Annotation', ->
       data: jasmine.objectContaining
         posx: newx
         posy: newy
+
+  it 'is resizable', ->
+    new_width = 100
+    new_height = 200
+
+    ev = $.Event 'resizestop'
+    ui =
+      size:
+        width: new_width
+        height: new_height
+
+    ann.updateOnEvent ev, ui
+
+    expect(ann.geom).toEqual jasmine.objectContaining
+      width: new_width
+      height: new_height
+    expect($.ajax).toHaveBeenCalledWith jasmine.objectContaining
+      type: 'PUT'
+      url: '/annotation/8'
+      data: jasmine.objectContaining
+        width: new_width
+        height: new_height
