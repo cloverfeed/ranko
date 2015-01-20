@@ -90,3 +90,13 @@ describe 'Annotation', ->
       data: jasmine.objectContaining
         width: new_width
         height: new_height
+
+  it 'updates its class when state changes', ->
+    expect(ann.$div).toHaveClass('annotation-open')
+    expect(ann.$div).not.toHaveClass('annotation-closed')
+
+    ann.state = 'closed'
+    ann.update()
+
+    expect(ann.$div).toHaveClass('annotation-closed')
+    expect(ann.$div).not.toHaveClass('annotation-open')
