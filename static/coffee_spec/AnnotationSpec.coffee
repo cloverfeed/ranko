@@ -62,3 +62,9 @@ describe 'Annotation', ->
     expect(ann.geom).toEqual jasmine.objectContaining
       posx: newx
       posy: newy
+    expect($.ajax).toHaveBeenCalledWith jasmine.objectContaining
+      type: 'PUT'
+      url: '/annotation/8'
+      data: jasmine.objectContaining
+        posx: newx
+        posy: newy
