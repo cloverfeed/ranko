@@ -5,6 +5,8 @@ class Selection
     @x2 = 0
     @y2 = 0
     @$div = jQuery('<div>').addClass 'selectionDiv'
+    @$div.hide()
+    @$tld.append @$div
     @$tld.mousedown (e) => @mousedown e
     @$tld.mousemove (e) => @mousemove e
     @$tld.mouseup (e) => @mouseup e
