@@ -9,11 +9,12 @@ view_init = (docid, filetype, readOnly) ->
   switch filetype
     when "pdf"
       p = new PdfViewPage docid, filetype, readOnly
-    when "image"
-      p = new ImageViewPage docid, filetype, readOnly
+      p.init()
     when "audio"
       p = new AudioViewPage docid, filetype, readOnly
-  p.init()
+      p.init()
+    when "image"
+      create_image_view_page docid, filetype, readOnly
 
 class ViewPage
   #  TODO: refactor @filetype out
@@ -120,24 +121,30 @@ class PdfViewPage extends ViewPage
   list_view_selector: '#listview'
 
 
+create_image_view_page = (docid, filetype, readOnly) ->
+  p = new ImageViewPage docid, filetype, readOnly
+  $img = $('<img>')
+  $img.mousedown (e) ->
+    e.preventDefault()
+  $img.load ->
+    image = this
+    $.getJSON "/view/#{docid}/annotations", (annotations) ->
+      p.init image, annotations.data
+  $img.attr('src', '/raw/' + docid)
+
+
 class ImageViewPage extends ViewPage
-  init: ->
+  init: (image, annotations) ->
     super()
-    GET_ANN_URL = '/view/' + @docid + '/annotations'
-    $img = $('<img>')
     $pv = $('#docview')
-    $img.mousedown (e) ->
-      e.preventDefault()
-    $img.load ->
-      image = this
-      $.getJSON GET_ANN_URL, (annotations) ->
-        page = new Page @docid, 0,
-          image: image
-          annotations: annotations.data
-          readOnly: @readOnly
-        page.$div.append $img
-        $pv.append page.$div
-    $img.attr('src', '/raw/' + @docid)
+    page = new Page @docid, 0,
+      width: image.width
+      height: image.height
+      annotations: annotations
+      readOnly: @readOnly
+      $table: $('#listview tbody')
+    page.$div.append image
+    $pv.append page.$div
 
   get_annotations_route: '/annotation/'
   list_view_selector: '#listview'
