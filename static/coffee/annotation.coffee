@@ -22,9 +22,8 @@ class Annotation
         onblur: 'submit'
 
       @$div.draggable
-        stop: (ev, ui) =>
-          @updateGeom(ev, ui)
-          @submitChanges()
+        stop: @drag
+
     # necessary to keep out of the if because of bug #44
     @$div.resizable
       stop: (ev, ui) =>
@@ -35,6 +34,10 @@ class Annotation
     @text = value
     @submitChanges()
     return value
+
+  drag: (ev, ui) =>
+    @updateGeom(ev, ui)
+    @submitChanges()
 
   addStateClass: ->
     @$div.addClass ('annotation-' + @state)

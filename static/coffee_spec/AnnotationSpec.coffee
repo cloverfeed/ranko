@@ -11,6 +11,7 @@ describe 'Annotation', ->
     height: 40
   state = 'open'
   readOnly = false
+  $topDiv = null
 
   beforeEach ->
     setFixtures """
@@ -47,3 +48,17 @@ describe 'Annotation', ->
       url: '/annotation/8'
       data: jasmine.objectContaining
         value: 'new text'
+
+  it 'is draggable', ->
+    newx = 35
+    newy = 65
+    ev = $.Event 'dragstop'
+    offset = $topDiv.offset()
+    ui =
+      offset:
+        left: newx + offset.left
+        top: newy + offset.top
+    ann.drag ev, ui
+    expect(ann.geom).toEqual jasmine.objectContaining
+      posx: newx
+      posy: newy
