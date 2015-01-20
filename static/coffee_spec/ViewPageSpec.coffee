@@ -33,3 +33,17 @@ describe 'ImageViewPage', ->
 
   it 'should create an image', ->
     expect($('img')).toHaveLength(1)
+
+describe 'AudioViewPage', ->
+  docid = 5
+
+  beforeEach ->
+    setFixtures """
+    <div id="docview">
+    </div>
+    """
+    p = new AudioViewPage docid, 'audio', false
+    p.init()
+
+  it 'should create a canvas', ->
+    expect($('canvas')).toHaveLength(1)

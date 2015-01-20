@@ -8,12 +8,8 @@ class AudioPlayer
     @$table = params.$table
     @$div = $ '<div>'
 
-    url = '/raw/' + @docid
-    @audio = new Audio url
-
     @channels = 2
     @sampleRate = 44100
-    @audio.addEventListener 'loadedmetadata', (=> @startWaveform url), false
 
     $playBtn = $('<button>').addClass('btn btn-default').text('Play')
     $playBtn.click =>
@@ -46,11 +42,15 @@ class AudioPlayer
       for ann in annotations.data
         @addAudioAnnotation ann
 
-    @audio.addEventListener 'timeupdate', @update, false
     @update()
 
     @$canvas.mousedown @mousedown
     @$canvas.mouseup @mouseup
+
+  initAudio: (url) ->
+    @audio = new Audio url
+    @audio.addEventListener 'loadedmetadata', (=> @startWaveform url), false
+    @audio.addEventListener 'timeupdate', @update, false
 
   addAudioAnnotation: (ann) ->
     annotation = new AudioAnnotation this, ann.id, ann.start,
@@ -145,6 +145,8 @@ class AudioPlayer
     @audio.duration * pixels / @height
 
   update: =>
+    unless @audio?
+      return
     @ctx.clearRect 0, 0, @width, @height
     currentTime = @audio.currentTime
     totalTime = @audio.duration

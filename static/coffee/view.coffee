@@ -13,6 +13,7 @@ view_init = (docid, filetype, readOnly) ->
     when "audio"
       p = new AudioViewPage docid, filetype, readOnly
       p.init()
+      p.audioPlayer.initAudio "/raw/#{docid}"
     when "image"
       create_image_view_page docid, filetype, readOnly
 
@@ -154,10 +155,10 @@ class AudioViewPage extends ViewPage
   init: ->
     super()
     $pv = $('#docview')
-    audioPlayer = new AudioPlayer @docid,
+    @audioPlayer = new AudioPlayer @docid,
       readOnly: @readOnly
       $table: $('#listaudioview tbody')
-    $pv.append audioPlayer.$div
+    $pv.append @audioPlayer.$div
 
   get_annotations_route: '/audioannotation/'
   list_view_selector: '#listaudioview'
