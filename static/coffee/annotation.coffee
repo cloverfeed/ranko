@@ -18,11 +18,7 @@ class Annotation
         @rest.delete this, =>
           @$div.remove()
 
-      $annText.editable (value, settings) =>
-        @text = value
-        @submitChanges()
-        return value
-      ,
+      $annText.editable @edit,
         onblur: 'submit'
 
       @$div.draggable
@@ -34,6 +30,11 @@ class Annotation
       stop: (ev, ui) =>
         @updateGeom(ev, ui)
         @submitChanges()
+
+  edit: (value, settings) =>
+    @text = value
+    @submitChanges()
+    return value
 
   addStateClass: ->
     @$div.addClass ('annotation-' + @state)
