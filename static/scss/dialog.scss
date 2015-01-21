@@ -1,0 +1,9 @@
+.ui-widget-header {
+    background: $brand-primary;
+    border: 1px solid darken($brand-primary, 20%);
+}
+
+.ui-widget-content {
+    background: $body-bg;
+    color: $text-color;
+}

@@ -113,9 +113,7 @@ def configure_ext_assets(app, xstatic):
     assets.register('vendor_js', vendor_js)
 
     scss_bundle = Bundle(
-        'scss/bootstrap_custom.scss',
-        'scss/view.scss',
-        'scss/shame.scss',
+        'scss/site.scss',
         depends='**/*.scss',
         filters='pyscss',
         output='gen/app.css'
