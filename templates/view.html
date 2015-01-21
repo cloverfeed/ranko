@@ -1,6 +1,6 @@
-{% from 'macros.html' import glyphicon %}
 {% from 'macros.html' import glyph_button %}
 {% from 'macros.html' import glyph_link %}
+{% from 'macros.html' import glyph_title %}
 {% from 'macros.html' import js_bool %}
 {% from 'macros.html' import render_share_form %}
 {% from 'macros.html' import upload_form %}
@@ -58,7 +58,7 @@
 {% endif %}
     </div>
 
-    <h3>{{ glyphicon('eye-open') }} View</h3>
+    {{ glyph_title('View', 'eye-open') }}
 
     <div class="btn-group-vertical">
         <button class="view-states-btn btn btn-default" data-view="nothing">Nothing</button>
@@ -66,7 +66,7 @@
         <button class="view-states-btn btn btn-default" data-view="everything">Everything</button>
     </div>
 
-    <h3>{{ glyphicon('pencil') }} History</h3>
+    {{ glyph_title('History', 'pencil') }}
 
     <p>
     <a href="{{url_for('.view_revisions', id=doc.id)}}">Revisions</a>
@@ -85,7 +85,7 @@
     </div>
 {% endif %}
 
-    <h3>{{ glyphicon('comment') }} Comments</h3>
+    {{ glyph_title ('Comments', 'comment') }}
     <form method="POST" action="{{ url_for('comment.new') }}" id="post_comment_form">
         {{form_comm.hidden_tag()}}
         <p>{{form_comm.comment()}}</p>

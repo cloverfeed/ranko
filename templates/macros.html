@@ -92,3 +92,7 @@ false
     {{ content }}
 </a>
 {% endmacro %}
+
+{% macro glyph_title(content, icon) %}
+<h3>{{ glyphicon(icon) }} {{ content }}</h3>
+{% endmacro %}
