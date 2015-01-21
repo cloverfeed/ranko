@@ -10,6 +10,7 @@ import sys
 from random import choice
 
 import faker
+from flask import url_for
 from flask.ext.assets import ManageAssets
 from flask.ext.migrate import MigrateCommand
 from flask.ext.migrate import stamp
@@ -110,6 +111,24 @@ def main():
         user.set_password(password)
         db.session.commit()
         print password
+
+    @manager.command
+    def routes():
+        import urllib
+        output = []
+        for rule in manager.app.url_map.iter_rules():
+
+            options = {}
+            for arg in rule.arguments:
+                options[arg] = "[{0}]".format(arg)
+
+            methods = ','.join(rule.methods)
+            url = url_for(rule.endpoint, **options)
+            line = "{:40s} {:25s} {}".format(rule.endpoint, methods, url)
+            output.append(urllib.unquote(line))
+
+        for line in sorted(output):
+            print line
 
     manager.run()
 
