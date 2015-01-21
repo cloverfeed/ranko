@@ -49,8 +49,9 @@ class AudioPlayer
     @$canvas.mousedown @mousedown
     @$canvas.mouseup @mouseup
 
-  initAudio: (url) ->
-    @audio = new Audio url
+  initAudio: (audio) ->
+    @audio = audio
+    url = audio.src
     @audio.addEventListener 'loadedmetadata', (=> @startWaveform url), false
     @audio.addEventListener 'timeupdate', @update, false
 

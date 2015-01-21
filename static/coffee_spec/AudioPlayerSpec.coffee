@@ -12,6 +12,11 @@ describe 'AudioPlayer', ->
     player = new AudioPlayer docid,
       $table: $table
 
+    audio =
+      addEventListener: ->
+
+    player.initAudio audio
+
   it 'starts with no annotations', ->
     expect(player.annotations.length).toBe(0)
 

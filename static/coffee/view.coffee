@@ -13,7 +13,8 @@ view_init = (docid, filetype, readOnly) ->
     when "audio"
       p = new AudioViewPage docid, filetype, readOnly
       p.init()
-      p.audioPlayer.initAudio "/raw/#{docid}"
+      audio = new Audio "/raw/#{docid}"
+      p.audioPlayer.initAudio audio
     when "image"
       create_image_view_page docid, filetype, readOnly
 
