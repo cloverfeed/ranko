@@ -1,5 +1,7 @@
 class AudioPlayer
-  # params.$table is the table in list view
+  # params is a dict with:
+  #   $table: table in list view
+  #   readOnly: disable editing (default false)
   constructor: (@docid, params) ->
     @readOnly = false
     if params? and params.readOnly?
@@ -302,6 +304,8 @@ class AudioAnnotation
     @$div.addClass ('annotation-' + @state)
 
   update: ->
+    unless @player.audio?
+      return
     y = @player.secondsToPixels (@start + @length / 2)
     @$div.css
       top: y + "px"
