@@ -11,6 +11,7 @@ class Page
       height = viewport.height
       canvas.width = width
       canvas.height = height
+      @canvas = canvas
     else if params.width? and params.height?
       width = params.width
       height = params.height
@@ -26,6 +27,7 @@ class Page
       params.page.render
         canvasContext: canvas.getContext '2d'
         viewport: viewport
+      .then @updatePagePreview
     @readOnly = false
     if params.readOnly?
       @readOnly = params.readOnly
@@ -47,11 +49,25 @@ class Page
       for ann in anns
         @addAnnotation ann.text, ann.id, ann, ann.state
 
+  updatePagePreview: =>
+    if @previewCtx?
+      @previewCtx.drawImage(@canvas, 0, 0)
+
   addAnnotation: (text, id, geom, state) ->
     ann = new Annotation @$textLayerDiv, @docid, @i, text,
                          id, geom, state, @readOnly
     $row = $('<tr>')
-    $row.append($('<td>').text(@i))
+    $previewCanvas = $('<canvas>').attr
+      width: @canvas.width
+      height: @canvas.height
+    .css
+      width: "#{@canvas.width / 10}px"
+      height: "#{@canvas.height / 10}px"
+
+    @previewCtx = $previewCanvas[0].getContext('2d')
+
+    $previewCell = $('<td>').append($previewCanvas).append(@i)
+    $row.append $previewCell
     $row.append($('<td>').text(text))
 
     annotation_state = (st) ->

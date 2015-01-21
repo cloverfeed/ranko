@@ -78,3 +78,21 @@ false
         </div>
     </div>
 {%- endmacro %}
+
+{% macro glyph_button(content, id, icon) %}
+<button id="{{ id }}" class="btn btn-default" style="text-align: left">
+    {{ glyphicon(icon) }}
+    {{ content }}
+</button>
+{% endmacro %}
+
+{% macro glyph_link(content, href, icon) %}
+<a href="{{ href }}" class="btn btn-default" style="text-align: left">
+    {{ glyphicon(icon) }}
+    {{ content }}
+</a>
+{% endmacro %}
+
+{% macro glyph_title(content, icon) %}
+<h3>{{ glyphicon(icon) }} {{ content }}</h3>
+{% endmacro %}
