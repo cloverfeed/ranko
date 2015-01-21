@@ -36,6 +36,7 @@ def new():
     :>json int id: The new ID.
 
     :status 400: Document ID does not exist.
+    :status 401: Unauthorized
     """
     doc = coerce_to(int, request.form['doc'])
     page = coerce_to(int, request.form['page'])
