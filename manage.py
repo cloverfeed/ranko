@@ -10,6 +10,7 @@ import sys
 from random import choice
 
 import faker
+from flask.ext.assets import ManageAssets
 from flask.ext.migrate import MigrateCommand
 from flask.ext.migrate import stamp
 from flask.ext.script import Manager
@@ -51,6 +52,7 @@ def generate_password():
 def main():
     manager = Manager(create_app)
     manager.add_command('db', MigrateCommand)
+    manager.add_command('assets', ManageAssets)
     manager.add_option('-c', '--config', dest='config_file', required=False)
 
     @manager.command

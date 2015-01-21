@@ -1,5 +1,7 @@
 class AudioPlayer
-  # params.$table is the table in list view
+  # params is a dict with:
+  #   $table: table in list view
+  #   readOnly: disable editing (default false)
   constructor: (@docid, params) ->
     @readOnly = false
     if params? and params.readOnly?
@@ -8,12 +10,8 @@ class AudioPlayer
     @$table = params.$table
     @$div = $ '<div>'
 
-    url = '/raw/' + @docid
-    @audio = new Audio url
-
     @channels = 2
     @sampleRate = 44100
-    @audio.addEventListener 'loadedmetadata', (=> @startWaveform url), false
 
     $playBtn = $('<button>').addClass('btn btn-default').text('Play')
     $playBtn.click =>
@@ -46,11 +44,16 @@ class AudioPlayer
       for ann in annotations.data
         @addAudioAnnotation ann
 
-    @audio.addEventListener 'timeupdate', @update, false
     @update()
 
     @$canvas.mousedown @mousedown
     @$canvas.mouseup @mouseup
+
+  initAudio: (audio) ->
+    @audio = audio
+    url = audio.src
+    @audio.addEventListener 'loadedmetadata', (=> @startWaveform url), false
+    @audio.addEventListener 'timeupdate', @update, false
 
   addAudioAnnotation: (ann) ->
     annotation = new AudioAnnotation this, ann.id, ann.start,
@@ -145,6 +148,8 @@ class AudioPlayer
     @audio.duration * pixels / @height
 
   update: =>
+    unless @audio?
+      return
     @ctx.clearRect 0, 0, @width, @height
     currentTime = @audio.currentTime
     totalTime = @audio.duration
@@ -300,6 +305,8 @@ class AudioAnnotation
     @$div.addClass ('annotation-' + @state)
 
   update: ->
+    unless @player.audio?
+      return
     y = @player.secondsToPixels (@start + @length / 2)
     @$div.css
       top: y + "px"

@@ -11,9 +11,9 @@ class Page
       height = viewport.height
       canvas.width = width
       canvas.height = height
-    else if params.image?
-      width = params.image.width
-      height = params.image.height
+    else if params.width? and params.height?
+      width = params.width
+      height = params.height
     else
       console.log "Page: couldn't set geometry"
     @$div = jQuery('<div>')

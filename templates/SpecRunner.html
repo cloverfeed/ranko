@@ -6,13 +6,9 @@
 
   <link rel="stylesheet" type="text/css" href="{{url_for('xstatic', xs_package='jasmine', filename='jasmine.css')}}">
 
-  <script src="{{url_for('xstatic', xs_package='jquery', filename='jquery.min.js')}}"></script>
-  <script src="{{url_for('static', filename='vendor/pdfjs-' + config.X_PDFJS_VERSION + '-dist/build/pdf.js')}}"></script>
-  <script src="{{url_for('static', filename='vendor/jquery.jeditable.mini.js')}}"></script>
-  <script src="{{url_for('static', filename='vendor/jquery-ui-1.11.2/jquery-ui.min.js')}}"></script>
-
-  <script src="{{url_for('xstatic', xs_package='jquery', filename='jquery.min.js')}}"></script>
-  <script src="{{url_for('static', filename='vendor/jquery-ui-1.11.2/jquery-ui.min.js')}}"></script>
+  {% assets "vendor_js" %}
+  <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
 
   <script src="{{url_for('xstatic', xs_package='jasmine', filename='jasmine.js')}}"></script>
   <script src="{{url_for('xstatic', xs_package='jasmine', filename='jasmine-html.js')}}"></script>

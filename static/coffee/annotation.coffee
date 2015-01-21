@@ -18,22 +18,24 @@ class Annotation
         @rest.delete this, =>
           @$div.remove()
 
-      $annText.editable (value, settings) =>
-        @text = value
-        @submitChanges()
-        return value
-      ,
+      $annText.editable @edit,
         onblur: 'submit'
 
       @$div.draggable
-        stop: (ev, ui) =>
-          @updateGeom(ev, ui)
-          @submitChanges()
+        stop: @updateOnEvent
+
     # necessary to keep out of the if because of bug #44
     @$div.resizable
-      stop: (ev, ui) =>
-        @updateGeom(ev, ui)
-        @submitChanges()
+      stop: @updateOnEvent
+
+  edit: (value, settings) =>
+    @text = value
+    @submitChanges()
+    return value
+
+  updateOnEvent: (ev, ui) =>
+    @updateGeom(ev, ui)
+    @submitChanges()
 
   addStateClass: ->
     @$div.addClass ('annotation-' + @state)
