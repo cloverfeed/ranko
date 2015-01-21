@@ -52,6 +52,7 @@
         {{ glyph_button('Full screen', 'fullscreen_button', 'fullscreen') }}
         {{ glyph_button('List mode', 'listmode_button', 'list') }}
         {{ glyph_button('Document mode', 'docmode_button', 'file') }}
+        {{ glyph_link('Download', url_for('document.raw', id=doc.id), 'download') }}
 {% if can_edit %}
         {{ glyph_link('Edit', url_for('document.edit', id=doc.id), 'pencil') }}
         {{ glyph_button('Generate a review link', 'share_link', 'share') }}
