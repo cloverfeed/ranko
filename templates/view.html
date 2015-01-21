@@ -1,5 +1,6 @@
 {% from 'macros.html' import glyphicon %}
 {% from 'macros.html' import glyph_button %}
+{% from 'macros.html' import glyph_link %}
 {% from 'macros.html' import js_bool %}
 {% from 'macros.html' import render_share_form %}
 {% from 'macros.html' import upload_form %}
@@ -42,10 +43,7 @@
 <div class="col-md-1 col-md-offset-1">
 <div id="exitfullscreen">
     <div class="list-group">
-        <a id="fullscreen_button_exit" href="#" class="list-group-item">
-            {{ glyphicon('resize-small') }}
-            Exit fullscreen
-        </a>
+        {{ glyph_button('Exit fullscreen', 'fullscreen_button_exit', 'resize-small') }}
     </div>
 </div>
 <div id="subnav" data-spy="affix">
@@ -55,10 +53,7 @@
         {{ glyph_button('List mode', 'listmode_button', 'list') }}
         {{ glyph_button('Document mode', 'docmode_button', 'file') }}
 {% if can_edit %}
-        <a href="{{url_for('document.edit', id=doc.id)}}" class="btn btn-default" style="text-align: left">
-            {{ glyphicon('pencil') }}
-            Edit
-        </a>
+        {{ glyph_link('Edit', url_for('document.edit', id=doc.id), 'pencil') }}
         {{ glyph_button('Generate a review link', 'share_link', 'share') }}
 {% endif %}
     </div>

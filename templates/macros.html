@@ -85,3 +85,10 @@ false
     {{ content }}
 </button>
 {% endmacro %}
+
+{% macro glyph_link(content, href, icon) %}
+<a href="{{ href }}" class="btn btn-default" style="text-align: left">
+    {{ glyphicon(icon) }}
+    {{ content }}
+</a>
+{% endmacro %}
