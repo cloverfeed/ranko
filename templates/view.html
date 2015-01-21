@@ -1,4 +1,5 @@
 {% from 'macros.html' import glyphicon %}
+{% from 'macros.html' import glyph_button %}
 {% from 'macros.html' import js_bool %}
 {% from 'macros.html' import render_share_form %}
 {% from 'macros.html' import upload_form %}
@@ -50,27 +51,15 @@
 <div id="subnav" data-spy="affix">
 
     <div class="btn-group-vertical" role="group">
-        <button id="fullscreen_button" class="btn btn-default" style="text-align: left">
-            {{ glyphicon('fullscreen') }}
-            Full screen
-        </button>
-        <button id="listmode_button" class="btn btn-default" style="text-align: left">
-            {{ glyphicon('list') }}
-            List mode
-        </button>
-        <button id="docmode_button" class="btn btn-default" style="text-align: left">
-            {{ glyphicon('file') }}
-            Document mode
-        </button>
+        {{ glyph_button('Full screen', 'fullscreen_button', 'fullscreen') }}
+        {{ glyph_button('List mode', 'listmode_button', 'list') }}
+        {{ glyph_button('Document mode', 'docmode_button', 'file') }}
 {% if can_edit %}
         <a href="{{url_for('document.edit', id=doc.id)}}" class="btn btn-default" style="text-align: left">
             {{ glyphicon('pencil') }}
             Edit
         </a>
-        <button id="share_link" class="btn btn-default" style="text-align: left">
-            {{ glyphicon('share') }}
-            Generate a review link
-        </button>
+        {{ glyph_button('Generate a review link', 'share_link', 'share') }}
 {% endif %}
     </div>
 
