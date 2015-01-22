@@ -93,25 +93,29 @@ describe 'ViewPage (common elements)', ->
       expect($('#listmode_button')).toBeVisible()
       expect($('#listview')).toBeHidden()
 
+  describe 'share dialog', ->
 
-describe 'PDFViewPage', ->
-  docid = 5
-  beforeEach ->
-    setFixtures """
-    <form id="share_form">
-      <button type="submit">Submit</button>
-    </form>
-    """
-    view_init docid, 'pdf', false
+    beforeEach ->
+      setFixtures """
+      <form id="share_form">
+        <input type="text" name="name" value="Michel" />
+        <button type="submit">Submit</submit>
+      </form>
+      """
+      spyOn($, 'ajax').and.callFake (options) ->
+        options.success
+          data: 'FAKECODE'
+      p.init()
 
-  it 'should have a share button', ->
-    $shareForm = $('#share_form')
-    expect($shareForm).toHaveLength(1)
+    it 'displays a share url', ->
+      $('#share_form').submit()
+      expect($.ajax).toHaveBeenCalledWith jasmine.objectContaining
+        type: 'POST'
+        url: '/view/5/share'
+        data: 'name=Michel'
+      contents = $('input[type=text]').last().val()
+      expect(contents).toContain('/view/shared/FAKECODE')
 
-    spyOn($, "ajax").and.callFake (options) ->
-      expect(options.url).toContain(docid)
-
-    $shareForm.submit()
 
 describe 'ImageViewPage', ->
   docid = 5
