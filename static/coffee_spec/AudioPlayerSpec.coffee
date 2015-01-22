@@ -42,3 +42,21 @@ describe 'AudioPlayer', ->
     expect(player.annotationAt(19)).toEqual jasmine.objectContaining
       start: 18
       length: 2
+
+
+describe 'AudioSelection', ->
+  sel = null
+  spy = null
+  down = 3
+
+  beforeEach ->
+    spy = jasmine.createSpy 'audioselection success'
+    sel = new AudioSelection down, spy
+
+  it 'can be dragged in increasing order', ->
+    sel.mouseup(5)
+    expect(spy).toHaveBeenCalledWith(3, 2)
+
+  it 'can be dragged in decreasing order', ->
+    sel.mouseup(2)
+    expect(spy).toHaveBeenCalledWith(2, 1)
