@@ -12,9 +12,15 @@ describe 'ViewPage (common elements)', ->
     <button id="seeNone" class="view-states-btn" data-view="nothing"></button>
     <button id="seeOnlyOpen" class="view-states-btn" data-view="only-open"></button>
     <button id="seeAll" class="view-states-btn" data-view="everything"></button>
+
+    <div id="docview"></div>
+    <div id="listview"></div>
+    <button id="docmode_button"></button>
+    <button id="listmode_button"></button>
     """
     docid = 5
     p = new ViewPage docid, 'pdf', false
+    p.list_view_selector = '#listview'
     p.init()
 
   it 'has a fullscreen button', ->
@@ -49,6 +55,26 @@ describe 'ViewPage (common elements)', ->
 
     expect($('#openann')).toBeVisible()
     expect($('#closedann')).toBeVisible()
+
+  it 'can go from list mode to doc mode and back', ->
+    expect($('#docmode_button')).toBeHidden()
+    expect($('#docview')).toBeVisible()
+    expect($('#listmode_button')).toBeVisible()
+    expect($('#listview')).toBeHidden()
+
+    $('#listmode_button').click()
+
+    expect($('#docmode_button')).toBeVisible()
+    expect($('#docview')).toBeHidden()
+    expect($('#listmode_button')).toBeHidden()
+    expect($('#listview')).toBeVisible()
+
+    $('#docmode_button').click()
+
+    expect($('#docmode_button')).toBeHidden()
+    expect($('#docview')).toBeVisible()
+    expect($('#listmode_button')).toBeVisible()
+    expect($('#listview')).toBeHidden()
 
 
 describe 'PDFViewPage', ->
