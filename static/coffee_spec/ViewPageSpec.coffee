@@ -1,80 +1,97 @@
 describe 'ViewPage (common elements)', ->
+  p = null
+
   beforeEach ->
-    setFixtures """
-    <div id="subnav"></div>
-    <div id="exitfullscreen"></div>
-    <button id="fullscreen_button"></button>
-    <button id="fullscreen_button_exit"></button>
-
-    <div id="openann" class="annotation annotation-open"></div>
-    <div id="closedann" class="annotation annotation-closed"></div>
-
-    <button id="seeNone" class="view-states-btn" data-view="nothing"></button>
-    <button id="seeOnlyOpen" class="view-states-btn" data-view="only-open"></button>
-    <button id="seeAll" class="view-states-btn" data-view="everything"></button>
-
-    <div id="docview"></div>
-    <div id="listview"></div>
-    <button id="docmode_button"></button>
-    <button id="listmode_button"></button>
-    """
     docid = 5
     p = new ViewPage docid, 'pdf', false
     p.list_view_selector = '#listview'
-    p.init()
 
-  it 'has a fullscreen button', ->
-    expect($('#subnav')).toBeVisible()
-    expect($('#exitfullscreen')).toBeHidden()
+  describe 'fullscreen mode', ->
+    beforeEach ->
+      setFixtures """
+      <div id="subnav" />
+      <div id="exitfullscreen" />
+      <button id="fullscreen_button" />
+      <button id="fullscreen_button_exit" />
+      """
+      p.init()
 
-    $('#fullscreen_button').click()
+    it 'works', ->
+      expect($('#subnav')).toBeVisible()
+      expect($('#exitfullscreen')).toBeHidden()
 
-    expect($('#subnav')).toBeHidden()
-    expect($('#exitfullscreen')).toBeVisible()
+      $('#fullscreen_button').click()
 
-    $('#fullscreen_button_exit').click()
+      expect($('#subnav')).toBeHidden()
+      expect($('#exitfullscreen')).toBeVisible()
 
-    expect($('#subnav')).toBeVisible()
-    expect($('#exitfullscreen')).toBeHidden()
+      $('#fullscreen_button_exit').click()
 
-  it 'has a way to select annotations based on state', ->
-    expect($('#openann')).toBeVisible()
-    expect($('#closedann')).toBeVisible()
+      expect($('#subnav')).toBeVisible()
+      expect($('#exitfullscreen')).toBeHidden()
 
-    $('#seeOnlyOpen').click()
+  describe 'state toggle button', ->
 
-    expect($('#openann')).toBeVisible()
-    expect($('#closedann')).toBeHidden()
+    beforeEach ->
+      setFixtures """
+      <div id="openann" class="annotation annotation-open" />
+      <div id="closedann" class="annotation annotation-closed" />
 
-    $('#seeNone').click()
+      <button id="seeNone" class="view-states-btn" data-view="nothing" />
+      <button id="seeOnlyOpen" class="view-states-btn" data-view="only-open" />
+      <button id="seeAll" class="view-states-btn" data-view="everything" />
+      """
+      p.init()
 
-    expect($('#openann')).toBeHidden()
-    expect($('#closedann')).toBeHidden()
+    it 'selects annotations based on their state', ->
+      expect($('#openann')).toBeVisible()
+      expect($('#closedann')).toBeVisible()
 
-    $('#seeAll').click()
+      $('#seeOnlyOpen').click()
 
-    expect($('#openann')).toBeVisible()
-    expect($('#closedann')).toBeVisible()
+      expect($('#openann')).toBeVisible()
+      expect($('#closedann')).toBeHidden()
 
-  it 'can go from list mode to doc mode and back', ->
-    expect($('#docmode_button')).toBeHidden()
-    expect($('#docview')).toBeVisible()
-    expect($('#listmode_button')).toBeVisible()
-    expect($('#listview')).toBeHidden()
+      $('#seeNone').click()
 
-    $('#listmode_button').click()
+      expect($('#openann')).toBeHidden()
+      expect($('#closedann')).toBeHidden()
 
-    expect($('#docmode_button')).toBeVisible()
-    expect($('#docview')).toBeHidden()
-    expect($('#listmode_button')).toBeHidden()
-    expect($('#listview')).toBeVisible()
+      $('#seeAll').click()
 
-    $('#docmode_button').click()
+      expect($('#openann')).toBeVisible()
+      expect($('#closedann')).toBeVisible()
 
-    expect($('#docmode_button')).toBeHidden()
-    expect($('#docview')).toBeVisible()
-    expect($('#listmode_button')).toBeVisible()
-    expect($('#listview')).toBeHidden()
+  describe 'list mode', ->
+
+    beforeEach ->
+      setFixtures """
+      <div id="docview" />
+      <div id="listview" />
+      <button id="docmode_button" />
+      <button id="listmode_button" />
+      """
+      p.init()
+
+    it 'can be activated and deactivated', ->
+      expect($('#docmode_button')).toBeHidden()
+      expect($('#docview')).toBeVisible()
+      expect($('#listmode_button')).toBeVisible()
+      expect($('#listview')).toBeHidden()
+
+      $('#listmode_button').click()
+
+      expect($('#docmode_button')).toBeVisible()
+      expect($('#docview')).toBeHidden()
+      expect($('#listmode_button')).toBeHidden()
+      expect($('#listview')).toBeVisible()
+
+      $('#docmode_button').click()
+
+      expect($('#docmode_button')).toBeHidden()
+      expect($('#docview')).toBeVisible()
+      expect($('#listmode_button')).toBeVisible()
+      expect($('#listview')).toBeHidden()
 
 
 describe 'PDFViewPage', ->
