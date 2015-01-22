@@ -5,6 +5,13 @@ describe 'ViewPage (common elements)', ->
     <div id="exitfullscreen"></div>
     <button id="fullscreen_button"></button>
     <button id="fullscreen_button_exit"></button>
+
+    <div id="openann" class="annotation annotation-open"></div>
+    <div id="closedann" class="annotation annotation-closed"></div>
+
+    <button id="seeNone" class="view-states-btn" data-view="nothing"></button>
+    <button id="seeOnlyOpen" class="view-states-btn" data-view="only-open"></button>
+    <button id="seeAll" class="view-states-btn" data-view="everything"></button>
     """
     docid = 5
     p = new ViewPage docid, 'pdf', false
@@ -23,6 +30,26 @@ describe 'ViewPage (common elements)', ->
 
     expect($('#subnav')).toBeVisible()
     expect($('#exitfullscreen')).toBeHidden()
+
+  it 'has a way to select annotations based on state', ->
+    expect($('#openann')).toBeVisible()
+    expect($('#closedann')).toBeVisible()
+
+    $('#seeOnlyOpen').click()
+
+    expect($('#openann')).toBeVisible()
+    expect($('#closedann')).toBeHidden()
+
+    $('#seeNone').click()
+
+    expect($('#openann')).toBeHidden()
+    expect($('#closedann')).toBeHidden()
+
+    $('#seeAll').click()
+
+    expect($('#openann')).toBeVisible()
+    expect($('#closedann')).toBeVisible()
+
 
 describe 'PDFViewPage', ->
   docid = 5
