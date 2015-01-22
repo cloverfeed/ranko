@@ -60,3 +60,16 @@ describe 'AudioSelection', ->
   it 'can be dragged in decreasing order', ->
     sel.mouseup(2)
     expect(spy).toHaveBeenCalledWith(2, 1)
+
+
+describe 'AudioDrag', ->
+  drag = null
+  spy = null
+
+  beforeEach ->
+    spy = jasmine.createSpy 'audiodrag success'
+    drag = new AudioDrag 7, spy
+
+  it 'can be dragged', ->
+    drag.mouseup(5)
+    expect(spy).toHaveBeenCalledWith(-2)
