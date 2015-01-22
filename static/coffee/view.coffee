@@ -55,6 +55,7 @@ class ViewPage
       $('#subnav').hide()
       $('#exitfullscreen').show()
 
+    $('#exitfullscreen').hide()
     $('#fullscreen_button_exit').click (e) ->
       e.preventDefault()
       $('#subnav').show()

@@ -1,3 +1,29 @@
+describe 'ViewPage (common elements)', ->
+  beforeEach ->
+    setFixtures """
+    <div id="subnav"></div>
+    <div id="exitfullscreen"></div>
+    <button id="fullscreen_button"></button>
+    <button id="fullscreen_button_exit"></button>
+    """
+    docid = 5
+    p = new ViewPage docid, 'pdf', false
+    p.init()
+
+  it 'has a fullscreen button', ->
+    expect($('#subnav')).toBeVisible()
+    expect($('#exitfullscreen')).toBeHidden()
+
+    $('#fullscreen_button').click()
+
+    expect($('#subnav')).toBeHidden()
+    expect($('#exitfullscreen')).toBeVisible()
+
+    $('#fullscreen_button_exit').click()
+
+    expect($('#subnav')).toBeVisible()
+    expect($('#exitfullscreen')).toBeHidden()
+
 describe 'PDFViewPage', ->
   docid = 5
   beforeEach ->
