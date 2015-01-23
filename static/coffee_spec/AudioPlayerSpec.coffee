@@ -3,6 +3,12 @@ describe 'AudioPlayer', ->
   player = null
   $table = null
 
+  makeEvent = (type, coords) ->
+    canvasOffset = player.$canvas.offset()
+    $.Event type,
+      pageX: canvasOffset.left + coords.x
+      pageY: canvasOffset.top + coords.y
+
   beforeEach ->
     setFixtures """
     <div id="playertable">
@@ -56,15 +62,38 @@ describe 'AudioPlayer', ->
     expect(ann.state).toBe 'closed'
 
   it 'can seek', ->
-    canvasOffset = player.$canvas.offset()
-    e = $.Event 'mousedown',
-      pageX: canvasOffset.left + 10
-      pageY: canvasOffset.top + 10
+    e = makeEvent 'mousedown',
+      x: 10
+      y: 10
 
     player.$canvas.trigger e
 
     expect(player.audio.currentTime).toBe(1)
 
+  it 'can create and move annotations', ->
+    eventCreateDown = makeEvent 'mousedown', x: 190, y: 10
+    eventCreateUp = makeEvent 'mouseup', x: 190, y: 30
+
+    player.$canvas.trigger eventCreateDown
+    player.$canvas.trigger eventCreateUp
+
+    expect(player.annotations.length).toBe(1)
+    annotation = player.annotations[0]
+    expect(annotation).toEqual jasmine.objectContaining
+      start: 1
+      length: 2
+
+    eventMoveDown = makeEvent 'mousedown', x: 190, y: 20
+    eventMoveUp = makeEvent 'mouseup', x: 190, y: 50
+
+    player.$canvas.trigger eventMoveDown
+    player.$canvas.trigger eventMoveUp
+
+    expect(player.annotations.length).toBe(1)
+    annotation = player.annotations[0]
+    expect(annotation).toEqual jasmine.objectContaining
+      start: 4
+      length: 2
 
 describe 'AudioSelection', ->
   sel = null
