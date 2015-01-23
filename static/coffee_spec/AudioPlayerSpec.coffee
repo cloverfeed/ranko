@@ -13,6 +13,7 @@ describe 'AudioPlayer', ->
       $table: $table
 
     audio =
+      duration: 100
       addEventListener: ->
 
     player.initAudio audio
@@ -53,6 +54,16 @@ describe 'AudioPlayer', ->
 
     ann = player.annotationAt(3)
     expect(ann.state).toBe 'closed'
+
+  it 'can seek', ->
+    canvasOffset = player.$canvas.offset()
+    e = $.Event 'mousedown',
+      pageX: canvasOffset.left + 10
+      pageY: canvasOffset.top + 10
+
+    player.$canvas.trigger e
+
+    expect(player.audio.currentTime).toBe(1)
 
 
 describe 'AudioSelection', ->
