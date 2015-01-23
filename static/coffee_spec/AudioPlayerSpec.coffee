@@ -24,24 +24,35 @@ describe 'AudioPlayer', ->
     ann =
       start: 2
       length: 5
+      state: 'open'
 
     ann2 =
       start: 18
       length: 2
+      state: 'open'
 
     player.addAudioAnnotation ann
     player.addAudioAnnotation ann2
+    $checkboxes = $table.find('input[type=checkbox]')
 
     expect(player.annotations.length).toBe(2)
-    expect($table.find('input[type=checkbox]')).toHaveLength(2)
+    expect($checkboxes).toHaveLength(2)
 
     expect(player.annotationAt(3)).toEqual jasmine.objectContaining
       start: 2
       length: 5
+      state: 'open'
     expect(player.annotationAt(10)).toBeNull()
     expect(player.annotationAt(19)).toEqual jasmine.objectContaining
       start: 18
       length: 2
+
+    $checkbox = $checkboxes.first()
+
+    $checkbox.click()
+
+    ann = player.annotationAt(3)
+    expect(ann.state).toBe 'closed'
 
 
 describe 'AudioSelection', ->
