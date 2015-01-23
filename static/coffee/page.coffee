@@ -7,21 +7,21 @@ class Page
       scale = 1.5
       canvas = $canvas.get 0
       viewport = params.page.getViewport scale
-      width = viewport.width
-      height = viewport.height
-      canvas.width = width
-      canvas.height = height
+      @width = viewport.width
+      @height = viewport.height
+      canvas.width = @width
+      canvas.height = @height
       @canvas = canvas
     else if params.width? and params.height?
-      width = params.width
-      height = params.height
+      @width = params.width
+      @height = params.height
     else
       console.log "Page: couldn't set geometry"
     @$div = jQuery('<div>')
       .addClass('docPage')
       .css
-        width: width + "px"
-        height: height + "px"
+        width: @width + "px"
+        height: @height + "px"
     if params.page?
       @$div.append $canvas
       params.page.render
@@ -34,8 +34,8 @@ class Page
     @$textLayerDiv = jQuery("<div />")
       .addClass("textLayer")
       .css
-        height: height + "px"
-        width: width + "px"
+        height: @height + "px"
+        width: @width + "px"
     @$div.append @$textLayerDiv
     @$table = params.$table
 
@@ -58,11 +58,11 @@ class Page
                          id, geom, state, @readOnly
     $row = $('<tr>')
     $previewCanvas = $('<canvas>').attr
-      width: @canvas.width
-      height: @canvas.height
+      width: @width
+      height: @height
     .css
-      width: "#{@canvas.width / 10}px"
-      height: "#{@canvas.height / 10}px"
+      width: "#{@width / 10}px"
+      height: "#{@height / 10}px"
 
     @previewCtx = $previewCanvas[0].getContext('2d')
 
