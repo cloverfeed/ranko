@@ -95,6 +95,24 @@ describe 'AudioPlayer', ->
       start: 4
       length: 2
 
+  describe 'waveform', ->
+    buffer = null
+    samples = null
+
+    beforeEach ->
+      size = player.audio.duration * player.sampleRate
+      constantval = 0.14
+      samples = (constantval for _ in [1..size])
+      buffer =
+        getChannelData: (channelNum) ->
+          samples
+
+    it 'can be computed', ->
+      player.computeWaveform buffer
+
+      expect(player.waveform).toEqual((1 for _ in [1..player.height]))
+
+
 describe 'AudioSelection', ->
   sel = null
   spy = null
