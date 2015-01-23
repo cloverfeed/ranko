@@ -39,10 +39,6 @@ class AudioPlayer
     @ctx = @$canvas[0].getContext '2d'
 
     @annotations = []
-    ann_url = '/view/' + docid + '/audioannotations'
-    $.getJSON ann_url, (annotations) =>
-      for ann in annotations.data
-        @addAudioAnnotation ann
 
     @update()
 
