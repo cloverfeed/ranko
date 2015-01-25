@@ -18,8 +18,8 @@ class Page
     @$div = jQuery('<div>')
       .addClass('docPage')
       .css
-        width: @width + "px"
-        height: @height + "px"
+        width: "#{@width}px"
+        height: "#{@height}px"
     if params.page?
       @$div.append $canvas
       params.page.render
@@ -29,17 +29,17 @@ class Page
     @readOnly = false
     if params.readOnly?
       @readOnly = params.readOnly
-    @$textLayerDiv = jQuery("<div />")
-      .addClass("textLayer")
+    @$textLayerDiv = jQuery('<div />')
+      .addClass('textLayer')
       .css
-        height: @height + "px"
-        width: @width + "px"
+        height: "#{@height}px"
+        width: "#{@width}px"
     @$div.append @$textLayerDiv
     @$table = params.$table
 
     if !@readOnly
       selection = new Selection @$textLayerDiv, (geom) =>
-        @addAnnotation "", null, geom, 'open'
+        @addAnnotation '', null, geom, 'open'
       @$div.append selection.$div
 
     anns = annotations[@i]

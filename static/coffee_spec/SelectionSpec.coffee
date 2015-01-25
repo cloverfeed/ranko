@@ -4,10 +4,10 @@ describe 'Selection', ->
   $div = null
 
   beforeEach ->
-    setFixtures """
+    setFixtures '''
     <div id="sel">
     </div>
-    """
+    '''
 
     $div = $('#sel')
     spy = jasmine.createSpy 'selection spy'

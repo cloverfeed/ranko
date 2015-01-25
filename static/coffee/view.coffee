@@ -1,21 +1,21 @@
 setGeom = ($div, geom) ->
   $div.css
-    left: geom.posx + "px"
-    top: geom.posy + "px"
-    width: geom.width + "px"
-    height: geom.height + "px"
+    left: "#{geom.posx}px"
+    top: "#{geom.posy}px"
+    width: "#{geom.width}px"
+    height: "#{geom.height}px"
 
 view_init = (docid, filetype, readOnly) ->
   switch filetype
-    when "pdf"
+    when 'pdf'
       p = new PdfViewPage docid, readOnly
       p.init()
-    when "audio"
+    when 'audio'
       p = new AudioViewPage docid, readOnly
       p.init()
       audio = new Audio "/raw/#{docid}"
       p.audioPlayer.initAudio audio
-    when "image"
+    when 'image'
       create_image_view_page docid, readOnly
 
 class ViewPage
@@ -105,7 +105,7 @@ class PdfViewPage extends ViewPage
         pdf.getPage(1).then (page) =>
           @render_page pdf, 1, page, annotations.data
     .then null, ->
-      @$pv.text "Error loading the document."
+      @$pv.text 'Error loading the document.'
 
   render_page: (pdf, i, page, annotations) ->
     pp = new Page @docid, i,

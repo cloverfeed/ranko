@@ -14,10 +14,10 @@ describe 'Annotation', ->
   $topDiv = null
 
   beforeEach ->
-    setFixtures """
+    setFixtures '''
     <div id="top">
     </div>
-    """
+    '''
     $topDiv = $('#top')
 
     ann = new Annotation $topDiv, docid, page, text, id, geom, state, readOnly
@@ -106,9 +106,9 @@ describe 'Annotation', ->
   describe 'when network fails', ->
     beforeEach ->
       spyOn($, 'ajax').and.callFake (options) ->
-        options.error null, null, "Fail"
+        options.error null, null, 'Fail'
       spyOn(window, 'flash_message')
 
     it 'flashes an error message', ->
-      ann.edit "Value", {}
+      ann.edit 'Value', {}
       expect(window.flash_message).toHaveBeenCalled()

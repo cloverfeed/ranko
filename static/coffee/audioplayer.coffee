@@ -112,7 +112,7 @@ class AudioPlayer
         # New one
         @selection = new AudioSelection time, (start, length) =>
           annotation = new AudioAnnotation this, null, start, length,
-                                           'open', "", @readOnly
+                                           'open', '', @readOnly
           @$div.append annotation.$div
           @annotations.push annotation
           @update()
@@ -155,27 +155,27 @@ class AudioPlayer
     aw = @annZoneRatio * @width
     wf = (1 - @annZoneRatio) * @width
 
-    @ctx.fillStyle = "lightpink"
+    @ctx.fillStyle = 'lightpink'
     @ctx.fillRect wf, 0, aw, @height
 
-    @ctx.fillStyle = "lightsalmon"
+    @ctx.fillStyle = 'lightsalmon'
     @ctx.fillRect wf, 0, aw, size
 
     for annotation in @annotations
       switch annotation.state
         when 'open'
-          @ctx.fillStyle = "orange"
+          @ctx.fillStyle = 'orange'
         when 'closed'
-          @ctx.fillStyle = "lightgreen"
+          @ctx.fillStyle = 'lightgreen'
       annStart = @secondsToPixels annotation.start
       annSize = @secondsToPixels annotation.length
       @ctx.fillRect wf, annStart, aw, annSize
       annotation.update()
 
-    @ctx.fillStyle = "purple"
+    @ctx.fillStyle = 'purple'
     for y in [0 .. @height - 1]
       if y > size
-        @ctx.fillStyle = "violet"
+        @ctx.fillStyle = 'violet'
 
       if @waveform?
         value = @waveform[y]
@@ -212,7 +212,7 @@ class AudioPlayer
           offlineCtx.startRendering()
 
         offlineCtx.decodeAudioData audioData, ok, (e) ->
-          console.log("Error with decoding audio data" + e.err)
+          console.log "Error with decoding audio data: #{e.err}"
 
       request.send()
 
@@ -272,7 +272,7 @@ class AudioAnnotation
     @$div.css
       height: 50
       width: 50
-      left: x + "px"
+      left: "#{x}px"
     @update()
 
     @rest = new RestClient '/audioannotation/',
@@ -305,7 +305,7 @@ class AudioAnnotation
       return
     y = @player.secondsToPixels (@start + @length / 2)
     @$div.css
-      top: y + "px"
+      top: "#{y}px"
     @$div.removeClass 'annotation-open'
     @$div.removeClass 'annotation-closed'
     @addStateClass()

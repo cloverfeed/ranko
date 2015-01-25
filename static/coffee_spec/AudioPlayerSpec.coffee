@@ -4,10 +4,10 @@ describe 'AudioPlayer', ->
   $table = null
 
   beforeEach ->
-    setFixtures """
+    setFixtures '''
     <div id="playertable">
     </div>
-    """
+    '''
     $table = $('#playertable')
     spyOn($, 'ajax').and.callFake (options) ->
       data = {}

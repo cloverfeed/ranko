@@ -7,7 +7,7 @@ describe 'Flash', ->
     jasmine.clock().uninstall()
 
   it 'should flash a message', ->
-    flash_message "My message"
+    flash_message 'My message'
 
     expect($('.flashMessage')).toBeVisible()
     jasmine.clock().tick(2001)

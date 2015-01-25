@@ -4,9 +4,9 @@ describe 'Page', ->
   $table = null
 
   beforeEach ->
-    setFixtures """
+    setFixtures '''
     <table id="table"></table>
-    """
+    '''
     $table = $('#table')
     ann =
       text: 'Text'

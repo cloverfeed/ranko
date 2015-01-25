@@ -8,12 +8,12 @@ describe 'ViewPage (common elements)', ->
 
   describe 'fullscreen mode', ->
     beforeEach ->
-      setFixtures """
+      setFixtures '''
       <div id="subnav" />
       <div id="exitfullscreen" />
       <button id="fullscreen_button" />
       <button id="fullscreen_button_exit" />
-      """
+      '''
       p.init()
 
     it 'works', ->
@@ -33,14 +33,14 @@ describe 'ViewPage (common elements)', ->
   describe 'state toggle button', ->
 
     beforeEach ->
-      setFixtures """
+      setFixtures '''
       <div id="openann" class="annotation annotation-open" />
       <div id="closedann" class="annotation annotation-closed" />
 
       <button id="seeNone" class="view-states-btn" data-view="nothing" />
       <button id="seeOnlyOpen" class="view-states-btn" data-view="only-open" />
       <button id="seeAll" class="view-states-btn" data-view="everything" />
-      """
+      '''
       p.init()
 
     it 'selects annotations based on their state', ->
@@ -65,12 +65,12 @@ describe 'ViewPage (common elements)', ->
   describe 'list mode', ->
 
     beforeEach ->
-      setFixtures """
+      setFixtures '''
       <div id="docview" />
       <div id="listview" />
       <button id="docmode_button" />
       <button id="listmode_button" />
-      """
+      '''
       p.init()
 
     it 'can be activated and deactivated', ->
@@ -96,12 +96,12 @@ describe 'ViewPage (common elements)', ->
   describe 'share dialog', ->
 
     beforeEach ->
-      setFixtures """
+      setFixtures '''
       <form id="share_form">
         <input type="text" name="name" value="Michel" />
         <button type="submit">Submit</submit>
       </form>
-      """
+      '''
       spyOn($, 'ajax').and.callFake (options) ->
         options.success
           data: 'FAKECODE'
@@ -122,10 +122,10 @@ describe 'ImageViewPage', ->
   p = null
 
   beforeEach ->
-    setFixtures """
+    setFixtures '''
     <div id="docview">
     </div>
-    """
+    '''
     p = new ImageViewPage docid, false
     image = $('<img>')
     annotations = []
@@ -138,10 +138,10 @@ describe 'AudioViewPage', ->
   docid = 5
 
   beforeEach ->
-    setFixtures """
+    setFixtures '''
     <div id="docview">
     </div>
-    """
+    '''
     p = new AudioViewPage docid, false
     p.init()
 
