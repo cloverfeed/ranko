@@ -95,8 +95,15 @@ def configure_ext_assets(app, xstatic):
         output='gen/lib.js'
         )
     assets.register('coffee_lib', coffee_lib)
+    coffee_pages = Bundle(
+        'coffee/pages/*.coffee',
+        filters='coffeescript',
+        output='gen/pages.js'
+        )
+    assets.register('coffee_lib', coffee_lib)
     coffee = Bundle(
         coffee_lib,
+        coffee_pages,
         output='gen/app.js'
         )
     assets.register('coffee_app', coffee)
