@@ -15,8 +15,6 @@ class Page
     else if params.width? and params.height?
       @width = params.width
       @height = params.height
-    else
-      console.log "Page: couldn't set geometry"
     @$div = jQuery('<div>')
       .addClass('docPage')
       .css
