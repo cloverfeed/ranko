@@ -31,3 +31,21 @@ describe 'Page', ->
 
     expect(p.$div.find('.annotation')).toHaveClass('annotation-closed')
     expect($.ajax).toHaveBeenCalled()
+
+describe 'Page, initialized from a pdf', ->
+  page = null
+
+  beforeEach ->
+    docid = 5
+    pdfPage =
+      getViewport: ->
+        width: 100
+        height: 200
+      render: ->
+        'then': (f) ->
+          f()
+    page = new Page docid, 0,
+      page: pdfPage
+
+  it 'has a canvas', ->
+    expect(page.$div.find('canvas')).toHaveLength(1)
