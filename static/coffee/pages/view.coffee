@@ -2,7 +2,10 @@ view_init = (docid, filetype, readOnly) ->
   switch filetype
     when 'pdf'
       p = new PdfViewPage docid, readOnly
-      p.init()
+      $pv = $('#docview')
+      PDFJS.getDocument("/raw/#{docid}").then (pdf) ->
+        $.getJSON "/view/#{docid}/annotations", (annotations) ->
+          p.init $pv, pdf, annotations.data
     when 'audio'
       p = new AudioViewPage docid, readOnly
       p.init()

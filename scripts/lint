@@ -1,6 +1,6 @@
 #!/bin/bash
 src_py="*.py scripts/*.py conf/*.py app/*.py tests/*.py"
-src_coffee="static/coffee/* static/coffee_spec/*"
+src_coffee="static/coffee/*/*.coffee"
 
 isort -c -sl $src_py
 pep8 $src_py

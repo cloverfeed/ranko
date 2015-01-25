@@ -84,16 +84,11 @@ class ViewPage
 
 
 class PdfViewPage extends ViewPage
-  init: ->
+  init: ($pv, pdf, annotations) ->
     super()
-    @$pv = $('#docview')
-    PDFJS.getDocument('/raw/' + @docid).then (pdf) =>
-      GET_ANN_URL = '/view/' + @docid + '/annotations'
-      $.getJSON GET_ANN_URL, (annotations) =>
-        pdf.getPage(1).then (page) =>
-          @render_page pdf, 1, page, annotations.data
-    .then null, ->
-      @$pv.text 'Error loading the document.'
+    @$pv = $pv
+    pdf.getPage(1).then (page) =>
+      @render_page pdf, 1, page, annotations
 
   render_page: (pdf, i, page, annotations) ->
     pp = new Page @docid, i,
