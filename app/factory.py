@@ -89,15 +89,20 @@ def configure_ext_assets(app, xstatic):
     Configure the flask-assets extension.
     """
     assets = Environment(app)
-    coffee = Bundle(
-        'coffee/*.coffee',
+    coffee_lib = Bundle(
+        'coffee/lib/*.coffee',
         filters='coffeescript',
+        output='gen/lib.js'
+        )
+    assets.register('coffee_lib', coffee_lib)
+    coffee = Bundle(
+        coffee_lib,
         output='gen/app.js'
         )
     assets.register('coffee_app', coffee)
 
     coffee_spec = Bundle(
-        'coffee_spec/*.coffee',
+        'coffee/spec/*.coffee',
         filters='coffeescript',
         output='gen/coffee_spec.js'
         )
