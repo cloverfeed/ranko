@@ -32,6 +32,18 @@ describe 'Page', ->
     expect(p.$div.find('.annotation')).toHaveClass('annotation-closed')
     expect($.ajax).toHaveBeenCalled()
 
+  it 'creates an annotation', ->
+    startPos = x: 10, y: 10
+    endPos = x: 50, y: 50
+    ed = makeEvent p.$textLayerDiv, 'mousedown', startPos
+    em = makeEvent p.$textLayerDiv, 'mousemove', endPos
+    eu = makeEvent p.$textLayerDiv, 'mouseup', endPos
+
+    for event in [ed, em, eu]
+      p.$textLayerDiv.trigger event
+
+    expect(p.$div.find('.annotation')).toHaveLength(2)
+
 describe 'Page, initialized from a pdf', ->
   page = null
 
