@@ -20,9 +20,6 @@ describe 'Annotation', ->
     """
     $topDiv = $('#top')
 
-    spyOn($, 'ajax').and.callFake (options) ->
-      options.success()
-
     ann = new Annotation $topDiv, docid, page, text, id, geom, state, readOnly
     $topDiv.append ann.$div
 
@@ -30,73 +27,88 @@ describe 'Annotation', ->
     expect(ann.$div).toBeInDOM()
     expect(ann.$div).toHaveClass('annotation')
 
-  it 'should close itself', ->
-    $closeBtn = ann.$div.find('a')
-    expect($closeBtn).toHaveText('[X]')
+  describe 'when network works', ->
+    beforeEach ->
+      spyOn($, 'ajax').and.callFake (options) ->
+        options.success()
 
-    $closeBtn.click()
+    it 'should close itself', ->
+      $closeBtn = ann.$div.find('a')
+      expect($closeBtn).toHaveText('[X]')
 
-    expect($.ajax).toHaveBeenCalledWith jasmine.objectContaining
-      type: 'DELETE'
-      url: '/annotation/8'
-    expect(ann.$div).not.toBeInDOM()
+      $closeBtn.click()
 
-  it 'is editable', ->
-    ann.edit 'new text', {}
-    expect($.ajax).toHaveBeenCalledWith jasmine.objectContaining
-      type: 'PUT'
-      url: '/annotation/8'
-      data: jasmine.objectContaining
-        value: 'new text'
+      expect($.ajax).toHaveBeenCalledWith jasmine.objectContaining
+        type: 'DELETE'
+        url: '/annotation/8'
+      expect(ann.$div).not.toBeInDOM()
 
-  it 'is draggable', ->
-    newx = 35
-    newy = 65
-    ev = $.Event 'dragstop'
-    offset = $topDiv.offset()
-    ui =
-      offset:
-        left: newx + offset.left
-        top: newy + offset.top
-    ann.updateOnEvent ev, ui
-    expect(ann.geom).toEqual jasmine.objectContaining
-      posx: newx
-      posy: newy
-    expect($.ajax).toHaveBeenCalledWith jasmine.objectContaining
-      type: 'PUT'
-      url: '/annotation/8'
-      data: jasmine.objectContaining
+    it 'is editable', ->
+      ann.edit 'new text', {}
+      expect($.ajax).toHaveBeenCalledWith jasmine.objectContaining
+        type: 'PUT'
+        url: '/annotation/8'
+        data: jasmine.objectContaining
+          value: 'new text'
+
+    it 'is draggable', ->
+      newx = 35
+      newy = 65
+      ev = $.Event 'dragstop'
+      offset = $topDiv.offset()
+      ui =
+        offset:
+          left: newx + offset.left
+          top: newy + offset.top
+      ann.updateOnEvent ev, ui
+      expect(ann.geom).toEqual jasmine.objectContaining
         posx: newx
         posy: newy
+      expect($.ajax).toHaveBeenCalledWith jasmine.objectContaining
+        type: 'PUT'
+        url: '/annotation/8'
+        data: jasmine.objectContaining
+          posx: newx
+          posy: newy
 
-  it 'is resizable', ->
-    new_width = 100
-    new_height = 200
+    it 'is resizable', ->
+      new_width = 100
+      new_height = 200
 
-    ev = $.Event 'resizestop'
-    ui =
-      size:
+      ev = $.Event 'resizestop'
+      ui =
+        size:
+          width: new_width
+          height: new_height
+
+      ann.updateOnEvent ev, ui
+
+      expect(ann.geom).toEqual jasmine.objectContaining
         width: new_width
         height: new_height
+      expect($.ajax).toHaveBeenCalledWith jasmine.objectContaining
+        type: 'PUT'
+        url: '/annotation/8'
+        data: jasmine.objectContaining
+          width: new_width
+          height: new_height
 
-    ann.updateOnEvent ev, ui
+    it 'updates its class when state changes', ->
+      expect(ann.$div).toHaveClass('annotation-open')
+      expect(ann.$div).not.toHaveClass('annotation-closed')
 
-    expect(ann.geom).toEqual jasmine.objectContaining
-      width: new_width
-      height: new_height
-    expect($.ajax).toHaveBeenCalledWith jasmine.objectContaining
-      type: 'PUT'
-      url: '/annotation/8'
-      data: jasmine.objectContaining
-        width: new_width
-        height: new_height
+      ann.state = 'closed'
+      ann.update()
 
-  it 'updates its class when state changes', ->
-    expect(ann.$div).toHaveClass('annotation-open')
-    expect(ann.$div).not.toHaveClass('annotation-closed')
+      expect(ann.$div).toHaveClass('annotation-closed')
+      expect(ann.$div).not.toHaveClass('annotation-open')
 
-    ann.state = 'closed'
-    ann.update()
+  describe 'when network fails', ->
+    beforeEach ->
+      spyOn($, 'ajax').and.callFake (options) ->
+        options.error null, null, "Fail"
+      spyOn(window, 'flash_message')
 
-    expect(ann.$div).toHaveClass('annotation-closed')
-    expect(ann.$div).not.toHaveClass('annotation-open')
+    it 'flashes an error message', ->
+      ann.edit "Value", {}
+      expect(window.flash_message).toHaveBeenCalled()
