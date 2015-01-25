@@ -21,6 +21,7 @@ describe 'AudioPlayer', ->
     audio =
       duration: 100
       addEventListener: ->
+        undefined
       play: jasmine.createSpy 'audio play'
       pause: jasmine.createSpy 'audio pause'
 

@@ -248,6 +248,7 @@ class AudioPlayer
 
 class AudioSelection
   constructor: (@down, @success) ->
+    undefined
 
   mouseup: (up) ->
     length = Math.abs(up - @down)
@@ -257,6 +258,7 @@ class AudioSelection
 
 class AudioDrag
   constructor: (@down, @success) ->
+    undefined
 
   mouseup: (up) ->
     timeDelta = up - @down

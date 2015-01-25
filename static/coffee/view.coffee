@@ -20,6 +20,7 @@ view_init = (docid, filetype, readOnly) ->
 
 class ViewPage
   constructor: (@docid, @readOnly) ->
+    undefined
 
   init: ->
     form_init '#upload_dialog', '#upload_link'
