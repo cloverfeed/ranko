@@ -138,7 +138,7 @@ describe 'ViewPage (common elements)', ->
         type: 'POST'
         data: 'comment=my+comment'
 
-      expect($("#comments li")).toHaveLength(1)
+      expect($('#comments li')).toHaveLength(1)
 
 
 describe 'ImageViewPage', ->
