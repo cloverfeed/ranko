@@ -102,7 +102,6 @@ class PdfViewPage extends ViewPage
       pdf.getPage(i + 1).then (page) =>
         @render_page pdf, i + 1, page, annotations
 
-  get_annotations_route: '/annotation/'
   list_view_selector: '#listview'
 
 
@@ -119,7 +118,6 @@ class ImageViewPage extends ViewPage
     page.$div.append image
     $pv.append page.$div
 
-  get_annotations_route: '/annotation/'
   list_view_selector: '#listview'
 
 
@@ -136,5 +134,4 @@ class AudioViewPage extends ViewPage
         @audioPlayer.addAudioAnnotation ann
     $pv.append @audioPlayer.$div
 
-  get_annotations_route: '/audioannotation/'
   list_view_selector: '#listaudioview'
