@@ -147,3 +147,31 @@ describe 'AudioViewPage', ->
 
   it 'should create a canvas', ->
     expect($('canvas')).toHaveLength(1)
+
+describe 'PDFViewPage', ->
+  $div = null
+  docid = 5
+
+  beforeEach ->
+    setFixtures '<div id="pdf" />'
+    $div = $('#pdf')
+
+  it 'renders pages', ->
+    p = new PdfViewPage docid, false
+
+    pdf =
+      numPages: 3
+      getPage: (n) ->
+        then: (f) ->
+          f
+            render: ->
+              then: ->
+                undefined
+            getViewport: ->
+              height: 400
+              width: 300
+
+    anns = []
+    p.init $div, pdf, anns
+
+    expect($div.find('canvas')).toHaveLength(3)
