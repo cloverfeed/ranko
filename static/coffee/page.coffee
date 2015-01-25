@@ -37,7 +37,7 @@ class Page
     @$div.append @$textLayerDiv
     @$table = params.$table
 
-    if !@readOnly
+    unless @readOnly
       selection = new Selection @$textLayerDiv, (geom) =>
         @addAnnotation '', null, geom, 'open'
       @$div.append selection.$div
@@ -69,7 +69,7 @@ class Page
     $row.append($('<td>').text(text))
 
     annotation_state = (st) ->
-      st == 'closed'
+      st is 'closed'
 
     $checkbox = $ '<input>',
       type: 'checkbox'

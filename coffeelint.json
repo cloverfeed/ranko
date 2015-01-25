@@ -122,5 +122,9 @@
     "no_empty_functions": {
         "name": "no_empty_functions",
         "level": "error"
+    },
+    "prefer_english_operator": {
+        "name": "prefer_english_operator",
+        "level": "error"
     }
 }

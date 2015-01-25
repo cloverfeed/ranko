@@ -11,7 +11,7 @@ class Annotation
     $annText = jQuery('<div>').text(@text)
     @$div.append $annText
 
-    if !readOnly
+    unless readOnly
       $closeBtn = jQuery('<a>').text '[X]'
       @$div.prepend $closeBtn
       $closeBtn.click =>
@@ -42,12 +42,13 @@ class Annotation
 
   updateGeom: (e, ui) ->
     tldOffset = @$tld.offset()
-    if e.type == 'dragstop'
-      @geom.posx = ui.offset.left - tldOffset.left
-      @geom.posy = ui.offset.top - tldOffset.top
-    else if e.type == 'resizestop'
-      @geom.width = ui.size.width
-      @geom.height = ui.size.height
+    switch e.type
+      when 'dragstop'
+        @geom.posx = ui.offset.left - tldOffset.left
+        @geom.posy = ui.offset.top - tldOffset.top
+      when 'resizestop'
+        @geom.width = ui.size.width
+        @geom.height = ui.size.height
 
   update: ->
     @$div.removeClass 'annotation-open'

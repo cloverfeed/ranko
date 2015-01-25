@@ -58,7 +58,7 @@ class AudioPlayer
     @$div.append annotation.$div
 
     annotation_state = (st) ->
-      st == 'closed'
+      st is 'closed'
 
     $checkbox = $ '<input>',
       type: 'checkbox'
@@ -80,7 +80,7 @@ class AudioPlayer
 
   annotationAt: (time) ->
     ok = (ann) ->
-      (ann.start <= time) && (time <= ann.start + ann.length)
+      ann.start <= time <= ann.start + ann.length
     for ann in @annotations
       if ok ann
         return ann
@@ -119,7 +119,7 @@ class AudioPlayer
 
   removeAnnotation: (targetId) ->
     rm = @annotations.filter (ann) ->
-      ann.id != targetId
+      ann.id isnt targetId
     @annotations = rm
     @update()
 
@@ -284,7 +284,7 @@ class AudioAnnotation
     $textDiv = $('<div>').text(@text)
     @$div.append $textDiv
 
-    if !readOnly
+    unless readOnly
       $closeBtn = jQuery('<a>').text '[X]'
       @$div.prepend $closeBtn
       $closeBtn.click =>

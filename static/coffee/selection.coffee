@@ -32,7 +32,7 @@ class Selection
 
   bigEnough: ->
     geom = @computeGeom()
-    geom.width > 30 && geom.height > 30
+    geom.width > 30 and geom.height > 30
 
   mouseup: ->
     @$div.hide()

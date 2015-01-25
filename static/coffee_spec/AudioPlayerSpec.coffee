@@ -11,7 +11,7 @@ describe 'AudioPlayer', ->
     $table = $('#playertable')
     spyOn($, 'ajax').and.callFake (options) ->
       data = {}
-      if options.type == 'POST'
+      if options.type is 'POST'
         data['id'] = 1000
       options.success data
 
