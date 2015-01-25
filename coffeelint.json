@@ -110,5 +110,21 @@
     "non_empty_constructor_needs_parens": {
         "name": "non_empty_constructor_needs_parens",
         "level": "ignore"
+    },
+    "no_interpolation_in_single_quotes": {
+        "name": "no_interpolation_in_single_quotes",
+        "level": "error"
+    },
+    "no_unnecessary_double_quotes": {
+        "name": "no_unnecessary_double_quotes",
+        "level": "error"
+    },
+    "no_empty_functions": {
+        "name": "no_empty_functions",
+        "level": "error"
+    },
+    "prefer_english_operator": {
+        "name": "prefer_english_operator",
+        "level": "error"
     }
 }

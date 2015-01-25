@@ -1,26 +1,13 @@
 setGeom = ($div, geom) ->
   $div.css
-    left: geom.posx + "px"
-    top: geom.posy + "px"
-    width: geom.width + "px"
-    height: geom.height + "px"
-
-view_init = (docid, filetype, readOnly) ->
-  switch filetype
-    when "pdf"
-      p = new PdfViewPage docid, filetype, readOnly
-      p.init()
-    when "audio"
-      p = new AudioViewPage docid, filetype, readOnly
-      p.init()
-      audio = new Audio "/raw/#{docid}"
-      p.audioPlayer.initAudio audio
-    when "image"
-      create_image_view_page docid, filetype, readOnly
+    left: "#{geom.posx}px"
+    top: "#{geom.posy}px"
+    width: "#{geom.width}px"
+    height: "#{geom.height}px"
 
 class ViewPage
-  #  TODO: refactor @filetype out
-  constructor: (@docid, @filetype, @readOnly) ->
+  constructor: (@docid, @readOnly) ->
+    undefined
 
   init: ->
     form_init '#upload_dialog', '#upload_link'
@@ -55,6 +42,7 @@ class ViewPage
       $('#subnav').hide()
       $('#exitfullscreen').show()
 
+    $('#exitfullscreen').hide()
     $('#fullscreen_button_exit').click (e) ->
       e.preventDefault()
       $('#subnav').show()
@@ -96,16 +84,11 @@ class ViewPage
 
 
 class PdfViewPage extends ViewPage
-  init: ->
+  init: ($pv, pdf, annotations) ->
     super()
-    @$pv = $('#docview')
-    PDFJS.getDocument('/raw/' + @docid).then (pdf) =>
-      GET_ANN_URL = '/view/' + @docid + '/annotations'
-      $.getJSON GET_ANN_URL, (annotations) =>
-        pdf.getPage(1).then (page) =>
-          @render_page pdf, 1, page, annotations.data
-    .then null, ->
-      @$pv.text "Error loading the document."
+    @$pv = $pv
+    pdf.getPage(1).then (page) =>
+      @render_page pdf, 1, page, annotations
 
   render_page: (pdf, i, page, annotations) ->
     pp = new Page @docid, i,
@@ -119,20 +102,7 @@ class PdfViewPage extends ViewPage
       pdf.getPage(i + 1).then (page) =>
         @render_page pdf, i + 1, page, annotations
 
-  get_annotations_route: '/annotation/'
   list_view_selector: '#listview'
-
-
-create_image_view_page = (docid, filetype, readOnly) ->
-  p = new ImageViewPage docid, filetype, readOnly
-  $img = $('<img>')
-  $img.mousedown (e) ->
-    e.preventDefault()
-  $img.load ->
-    image = this
-    $.getJSON "/view/#{docid}/annotations", (annotations) ->
-      p.init image, annotations.data
-  $img.attr('src', '/raw/' + docid)
 
 
 class ImageViewPage extends ViewPage
@@ -148,7 +118,6 @@ class ImageViewPage extends ViewPage
     page.$div.append image
     $pv.append page.$div
 
-  get_annotations_route: '/annotation/'
   list_view_selector: '#listview'
 
 
@@ -161,5 +130,8 @@ class AudioViewPage extends ViewPage
       $table: $('#listaudioview tbody')
     $pv.append @audioPlayer.$div
 
-  get_annotations_route: '/audioannotation/'
+  addAnnotations: (annotations) ->
+    for ann in annotations
+      @audioPlayer.addAudioAnnotation ann
+
   list_view_selector: '#listaudioview'

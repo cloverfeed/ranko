@@ -4,7 +4,7 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     jasmine : {
-      src : 'static/gen/app.js',
+      src : 'static/gen/lib.js',
       options : {
         vendor : 'static/gen/vendor_js.js',
         helpers: 'static/vendor/jasmine-jquery.js',

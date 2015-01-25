@@ -39,10 +39,6 @@ class AudioPlayer
     @ctx = @$canvas[0].getContext '2d'
 
     @annotations = []
-    ann_url = '/view/' + docid + '/audioannotations'
-    $.getJSON ann_url, (annotations) =>
-      for ann in annotations.data
-        @addAudioAnnotation ann
 
     @update()
 
@@ -62,7 +58,7 @@ class AudioPlayer
     @$div.append annotation.$div
 
     annotation_state = (st) ->
-      st == 'closed'
+      st is 'closed'
 
     $checkbox = $ '<input>',
       type: 'checkbox'
@@ -84,7 +80,7 @@ class AudioPlayer
 
   annotationAt: (time) ->
     ok = (ann) ->
-      (ann.start <= time) && (time <= ann.start + ann.length)
+      ann.start <= time <= ann.start + ann.length
     for ann in @annotations
       if ok ann
         return ann
@@ -116,14 +112,14 @@ class AudioPlayer
         # New one
         @selection = new AudioSelection time, (start, length) =>
           annotation = new AudioAnnotation this, null, start, length,
-                                           'open', "", @readOnly
+                                           'open', '', @readOnly
           @$div.append annotation.$div
           @annotations.push annotation
           @update()
 
   removeAnnotation: (targetId) ->
     rm = @annotations.filter (ann) ->
-      ann.id != targetId
+      ann.id isnt targetId
     @annotations = rm
     @update()
 
@@ -159,27 +155,27 @@ class AudioPlayer
     aw = @annZoneRatio * @width
     wf = (1 - @annZoneRatio) * @width
 
-    @ctx.fillStyle = "lightpink"
+    @ctx.fillStyle = 'lightpink'
     @ctx.fillRect wf, 0, aw, @height
 
-    @ctx.fillStyle = "lightsalmon"
+    @ctx.fillStyle = 'lightsalmon'
     @ctx.fillRect wf, 0, aw, size
 
     for annotation in @annotations
       switch annotation.state
         when 'open'
-          @ctx.fillStyle = "orange"
+          @ctx.fillStyle = 'orange'
         when 'closed'
-          @ctx.fillStyle = "lightgreen"
+          @ctx.fillStyle = 'lightgreen'
       annStart = @secondsToPixels annotation.start
       annSize = @secondsToPixels annotation.length
       @ctx.fillRect wf, annStart, aw, annSize
       annotation.update()
 
-    @ctx.fillStyle = "purple"
+    @ctx.fillStyle = 'purple'
     for y in [0 .. @height - 1]
       if y > size
-        @ctx.fillStyle = "violet"
+        @ctx.fillStyle = 'violet'
 
       if @waveform?
         value = @waveform[y]
@@ -216,7 +212,7 @@ class AudioPlayer
           offlineCtx.startRendering()
 
         offlineCtx.decodeAudioData audioData, ok, (e) ->
-          console.log("Error with decoding audio data" + e.err)
+          console.log "Error with decoding audio data: #{e.err}"
 
       request.send()
 
@@ -252,6 +248,7 @@ class AudioPlayer
 
 class AudioSelection
   constructor: (@down, @success) ->
+    undefined
 
   mouseup: (up) ->
     length = Math.abs(up - @down)
@@ -261,6 +258,7 @@ class AudioSelection
 
 class AudioDrag
   constructor: (@down, @success) ->
+    undefined
 
   mouseup: (up) ->
     timeDelta = up - @down
@@ -276,7 +274,7 @@ class AudioAnnotation
     @$div.css
       height: 50
       width: 50
-      left: x + "px"
+      left: "#{x}px"
     @update()
 
     @rest = new RestClient '/audioannotation/',
@@ -286,7 +284,7 @@ class AudioAnnotation
     $textDiv = $('<div>').text(@text)
     @$div.append $textDiv
 
-    if !readOnly
+    unless readOnly
       $closeBtn = jQuery('<a>').text '[X]'
       @$div.prepend $closeBtn
       $closeBtn.click =>
@@ -309,7 +307,7 @@ class AudioAnnotation
       return
     y = @player.secondsToPixels (@start + @length / 2)
     @$div.css
-      top: y + "px"
+      top: "#{y}px"
     @$div.removeClass 'annotation-open'
     @$div.removeClass 'annotation-closed'
     @addStateClass()

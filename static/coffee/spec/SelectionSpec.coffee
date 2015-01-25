@@ -4,10 +4,10 @@ describe 'Selection', ->
   $div = null
 
   beforeEach ->
-    setFixtures """
+    setFixtures '''
     <div id="sel">
     </div>
-    """
+    '''
 
     $div = $('#sel')
     spy = jasmine.createSpy 'selection spy'
@@ -47,18 +47,13 @@ describe 'Selection', ->
       x: 45
       y: 57
 
-    makeEvent = (t, c) ->
-      $.Event t,
-        pageX: c.x
-        pageY: c.y
-
-    evDown = makeEvent 'mousedown', initial
+    evDown = makeEvent $div, 'mousedown', initial
     $div.trigger evDown
 
-    evMove = makeEvent 'mousemove', final
+    evMove = makeEvent $div, 'mousemove', final
     $div.trigger evMove
 
-    evUp = makeEvent 'mouseup', final
+    evUp = makeEvent $div, 'mouseup', final
     $div.trigger evUp
 
     expect(spy).toHaveBeenCalled()

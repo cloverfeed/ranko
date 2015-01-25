@@ -15,7 +15,7 @@ class RestClient
       url: url
       data: data
       success: (d) ->
-        if type == 'POST'
+        if type is 'POST'
           obj.id = d.id
       error: @handle_ajax_error
 

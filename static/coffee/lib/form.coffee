@@ -3,4 +3,4 @@ form_init = (dialog_selector, link_selector) ->
     autoOpen: false
     modal: true
   $(link_selector).click ->
-    $(dialog_selector).dialog "open"
+    $(dialog_selector).dialog 'open'
