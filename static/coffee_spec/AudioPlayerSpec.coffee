@@ -3,12 +3,6 @@ describe 'AudioPlayer', ->
   player = null
   $table = null
 
-  makeEvent = (type, coords) ->
-    canvasOffset = player.$canvas.offset()
-    $.Event type,
-      pageX: canvasOffset.left + coords.x
-      pageY: canvasOffset.top + coords.y
-
   beforeEach ->
     setFixtures """
     <div id="playertable">
@@ -64,7 +58,7 @@ describe 'AudioPlayer', ->
     expect(ann.state).toBe 'closed'
 
   it 'can seek', ->
-    e = makeEvent 'mousedown',
+    e = makeEvent player.$canvas, 'mousedown',
       x: 10
       y: 10
 
@@ -73,8 +67,8 @@ describe 'AudioPlayer', ->
     expect(player.audio.currentTime).toBe(1)
 
   it 'can create and move annotations', ->
-    eventCreateDown = makeEvent 'mousedown', x: 190, y: 10
-    eventCreateUp = makeEvent 'mouseup', x: 190, y: 30
+    eventCreateDown = makeEvent player.$canvas, 'mousedown', x: 190, y: 10
+    eventCreateUp = makeEvent player.$canvas, 'mouseup', x: 190, y: 30
 
     player.$canvas.trigger eventCreateDown
     player.$canvas.trigger eventCreateUp
@@ -85,8 +79,8 @@ describe 'AudioPlayer', ->
       start: 1
       length: 2
 
-    eventMoveDown = makeEvent 'mousedown', x: 190, y: 20
-    eventMoveUp = makeEvent 'mouseup', x: 190, y: 50
+    eventMoveDown = makeEvent player.$canvas, 'mousedown', x: 190, y: 20
+    eventMoveUp = makeEvent player.$canvas, 'mouseup', x: 190, y: 50
 
     player.$canvas.trigger eventMoveDown
     player.$canvas.trigger eventMoveUp
