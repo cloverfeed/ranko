@@ -110,5 +110,9 @@
     "non_empty_constructor_needs_parens": {
         "name": "non_empty_constructor_needs_parens",
         "level": "ignore"
+    },
+    "no_interpolation_in_single_quotes": {
+        "name": "no_interpolation_in_single_quotes",
+        "level": "error"
     }
 }
