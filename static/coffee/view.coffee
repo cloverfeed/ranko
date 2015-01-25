@@ -8,19 +8,18 @@ setGeom = ($div, geom) ->
 view_init = (docid, filetype, readOnly) ->
   switch filetype
     when "pdf"
-      p = new PdfViewPage docid, filetype, readOnly
+      p = new PdfViewPage docid, readOnly
       p.init()
     when "audio"
-      p = new AudioViewPage docid, filetype, readOnly
+      p = new AudioViewPage docid, readOnly
       p.init()
       audio = new Audio "/raw/#{docid}"
       p.audioPlayer.initAudio audio
     when "image"
-      create_image_view_page docid, filetype, readOnly
+      create_image_view_page docid, readOnly
 
 class ViewPage
-  #  TODO: refactor @filetype out
-  constructor: (@docid, @filetype, @readOnly) ->
+  constructor: (@docid, @readOnly) ->
 
   init: ->
     form_init '#upload_dialog', '#upload_link'
@@ -124,8 +123,8 @@ class PdfViewPage extends ViewPage
   list_view_selector: '#listview'
 
 
-create_image_view_page = (docid, filetype, readOnly) ->
-  p = new ImageViewPage docid, filetype, readOnly
+create_image_view_page = (docid, readOnly) ->
+  p = new ImageViewPage docid, readOnly
   $img = $('<img>')
   $img.mousedown (e) ->
     e.preventDefault()

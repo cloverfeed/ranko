@@ -3,7 +3,7 @@ describe 'ViewPage (common elements)', ->
 
   beforeEach ->
     docid = 5
-    p = new ViewPage docid, 'pdf', false
+    p = new ViewPage docid, false
     p.list_view_selector = '#listview'
 
   describe 'fullscreen mode', ->
@@ -126,7 +126,7 @@ describe 'ImageViewPage', ->
     <div id="docview">
     </div>
     """
-    p = new ImageViewPage docid, 'image', false
+    p = new ImageViewPage docid, false
     image = $('<img>')
     annotations = []
     p.init image, annotations
@@ -142,7 +142,7 @@ describe 'AudioViewPage', ->
     <div id="docview">
     </div>
     """
-    p = new AudioViewPage docid, 'audio', false
+    p = new AudioViewPage docid, false
     p.init()
 
   it 'should create a canvas', ->
