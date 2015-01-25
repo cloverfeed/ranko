@@ -1,0 +1,3 @@
+--ignore-dir=static/.webassets-cache
+--ignore-dir=static/gen
+--ignore-dir=reports

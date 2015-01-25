@@ -6,3 +6,7 @@ instance/uploads
 static/gen
 static/.webassets-cache
 docs/_build
+.vagrant
+vagrant_ansible_inventory_default
+node_modules
+reports
