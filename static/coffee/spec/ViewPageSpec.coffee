@@ -136,6 +136,7 @@ describe 'ImageViewPage', ->
 
 describe 'AudioViewPage', ->
   docid = 5
+  p = null
 
   beforeEach ->
     setFixtures '''
@@ -147,6 +148,15 @@ describe 'AudioViewPage', ->
 
   it 'should create a canvas', ->
     expect($('canvas')).toHaveLength(1)
+
+  it 'has annotations', ->
+    ann1 =
+      start: 1
+    ann2 =
+      start: 10
+    p.addAnnotations [ann1, ann2]
+
+    expect($('.audioAnnotation')).toHaveLength(2)
 
 describe 'PDFViewPage', ->
   $div = null

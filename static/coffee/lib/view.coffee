@@ -128,10 +128,10 @@ class AudioViewPage extends ViewPage
     @audioPlayer = new AudioPlayer @docid,
       readOnly: @readOnly
       $table: $('#listaudioview tbody')
-    ann_url = "/view/#{@docid}/audioannotations"
-    $.getJSON ann_url, (annotations) =>
-      for ann in annotations.data
-        @audioPlayer.addAudioAnnotation ann
     $pv.append @audioPlayer.$div
+
+  addAnnotations: (annotations) ->
+    for ann in annotations
+      @audioPlayer.addAudioAnnotation ann
 
   list_view_selector: '#listaudioview'

@@ -9,6 +9,8 @@ view_init = (docid, filetype, readOnly) ->
     when 'audio'
       p = new AudioViewPage docid, readOnly
       p.init()
+      $.getJSON "/view/#{docid}/audioannotations", (annotations) ->
+        p.addAnnotations annotations.data
       audio = new Audio "/raw/#{docid}"
       p.audioPlayer.initAudio audio
     when 'image'
