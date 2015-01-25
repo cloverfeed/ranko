@@ -21,6 +21,8 @@ describe 'AudioPlayer', ->
     audio =
       duration: 100
       addEventListener: ->
+      play: jasmine.createSpy 'audio play'
+      pause: jasmine.createSpy 'audio pause'
 
     player.initAudio audio
 
@@ -94,6 +96,18 @@ describe 'AudioPlayer', ->
     expect(annotation).toEqual jasmine.objectContaining
       start: 4
       length: 2
+
+  it 'has an play button', ->
+    $playBtn = player.$div.find('button:contains("Play")')
+    expect($playBtn).toHaveLength(1)
+    $playBtn.click()
+    expect(player.audio.play).toHaveBeenCalled()
+
+  it 'has an pause button', ->
+    $pauseBtn = player.$div.find('button:contains("Pause")')
+    expect($pauseBtn).toHaveLength(1)
+    $pauseBtn.click()
+    expect(player.audio.pause).toHaveBeenCalled()
 
   describe 'waveform', ->
     buffer = null
