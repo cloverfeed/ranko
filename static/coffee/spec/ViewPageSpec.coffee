@@ -116,6 +116,30 @@ describe 'ViewPage (common elements)', ->
       contents = $('input[type=text]').last().val()
       expect(contents).toContain('/view/shared/FAKECODE')
 
+  describe 'comment form', ->
+    beforeEach ->
+      setFixtures '''
+        <form id="post_comment_form">
+          <input type="text" name="comment" value="my comment" />
+          <button type="submit">Submit</submit>
+        </form>
+        <div id="comments" />
+      '''
+      p.init()
+      spyOn($, 'ajax').and.callFake (options) ->
+        options.success {}
+
+    it 'creates a comment', ->
+      expect($('#post_comment_form')).toHaveLength(1)
+      $('#post_comment_form').submit()
+
+      expect($.ajax).toHaveBeenCalledWith jasmine.objectContaining
+        url: '/comment/new'
+        type: 'POST'
+        data: 'comment=my+comment'
+
+      expect($("#comments li")).toHaveLength(1)
+
 
 describe 'ImageViewPage', ->
   docid = 5
