@@ -9,6 +9,12 @@ describe 'AudioPlayer', ->
     </div>
     """
     $table = $('#playertable')
+    spyOn($, 'ajax').and.callFake (options) ->
+      data = {}
+      if options.type == 'POST'
+        data['id'] = 1000
+      options.success data
+
     player = new AudioPlayer docid,
       $table: $table
 
@@ -25,11 +31,13 @@ describe 'AudioPlayer', ->
 
   it 'can have annotations', ->
     ann =
+      id: 101
       start: 2
       length: 5
       state: 'open'
 
     ann2 =
+      id: 102
       start: 18
       length: 2
       state: 'open'
@@ -55,7 +63,20 @@ describe 'AudioPlayer', ->
     $checkbox.click()
 
     ann = player.annotationAt(3)
+    expect($.ajax).toHaveBeenCalled()
     expect(ann.state).toBe 'closed'
+
+    expect(player.annotations.length).toBe(2)
+
+    $closeBtn = ann.$div.find('a:contains("[X]")')
+    expect($closeBtn).toHaveLength(1)
+    $closeBtn.click()
+
+    expect($.ajax).toHaveBeenCalledWith jasmine.objectContaining
+      type: 'DELETE'
+      url: '/audioannotation/101'
+
+    expect(player.annotations.length).toBe(1)
 
   it 'can seek', ->
     e = makeEvent player.$canvas, 'mousedown',
