@@ -36,14 +36,14 @@ class User(db.Model):
     full_name = db.Column(db.String, nullable=True)
     only_doc_id = db.Column(db.Integer, nullable=True)
 
-    def __init__(self, login, password, workfactor=None):
+    def __init__(self, login, password):
         if login is None:
             login = 'guest'
         self.name = login
         if password is None:
             self.disable_password()
         else:
-            self.set_password(password, workfactor=workfactor)
+            self.set_password(password)
 
     def is_active(self):
         """
@@ -74,14 +74,12 @@ class User(db.Model):
     def generate(fake):
         username = fake.user_name()
         password = fake.password()
-        user = User(username, password, workfactor=4)
+        user = User(username, password)
         return user
 
-    def set_password(self, clear, workfactor):
-        if workfactor is None:
-            workfactor = current_app.config['BCRYPT_WORKFACTOR']
+    def set_password(self, clear):
         bcrypt = Bcrypt(current_app)
-        self.password = bcrypt.generate_password_hash(clear.encode('utf-8'), workfactor)
+        self.password = bcrypt.generate_password_hash(clear.encode('utf-8'))
 
     def disable_password(self):
         self.password = '!'
