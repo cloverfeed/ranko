@@ -1,4 +1,3 @@
-import bcrypt
 from flask import Blueprint
 from flask import current_app
 from flask import flash
@@ -6,6 +5,7 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
+from flask.ext.bcrypt import Bcrypt
 from flask.ext.login import login_user
 from flask.ext.login import LoginManager
 from flask.ext.login import logout_user
@@ -33,10 +33,13 @@ def auth_user(login, password):
     except NoResultFound:
         return None
     db_hash = user.password
-    hashed = bcrypt.hashpw(password.encode('utf-8'), db_hash.encode('ascii'))
-    if db_hash != hashed:
+    password = password.encode('utf-8')
+    db_hash = db_hash.encode('ascii')
+    bcrypt = Bcrypt(current_app)
+    if bcrypt.check_password_hash(db_hash, password):
+        return user
+    else:
         return None
-    return user
 
 
 class SignupForm(Form):
