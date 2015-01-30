@@ -6,9 +6,9 @@ import os.path
 import random
 import string
 
-import bcrypt
 import koremutake
 from flask import current_app
+from flask.ext.bcrypt import Bcrypt
 from flask.ext.login import current_user
 from flask.ext.sqlalchemy import SQLAlchemy
 
@@ -80,8 +80,8 @@ class User(db.Model):
     def set_password(self, clear, workfactor):
         if workfactor is None:
             workfactor = current_app.config['BCRYPT_WORKFACTOR']
-        salt = bcrypt.gensalt(workfactor)
-        self.password = bcrypt.hashpw(clear.encode('utf-8'), salt)
+        bcrypt = Bcrypt(current_app)
+        self.password = bcrypt.generate_password_hash(clear.encode('utf-8'), workfactor)
 
     def disable_password(self):
         self.password = '!'
