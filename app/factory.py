@@ -11,6 +11,7 @@ from flask.ext.assets import Environment
 from flask.ext.login import current_user
 from flask.ext.migrate import Migrate
 from flask.ext.uploads import configure_uploads
+from flask.ext.xstatic import FlaskXStatic
 
 import models
 from annotation import annotation
@@ -19,7 +20,6 @@ from auth import auth
 from auth import lm
 from comment import comment
 from document import document
-from ext_xstatic import FlaskXStatic
 from key import get_secret_key
 from uploads import documents
 from vendor.slack_log_handler import SlackLogHandler
