@@ -12,16 +12,3 @@ def kore_id(s):
     except ValueError:
         r = int(s)
     return r
-
-
-def coerce_to(typ, val):
-    """
-    Raise a BadRequest (400) exception if the value cannot be converted to the
-    given type.
-    Return unconverted value
-    """
-    try:
-        typ(val)
-    except ValueError:
-        raise BadRequest()
-    return val

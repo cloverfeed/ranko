@@ -66,16 +66,16 @@ class DocTestCase(RankoTestCase):
                 'height': 6,
                 'value': 'Oh oh',
                 }
-        r = self.client.post('/annotation/new', data=data)
+        r = self._annotate(data)
         self.assert401(r)
         self._login('username', 'password', signup=True)
-        r = self.client.post('/annotation/new', data=data)
+        r = self._annotate(data)
         self.assert400(r)
 
         docid = self._new_upload_id('blabla.pdf')
         data['doc'] = docid
-        r = self.client.post('/annotation/new', data=data)
-        self.assert200(r)
+        r = self._annotate(data)
+        self.assert201(r)
         d = r.json
         self.assertIn('id', d)
         id_resp = d['id']
@@ -91,7 +91,7 @@ class DocTestCase(RankoTestCase):
         for key in ['doc', 'page', 'posx', 'posy', 'width', 'height']:
             ok = bad_data[key]
             bad_data[key] = 0.5
-            r = self.client.post('/annotation/new', data=bad_data)
+            r = self._annotate(bad_data)
             self.assert400(r)
             bad_data[key] = ok
 
@@ -340,10 +340,10 @@ class DocTestCase(RankoTestCase):
                 'state': 'closed',
                 }
         r = self._annotate(data)
-        self.assert200(r)
+        self.assert201(r)
 
     def _annotate(self, data):
-        return self.client.post('/annotation/new', data=data)
+        return self.client_post_json('/api/annotation', data=data)
 
     def _can_annotate(self, docid):
         data = {'doc': docid,
@@ -355,7 +355,7 @@ class DocTestCase(RankoTestCase):
                 'value': 'Oh oh',
                 }
         r = self._annotate(data)
-        return r.status_code == 200
+        return r.status_code == 201
 
     def _can_comment_on(self, docid):
         comm = 'bla bla bla'

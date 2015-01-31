@@ -1,3 +1,4 @@
+import json
 import re
 from io import BytesIO
 
@@ -55,6 +56,15 @@ class RankoTestCase(TestCase):
         self.assertIsNotNone(m)
         docid = m.group(1)
         return docid
+
+    def client_post_json(self, url, data):
+        return self.client.post(url,
+                                data=json.dumps(data),
+                                content_type='application/json',
+                                )
+
+    def assert201(self, r):
+        self.assertEqual(r.status_code, 201)
 
     def assert204(self, r):
         self.assertEqual(r.status_code, 204)

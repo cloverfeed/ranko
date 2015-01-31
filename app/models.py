@@ -246,18 +246,6 @@ class Annotation(db.Model):
              }
         return d[string]
 
-    def __init__(self, doc, page, posx, posy,
-                 width, height, text, user, state):
-        self.doc = doc
-        self.page = page
-        self.posx = posx
-        self.posy = posy
-        self.width = width
-        self.height = height
-        self.text = text
-        self.user = user
-        self.state = state
-
     def to_json(self):
         return {'id': self.id,
                 'posx': self.posx,
@@ -297,9 +285,9 @@ class Annotation(db.Model):
                               }
         state = annotations_states[fake.boolean()]
         text = fake.text()
-        ann = Annotation(doc, page, posx, posy,
-                         width, height,
-                         text, user, state)
+        ann = Annotation(doc=doc, page=page, posx=posx, posy=posy,
+                         width=width, height=height,
+                         text=text, user=user, state=state)
         return ann
 
     @staticmethod

@@ -4,62 +4,14 @@ from flask import redirect
 from flask import request
 from flask.ext.login import current_user
 from flask.ext.login import login_required
-from werkzeug.exceptions import BadRequest
 from werkzeug.exceptions import Unauthorized
 
 from .auth import lm
 from .models import Annotation
 from .models import db
 from .models import Document
-from .tools import coerce_to
 
 annotation = Blueprint('annotation', __name__)
-
-
-@annotation.route('/annotation/new', methods=['POST'])
-@login_required
-def new():
-    """
-    Create a new annotation.
-
-    Note that the geometry depends on a particular scale,
-    as they are in pixels.
-
-    :<json int doc: Document ID.
-    :<json int page: Page it's on.
-    :<json int posx: X position on the page.
-    :<json int posy: Y position on the page.
-    :<json int width: Width of the annotation.
-    :<json int height: Height of the annotation.
-    :<json string value: The text content of the annotation.
-    :<json string state: Optional state: "open" (default), "closed"
-
-    :>json int id: The new ID.
-
-    :status 400: Document ID does not exist.
-    :status 401: Unauthorized
-    """
-    doc = coerce_to(int, request.form['doc'])
-    page = coerce_to(int, request.form['page'])
-    posx = coerce_to(int, request.form['posx'])
-    posy = coerce_to(int, request.form['posy'])
-    width = coerce_to(int, request.form['width'])
-    height = coerce_to(int, request.form['height'])
-    text = request.form['value']
-    state = Annotation.STATE_OPEN
-    if 'state' in request.form:
-        state = Annotation.state_decode(request.form['state'])
-    doc_obj = Document.query.get(doc)
-    if doc_obj is None:
-        return BadRequest()
-    if not current_user.can_annotate(doc):
-        return Unauthorized()
-    user = current_user.id
-    ann = Annotation(doc, page, posx, posy, width, height, text, user,
-                     state=state)
-    db.session.add(ann)
-    db.session.commit()
-    return jsonify(id=ann.id)
 
 
 @annotation.route('/view/<id>/annotations')
