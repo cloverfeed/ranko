@@ -11,7 +11,7 @@ def needs_login(**kwargs):
         return lm.unauthorized()
 
 
-def annotation_auth_delete(instance_id=None, **kwargs):
+def annotation_auth_edit(instance_id=None, **kwargs):
     ann = Annotation.query.get(instance_id)
     if not ann.editable_by(current_user):
         return lm.unauthorized()
@@ -30,13 +30,16 @@ def annotation_doc_exists(data=None):
         raise BadRequest()
 
 
-def annotation_decode_state(data=None):
+def annotation_state_default(data=None):
     if 'state' not in data:
         data['state'] = 'open'
+
+
+def annotation_decode_state(data=None, **kwargs):
     data['state'] = Annotation.state_decode(data['state'])
 
 
-def annotation_move_value_to_text(data=None):
+def annotation_move_value_to_text(data=None, **kwargs):
     data['text'] = data['value']
     del data['value']
 
@@ -54,16 +57,25 @@ def annotation_current_user(data=None):
 
 def make_api(manager):
     manager.create_api(Annotation,
-                       methods=['DELETE', 'POST'],
+                       methods=['DELETE', 'POST', 'PATCH', 'PUT'],
                        preprocessors={
-                           'DELETE': [annotation_auth_delete],
-                           'POST': [needs_login,
-                                    annotation_auth_create,
-                                    annotation_doc_exists,
-                                    annotation_check_type,
-                                    annotation_decode_state,
-                                    annotation_move_value_to_text,
-                                    annotation_current_user,
-                                    ],
+                           'DELETE':
+                               [annotation_auth_edit,
+                               ],
+                           'POST': [
+                               needs_login,
+                               annotation_auth_create,
+                               annotation_doc_exists,
+                               annotation_check_type,
+                               annotation_state_default,
+                               annotation_decode_state,
+                               annotation_move_value_to_text,
+                               annotation_current_user,
+                               ],
+                           'PUT_SINGLE': [
+                               annotation_auth_edit,
+                               annotation_decode_state,
+                               annotation_move_value_to_text,
+                               ],
                            },
                        )

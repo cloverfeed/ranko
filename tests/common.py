@@ -63,6 +63,12 @@ class RankoTestCase(TestCase):
                                 content_type='application/json',
                                 )
 
+    def client_put_json(self, url, data):
+        return self.client.put(url,
+                               data=json.dumps(data),
+                               content_type='application/json',
+                               )
+
     def assert201(self, r):
         self.assertEqual(r.status_code, 201)
 

@@ -114,11 +114,11 @@ class DocTestCase(RankoTestCase):
                 'state': 'closed',
                 }
         self._login('c', 'c', signup=True)
-        r = self.client.put('/annotation/{}'.format(id_retr), data=data)
+        r = self.client_put_json('/api/annotation/{}'.format(id_retr), data=data)
         self.assert401(r)
 
         self._login('username', 'password')
-        r = self.client.put('/annotation/{}'.format(id_retr), data=data)
+        r = self.client_put_json('/api/annotation/{}'.format(id_retr), data=data)
         self.assert200(r)
 
         r = self.client.get('/view/{}/annotations'.format(docid))

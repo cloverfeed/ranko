@@ -29,20 +29,3 @@ def for_doc(id):
             data[page] = []
         data[page].append(ann.to_json())
     return jsonify(data=data)
-
-
-@annotation.route('/annotation/<id>', methods=['PUT'])
-def edit(id):
-    """
-    Edit an Annotation.
-
-    For JSON parameters, see :py:func:`annotation_new`.
-
-    :>json string status: The string 'ok'
-    """
-    ann = Annotation.query.get(id)
-    if not ann.editable_by(current_user):
-        return lm.unauthorized()
-    ann.load_json(request.form)
-    db.session.commit()
-    return jsonify(status='ok')

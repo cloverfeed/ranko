@@ -256,20 +256,6 @@ class Annotation(db.Model):
                 'state': Annotation.state_encode(self.state)
                 }
 
-    def load_json(self, data):
-        if 'posx' in data:
-            self.posx = data['posx']
-        if 'posy' in data:
-            self.posy = data['posy']
-        if 'width' in data:
-            self.width = data['width']
-        if 'height' in data:
-            self.height = data['height']
-        if 'value' in data:
-            self.text = data['value']
-        if 'state' in data:
-            self.state = Annotation.state_decode(data['state'])
-
     def editable_by(self, user):
         return user.is_authenticated() and user.id == self.user
 
