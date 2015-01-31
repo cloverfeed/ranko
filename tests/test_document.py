@@ -134,12 +134,12 @@ class DocTestCase(RankoTestCase):
 
         self._login('username', 'password')
         r = self._delete_annotation(id_retr)
-        self.assert200(r)
+        self.assert204(r)
         r = self.client.get('/view/1/annotations')
         self.assertNotIn('2', r.json['data'])
 
     def _delete_annotation(self, docid):
-        return self.client.delete('/annotation/{}'.format(docid))
+        return self.client.delete('/api/annotation/{}'.format(docid))
 
     def test_upload_rev(self):
         r = self._upload('toto.pdf')

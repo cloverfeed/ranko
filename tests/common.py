@@ -55,3 +55,6 @@ class RankoTestCase(TestCase):
         self.assertIsNotNone(m)
         docid = m.group(1)
         return docid
+
+    def assert204(self, r):
+        self.assertEqual(r.status_code, 204)

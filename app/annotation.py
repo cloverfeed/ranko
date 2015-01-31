@@ -1,5 +1,6 @@
 from flask import Blueprint
 from flask import jsonify
+from flask import redirect
 from flask import request
 from flask.ext.login import current_user
 from flask.ext.login import login_required
@@ -76,22 +77,6 @@ def for_doc(id):
             data[page] = []
         data[page].append(ann.to_json())
     return jsonify(data=data)
-
-
-@annotation.route('/annotation/<id>', methods=['DELETE'])
-def delete(id):
-    """
-    Delete an annotation.
-
-    :param id: Integer ID
-    :>json string status: The string 'ok'
-    """
-    ann = Annotation.query.get(id)
-    if not ann.editable_by(current_user):
-        return lm.unauthorized()
-    db.session.delete(ann)
-    db.session.commit()
-    return jsonify(status='ok')
 
 
 @annotation.route('/annotation/<id>', methods=['PUT'])

@@ -10,11 +10,13 @@ from flask.ext.assets import Bundle
 from flask.ext.assets import Environment
 from flask.ext.login import current_user
 from flask.ext.migrate import Migrate
+from flask.ext.restless import APIManager
 from flask.ext.uploads import configure_uploads
 from flask.ext.xstatic import FlaskXStatic
 
 import models
 from annotation import annotation
+from api import make_api
 from audio_annotation import audioann
 from auth import auth
 from auth import lm
@@ -183,6 +185,11 @@ def configure_ext_admin(app):
         admin.add_view(RestrictedModelView(model, models.db.session))
 
 
+def configure_ext_restless(app):
+    manager = APIManager(app, flask_sqlalchemy_db=models.db)
+    make_api(manager)
+
+
 def register_blueprints(app):
     blueprints = [
         bp,
@@ -215,6 +222,7 @@ def create_app(config_file=None):
     configure_ext_migrate(app)
     configure_ext_login(app)
     configure_ext_admin(app)
+    configure_ext_restless(app)
 
     register_blueprints(app)
 
