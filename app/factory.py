@@ -176,6 +176,10 @@ def configure_ext_admin(app):
                     ]
 
     class RestrictedModelView(ModelView):
+        def __init__(self, *args, **kwargs):
+            super(RestrictedModelView, self).__init__(*args, **kwargs)
+            self.endpoint += '_admin'
+
         def is_accessible(self):
             return current_user.is_authenticated() and current_user.is_admin()
 
