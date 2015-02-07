@@ -15,7 +15,7 @@ Flask-XStatic==0.0.1
 koremutake==1.0.5
 nose==1.3.4
 psycopg2==2.5.4
-PyPDF2==1.23
+PyPDF2==1.24
 pyScss==1.3.4
 slacker==0.5.4
 XStatic==1.0.1
