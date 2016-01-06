@@ -28,3 +28,10 @@ notifications:
     slack: cloverfeed:Zd60W6QoaC1pGFP85rOvNJa1
 after_success:
     coveralls
+deploy:
+    provider: heroku
+    api_key:
+        secure: Yj7sDPQnWhUENr45/+gkf3c8dCwE8or91GIXWbln9HrZUAXwaO8o7Rkhd/tUTLmQWJxkrCSAsGahen8t00/gVwhIawrIl/vnOx2e5YIkH8eVFtutfMcegM8GW8LFGYGceIQoWshYHgCltG4myhMtK2omswQ55ky61W0bhBaQDvg=
+    app: ranko
+    on:
+        repo: cloverfeed/ranko
