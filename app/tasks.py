@@ -6,7 +6,7 @@ def extract_title_pdf(filename):
         with open(filename, 'rb') as f:
             p = PdfFileReader(f)
             info = p.getDocumentInfo()
-            title = info['/Title']
+            title = info.get('/Title')
     except IOError:
         title = None
     return title
