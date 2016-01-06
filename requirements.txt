@@ -1,5 +1,5 @@
 coverage==4.0.3
-fake-factory==0.4.2
+fake-factory==0.5.3
 Flask==0.10.1
 Flask-Admin==1.0.9
 Flask-Assets==0.10
