@@ -66,6 +66,7 @@ def configure_ext_sqlalchemy(app):
     """
     db_uri = app.config.get('SQLALCHEMY_DATABASE_URI')
     app.config['SQLALCHEMY_DATABASE_URI'] = translate_db_uri(app, db_uri)
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     models.db.init_app(app)
 
 
