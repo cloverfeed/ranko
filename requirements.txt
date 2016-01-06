@@ -2,7 +2,7 @@ coverage==4.0.3
 fake-factory==0.5.3
 Flask==0.10.1
 Flask-Admin==1.0.9
-Flask-Assets==0.10
+Flask-Assets==0.11
 Flask-Bcrypt==0.6.0
 Flask-Login==0.2.11
 Flask-Migrate==1.3
