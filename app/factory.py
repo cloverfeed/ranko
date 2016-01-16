@@ -58,8 +58,9 @@ def configure_logging(app):
     app.logger.addHandler(stderr_handler)
 
     @app.after_request
-    def flush_stream():
+    def flush_stream(resp):
         stderr_handler.flush()
+        return resp
 
 
 def configure_ext_uploads(app):
