@@ -23,6 +23,7 @@ from auth import lm
 from comment import comment
 from document import document
 from key import get_secret_key
+from s3 import s3
 from uploads import documents
 from vendor.slack_log_handler import SlackLogHandler
 from views import bp
@@ -207,6 +208,7 @@ def register_blueprints(app):
         annotation,
         auth,
         audioann,
+        s3,
         ]
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
