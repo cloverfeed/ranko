@@ -54,13 +54,14 @@ def configure_logging(app):
                                         )
         app.logger.addHandler(slack_handler)
 
-    stderr_handler = logging.StreamHandler()
-    app.logger.addHandler(stderr_handler)
+    if app.config.get('LOG_TO_STDERR') is not None:
+        stderr_handler = logging.StreamHandler()
+        app.logger.addHandler(stderr_handler)
 
-    @app.after_request
-    def flush_stream(resp):
-        stderr_handler.flush()
-        return resp
+        @app.after_request
+        def flush_stream(resp):
+            stderr_handler.flush()
+            return resp
 
 
 def configure_ext_uploads(app):

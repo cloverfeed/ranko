@@ -12,7 +12,7 @@ class SlackTestCase(TestCase):
 
     def test_loggers(self):
         app = create_app(config_file='conf/testing.py')
-        self.assertEqual(len(app.logger.handlers), 2)
+        self.assertEqual(len(app.logger.handlers), 1)
         extra_config = {'SLACK_API_TOKEN': 'token',
                         'SLACK_CHANNEL': '#general',
                         'SLACK_USERNAME': 'Bobby the bot',
@@ -20,4 +20,4 @@ class SlackTestCase(TestCase):
                         }
         app.config.update(extra_config)
         configure_logging(app)
-        self.assertEqual(len(app.logger.handlers), 4)
+        self.assertEqual(len(app.logger.handlers), 2)
