@@ -1,4 +1,6 @@
+import logging
 import os
+import sys
 
 import scss.config
 from flask import Flask
@@ -51,6 +53,13 @@ def configure_logging(app):
                                         stack_trace=True,
                                         )
         app.logger.addHandler(slack_handler)
+
+    stderr_handler = logging.StreamHandler()
+    app.logger.addHandler(stderr_handler)
+
+    @app.after_request
+    def flush_stream():
+        stderr_handler.flush()
 
 
 def configure_ext_uploads(app):
