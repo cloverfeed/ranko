@@ -33,10 +33,31 @@ from .uploads import documents_dir
 document = Blueprint('document', __name__)
 
 
+
 class UploadForm(Form):
+    """
+    Upload form using normal upload
+    """
+
     file = FileField('The file to review')
     title = TextField('Title',
                       description='The title of your document (may be blank)')
+
+    def save_validated_form(self):
+        return documents.save(self.file.data)
+
+
+class S3UploadForm(Form):
+    """
+    Upload directly to S3
+    """
+
+
+def upload_form():
+    if current_app.config.get('UPLOAD_TYPE') == 'S3':
+        return S3UploadForm()
+    else:
+        return UploadForm()
 
 
 @document.route('/upload', methods=['POST'])
@@ -46,10 +67,10 @@ def upload():
 
     :query revises: ID this doc is a new revision of.
     """
-    form = UploadForm()
+    form = upload_form()
     if form.validate_on_submit():
         try:
-            filename = documents.save(form.file.data)
+            filename = form.save_validated_form()
         except UploadNotAllowed:
             flash('Unsupported file type')
             return redirect(url_for('bp.home'))
@@ -78,7 +99,7 @@ def view(id):
     id = kore_id(id)
     doc = Document.query.get_or_404(id)
     form_comm = CommentForm(docid=id)
-    form_up = UploadForm()
+    form_up = upload_form()
     form_share = ShareForm()
     comments = Comment.query.filter_by(doc=id)
     readOnly = not current_user.is_authenticated()

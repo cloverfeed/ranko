@@ -10,7 +10,7 @@ from flask.ext.login import current_user
 from flask.ext.wtf import Form
 from wtforms import TextField
 
-from .document import UploadForm
+from .document import upload_form
 from .models import Annotation
 from .models import Document
 from .tools import kore_id
@@ -23,7 +23,7 @@ def home():
     """
     Home page.
     """
-    kwargs = {'form': UploadForm()}
+    kwargs = {'form': upload_form()}
     if current_user.is_authenticated():
         documents = Document.mine()
         kwargs['documents'] = documents
